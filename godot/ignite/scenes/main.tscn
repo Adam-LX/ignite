@@ -1,0 +1,29 @@
+[gd_scene load_steps=7 format=3 uid="uid://main_scene"]
+
+[ext_resource type="Script" path="res://scripts/game/game_session.gd" id="1_session"]
+[ext_resource type="PackedScene" uid="uid://arena_scene" path="res://scenes/arena.tscn" id="2_arena"]
+[ext_resource type="PackedScene" uid="uid://ball_scene" path="res://scenes/ball.tscn" id="3_ball"]
+[ext_resource type="PackedScene" uid="uid://rocket_car_scene" path="res://scenes/rocket_car.tscn" id="4_car"]
+[ext_resource type="PackedScene" uid="uid://rocket_camera_scene" path="res://scenes/rocket_camera.tscn" id="5_camera"]
+[ext_resource type="Script" path="res://scripts/ai/ai_manager.gd" id="6_ai"]
+
+[node name="Main" type="Node"]
+script = ExtResource("1_session")
+
+[node name="Arena" parent="." instance=ExtResource("2_arena")]
+
+[node name="MatchRoot" type="Node3D" parent="."]
+
+[node name="Ball" parent="MatchRoot" instance=ExtResource("3_ball")]
+
+[node name="Cars" type="Node3D" parent="MatchRoot"]
+
+[node name="CarHuman" parent="MatchRoot/Cars" instance=ExtResource("4_car")]
+
+[node name="CarBot" parent="MatchRoot/Cars" instance=ExtResource("4_car")]
+is_bot = true
+
+[node name="CameraRig" parent="." instance=ExtResource("5_camera")]
+
+[node name="AIManager" type="Node" parent="."]
+script = ExtResource("6_ai")

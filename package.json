@@ -1,0 +1,162 @@
+{
+	"name": "ignite",
+	"private": true,
+	"version": "0.0.68",
+	"description": "Ignite — car soccer arcade game",
+	"author": "FlyBall",
+	"homepage": "https://codeberg.org/Adam-LX/ignite",
+	"type": "module",
+	"scripts": {
+		"predev": "bash scripts/bake-donation.sh",
+		"dev": "vite",
+		"dev:force": "vite --force",
+		"build": "tsc && vite build && npm run diagnostic",
+		"diagnostic": "npx vite-node scripts/runDiagnosticAutopilot.ts && npx vite-node scripts/runKickoffDriveTest.ts",
+		"test:kickoff": "vite-node scripts/runKickoffDriveTest.ts",
+		"fetch:audio": "bash scripts/fetch_audio_assets.sh",
+		"music:setup": "bash scripts/music/flyball-music setup",
+		"music:generate": "bash scripts/music/flyball-music generate --style racer_like --duration 90 --seed 42 --out public/assets/audio/music/match_loop.mp3",
+		"music:stable-audio:up": "bash scripts/music/flyball-music stable-audio up",
+		"music:stable-audio:health": "bash scripts/music/flyball-music stable-audio health",
+		"music:synth": "bash scripts/music/flyball-music synth --bpm 124 --out public/assets/audio/music/match_moroder_synth.mp3",
+		"music:ace-step:up": "bash scripts/music/flyball-music ace-step up",
+		"music:ace-step:health": "bash scripts/music/flyball-music ace-step health",
+		"music:vocal": "bash scripts/music/flyball-music vocal --style prodigy_vocal_pl --duration 90 --seed 42 --out public/assets/audio/music/match_vocal_prodigy_pl.mp3",
+		"music:vocal:en": "bash scripts/music/flyball-music vocal --style prodigy_vocal --duration 90 --seed 42 --out public/assets/audio/music/match_msx.mp3",
+		"music:ignite:infinite": "bash scripts/music/flyball-music vocal --style ignite_infinite_grid --duration 90 --seed 101 --out public/assets/audio/music/match_ignite_infinite.mp3",
+		"music:ignite:chrome": "bash scripts/music/flyball-music vocal --style ignite_chrome_overdrive --duration 90 --seed 202 --out public/assets/audio/music/match_ignite_chrome.mp3",
+		"music:ignite:apex": "bash scripts/music/flyball-music vocal --style ignite_apex_rush --duration 90 --seed 303 --out public/assets/audio/music/match_ignite_apex.mp3",
+		"music:ignite:hiphop": "bash scripts/music/flyball-music vocal --style ignite_hip_hop_slipstream --duration 90 --seed 404 --out public/assets/audio/music/match_ignite_hiphop.mp3",
+		"music:ignite:all": "npm run music:ignite:infinite && npm run music:ignite:chrome && npm run music:ignite:apex && npm run music:ignite:hiphop",
+		"assets:car": "FLYBALL_ROOT=$PWD bash -c 'BLENDER=$(ls -d /nix/store/*-blender-*/bin/blender 2>/dev/null | tail -1); \"$BLENDER\" --background --python scripts/blender_export_car.py'",
+		"assets:car-body": "FLYBALL_ROOT=$PWD bash -c 'BLENDER=$(ls -d /nix/store/*-blender-*/bin/blender 2>/dev/null | tail -1); \"$BLENDER\" --background --python generate_car.py'",
+		"assets:car-texture": "python3 scripts/generate_car_comfyui.py",
+		"music:arrange": "bash scripts/music/flyball-music arrange",
+		"music:arrange:quick": "bash scripts/music/flyball-music arrange --skip-ace",
+		"music:studio": "bash scripts/music/flyball-music studio",
+		"music:generate:commercial": "bash scripts/music/flyball-music generate --backend stable-audio --style racer_like --duration 90 --seed 42 --out public/assets/audio/music/match_loop.mp3",
+		"preview": "vite preview",
+		"lint": "biome check ./src",
+		"lint:fix": "biome check --write ./src",
+		"prepare": "husky",
+		"build:web": "tsc && vite build",
+		"build:web:desktop": "bash scripts/bake-donation.sh && bash scripts/bake-mp-endpoint.sh && tsc && ELECTRON_BUILD=1 vite build && npm run build:mp-server",
+		"build:mp-server": "vite build --config vite.mp-server.config.ts && cp .build/mp-server.cjs electron/mp-server.cjs",
+		"build:win": "npm run build:web:desktop && electron-builder --win zip --x64",
+		"build:win:dir": "npm run build:web:desktop && electron-builder --win dir --x64",
+		"build:deb": "npm run build:web:desktop && electron-builder --linux deb --x64",
+		"publish:codeberg": "bash scripts/publish-codeberg.sh all",
+		"publish:codeberg:win": "bash scripts/publish-codeberg.sh win",
+		"publish:codeberg:linux": "bash scripts/publish-codeberg.sh linux",
+		"publish:codeberg:source": "bash scripts/publish-codeberg.sh source",
+		"publish:github": "bash scripts/publish-github-releases.sh --push-downloads",
+		"publish:github:mirror": "bash scripts/publish-github-mirror.sh",
+		"publish:bot-policy": "bash scripts/publish-bot-policy-github.sh",
+		"test": "vitest run",
+		"test:smoke": "npm test && npm run diagnostic && bash scripts/electron-kickoff-test.sh",
+		"test:e2e": "bash scripts/run-e2e-match.sh",
+		"test:e2e:online": "bash scripts/run-e2e-online.sh",
+		"test:watch": "vitest",
+		"train:bots": "vite-node scripts/trainBots.ts",
+		"train:bots:smoke": "BOT_TRAIN_GENS=2 BOT_TRAIN_POP=4 BOT_TRAIN_SEC=6 vite-node scripts/trainBots.ts",
+		"train:bots:cuda": "bash scripts/train-bots-cuda.sh",
+		"train:bots:cuda:smoke": "CUDA_TRAIN_GENS=4 CUDA_TRAIN_POP=12 CUDA_TRAIN_EPISODES=8 bash scripts/train-bots-cuda.sh",
+		"publish:trained-policy": "vite-node scripts/publishTrainedPolicy.ts",
+		"coach:bots:ollama": "node scripts/ollamaBotCoach.mjs",
+		"bot:progress": "vite-node scripts/botProgress.ts",
+		"mp:server": "vite-node server/roomServer.ts"
+	},
+	"main": "electron/main.cjs",
+	"lint-staged": {
+		"*": "bash scripts/lint-staged-biome.sh"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.2",
+		"electron": "^33.2.1",
+		"electron-builder": "^25.1.8",
+		"husky": "9.1.6",
+		"lint-staged": "^15.2.10",
+		"@types/ws": "^8.18.1",
+		"playwright": "^1.49.1",
+		"typescript": "^5.5.3",
+		"vite": "^5.4.1",
+		"vite-node": "^3.2.4",
+		"vitest": "^4.1.9"
+	},
+	"dependencies": {
+		"@dimforge/rapier3d-compat": "^0.14.0",
+		"@types/three": "^0.168.0",
+		"three": "^0.168.0",
+		"ws": "^8.18.3"
+	},
+	"build": {
+		"appId": "com.flyball.ignite",
+		"productName": "Ignite",
+		"copyright": "MIT",
+		"asar": true,
+		"asarUnpack": [
+			"**/*.wasm",
+			"**/*.glb",
+			"**/*.mp3",
+			"**/*.ogg",
+			"**/*.wav"
+		],
+		"compression": "maximum",
+		"directories": {
+			"output": "release",
+			"buildResources": "assets"
+		},
+		"files": [
+			"dist/**/*",
+			"!dist/**/*.provenance.json",
+			"!dist/**/.work/**",
+			"electron/**/*",
+			"package.json"
+		],
+		"win": {
+			"icon": "assets/icon.ico",
+			"signAndEditExecutable": true,
+			"requestedExecutionLevel": "asInvoker",
+			"target": [
+				{
+					"target": "zip",
+					"arch": [
+						"x64"
+					]
+				}
+			],
+			"artifactName": "Ignite-${version}-win64.${ext}"
+		},
+		"linux": {
+			"icon": "assets/icon.png",
+			"target": [
+				"deb"
+			],
+			"category": "Game",
+			"maintainer": "Adam-LX <adam-lx@noreply.codeberg.org>",
+			"synopsis": "Ignite — car soccer arcade game",
+			"description": "Ignite is a car soccer arcade game. Fullscreen desktop build with offline assets.",
+			"executableName": "ignite",
+			"artifactName": "Ignite-${version}-linux-amd64.${ext}",
+			"desktop": {
+				"Name": "Ignite",
+				"GenericName": "Car Soccer",
+				"Comment": "Car soccer arcade game",
+				"Categories": "Game;",
+				"Keywords": "ignite;car;soccer;game;"
+			}
+		},
+		"deb": {
+			"packageName": "ignite",
+			"priority": "optional",
+			"depends": [
+				"gconf2",
+				"gconf-service",
+				"libnotify4",
+				"libappindicator1",
+				"libxtst6",
+				"libnss3"
+			]
+		}
+	}
+}

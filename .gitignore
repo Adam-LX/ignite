@@ -1,0 +1,54 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+release
+.build
+electron/mp-server.cjs
+electron/assets
+electron/vite.svg
+*.local
+.flyball-dev.log
+.flyball-dev.pid
+.venv-music/
+public/assets/audio/music/.work/
+docker/stable-audio/.env
+docker/ace-step/.env
+
+# AI / IDE / notatki wewnętrzne
+.cursor/
+.cursorrules
+IMPLEMENTATION.md
+**/*.jsonl
+**/*transcript*
+
+# Dev-only (nie publikować)
+docker/
+scripts/music/
+screenshots/
+**/*.provenance.json
+.env
+.env.*
+data/global-bot-policy.json
+data/donation.env
+public/donation.json
+data/bot-progress-export.json
+data/ollama-bot-coach.txt
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

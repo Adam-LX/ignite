@@ -1,0 +1,17 @@
+{
+	"fetch": [
+		"https://raw.githubusercontent.com/Adam-LX/ignite-releases/bot-brain/global-bot-policy.json",
+		"https://hardcover-librarian-licensing-serves.trycloudflare.com/policy",
+		"/assets/ai/bot-policy.json"
+	],
+	"sync": [
+		"https://hardcover-librarian-licensing-serves.trycloudflare.com/policy/sync"
+	],
+	"github": {
+		"owner": "Adam-LX",
+		"repo": "ignite-releases",
+		"branch": "bot-brain",
+		"path": "global-bot-policy.json"
+	},
+	"updatedAt": "2026-07-01T15:19:44.281588+00:00"
+}

@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ignite | Car Soccer</title>
+    <style>
+      .hidden { display: none !important; }
+      #hud { position: fixed; inset: 0; pointer-events: none; }
+      #boost-panel { position: absolute; right: 1.35rem; bottom: 2rem; }
+      #boost-ring { width: 136px; height: 136px; }
+      #boost-ring svg { display: block; width: 136px; height: 136px; }
+      #speed-panel { display: none !important; }
+    </style>
+  </head>
+  <body>
+    <div id="loading">
+      <p data-i18n="loading.game">Ładowanie Ignite…</p>
+      <p id="loading-status"></p>
+    </div>
+    <div id="error">
+      <p><strong data-i18n="error.boot">Błąd uruchomienia</strong></p>
+      <pre id="error-msg"></pre>
+    </div>
+    <svg xmlns="http://www.w3.org/2000/svg" class="svg-sprite" aria-hidden="true" focusable="false">
+      <defs>
+        <symbol id="powerup-icon-magnet" viewBox="0 0 64 64">
+          <path fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" d="M15 42a17 17 0 0 1 0-24" />
+          <path fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" d="M49 42a17 17 0 0 0 0-24" />
+          <rect x="9" y="10" width="12" height="10" rx="3" fill="#ff5566" />
+          <rect x="43" y="10" width="12" height="10" rx="3" fill="#6ec8ff" />
+          <path fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.5" d="M12 15h6M46 15h6" />
+        </symbol>
+        <symbol id="powerup-icon-plunger" viewBox="0 0 64 64">
+          <ellipse cx="32" cy="43" rx="16" ry="9" fill="none" stroke="currentColor" stroke-width="4" />
+          <ellipse cx="32" cy="43" rx="10" ry="5.5" fill="currentColor" opacity="0.4" />
+          <path fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" d="M32 43V16" />
+          <path fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" d="M20 16h24" />
+          <circle cx="32" cy="16" r="3" fill="currentColor" />
+        </symbol>
+        <symbol id="powerup-icon-haymaker" viewBox="0 0 64 64">
+          <path fill="currentColor" d="M18 34c0-8 6-14 14-14s14 6 14 14v6c0 4-3 7-7 7H25c-4 0-7-3-7-7v-6z" />
+          <path fill="currentColor" opacity="0.85" d="M34 20c8 0 14 6 14 14v2H20v-2c0-8 6-14 14-14z" />
+          <path fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2" stroke-linecap="round" d="M28 28v14M34 26v16M40 28v14" />
+          <path fill="currentColor" d="M14 38h8v12c0 3-2 5-4 5s-4-2-4-5V38z" />
+        </symbol>
+        <symbol id="powerup-icon-spikes" viewBox="0 0 64 64">
+          <rect x="12" y="44" width="40" height="6" rx="2" fill="currentColor" />
+          <path fill="currentColor" d="M14 44L10 44l5-16 5 16zm10 0l-4 0 4-12 4 12zm10 0l-4 0 5-18 5 18zm10 0l-4 0 4-12 4 12zm10 0l-4 0 5-16 5 16z" />
+          <path fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" d="M12 47h40" />
+        </symbol>
+        <symbol id="powerup-icon-charging" viewBox="0 0 64 64">
+          <path fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" d="M16 48a24 24 0 0 1 0-32" />
+          <path fill="currentColor" d="M28 14h12l-4 14h10L26 50l3-16H28z" />
+          <circle cx="48" cy="20" r="3" fill="currentColor" opacity="0.55" />
+        </symbol>
+      </defs>
+    </svg>
+    <div id="goal-spectacle-flash" aria-hidden="true"></div>
+    <div id="goal-spectacle-vignette" aria-hidden="true"></div>
+    <div id="supersonic-flash" aria-hidden="true"></div>
+    <div id="supersonic-banner" aria-hidden="true">SUPERSONIC</div>
+    <div id="power-shot-flash" aria-hidden="true"></div>
+    <div id="power-shot-banner" aria-hidden="true">POWER SHOT</div>
+    <div id="demolish-flash" aria-hidden="true"></div>
+    <div id="demolish-banner" aria-hidden="true">DEMOLISH!</div>
+    <div id="epic-save-flash" aria-hidden="true"></div>
+    <div id="epic-save-banner" aria-hidden="true">EPIC SAVE</div>
+    <div id="match-moment-flash" aria-hidden="true"></div>
+    <div id="match-moment-banner" aria-hidden="true"></div>
+    <div id="main-menu"></div>
+    <div id="mp-lobby" class="hidden"></div>
+    <div id="cam-indicator" data-i18n="hud.ballCam" aria-live="polite">BALL CAM</div>
+    <div id="hud" class="hidden">
+      <div id="scoreboard">
+        <span class="scoreboard__glow scoreboard__glow--blue" aria-hidden="true"></span>
+        <span class="scoreboard__glow scoreboard__glow--orange" aria-hidden="true"></span>
+        <span class="scoreboard__edge scoreboard__edge--blue" aria-hidden="true"></span>
+        <span class="scoreboard__edge scoreboard__edge--orange" aria-hidden="true"></span>
+        <div class="team-block blue">
+          <span class="team-block__accent" aria-hidden="true"></span>
+          <span class="team-block__wash" aria-hidden="true"></span>
+          <div class="team-block__plate">
+            <span class="team-label">BLUE</span>
+            <span class="team-score" id="score-blue">0</span>
+          </div>
+        </div>
+        <div id="score-center">
+          <span class="score-center__bracket" aria-hidden="true"></span>
+          <span class="score-center__chevron" aria-hidden="true"></span>
+          <span id="match-status"></span>
+        </div>
+        <div class="team-block orange">
+          <span class="team-block__accent" aria-hidden="true"></span>
+          <span class="team-block__wash" aria-hidden="true"></span>
+          <div class="team-block__plate">
+            <span class="team-label">ORANGE</span>
+            <span class="team-score" id="score-orange">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="goal-banner" aria-live="polite"></div>
+      <div id="kickoff-banner" aria-live="polite"></div>
+      <div id="match-end-banner" aria-live="polite"></div>
+      <div id="match-end-sub" class="match-end-sub" aria-live="polite"></div>
+      <button type="button" id="match-rematch" class="match-rematch hidden" data-i18n="hud.rematch">REWANŻ · R</button>
+      <p id="match-rematch-wait" class="match-rematch-wait hidden" aria-live="polite" data-i18n="hud.rematchWait">Oczekiwanie na rewanż…</p>
+      <div id="ignition-score-panel" class="hidden" aria-live="polite">
+        <div id="ignition-score-ring" aria-labelledby="ignition-score-label">
+          <svg class="ignition-score__svg" viewBox="0 0 100 100" width="136" height="136" aria-hidden="true">
+            <defs>
+              <linearGradient id="ignition-score-ring-gradient" x1="8%" y1="92%" x2="92%" y2="8%">
+                <stop offset="0%" stop-color="#2d8fff" />
+                <stop offset="45%" stop-color="#5ec8ff" />
+                <stop offset="100%" stop-color="#9efcff" />
+              </linearGradient>
+              <linearGradient id="ignition-score-track-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0.06)" />
+                <stop offset="50%" stop-color="rgba(255,255,255,0.16)" />
+                <stop offset="100%" stop-color="rgba(255,255,255,0.08)" />
+              </linearGradient>
+            </defs>
+            <circle class="ignition-score__track" cx="50" cy="50" r="40" />
+            <circle class="ignition-score__ring" cx="50" cy="50" r="40" />
+          </svg>
+          <div class="ignition-score__body">
+            <span id="ignition-score-label" data-i18n="hud.ffaYou">YOU</span>
+            <span id="ignition-score-number">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="power-up-panel" class="hidden" aria-live="polite">
+        <div id="power-up-ring" data-kind="charging">
+          <svg class="power-up-ring__svg" viewBox="0 0 100 100" width="136" height="136" aria-hidden="true">
+            <defs>
+              <linearGradient id="powerup-ring-gradient-magnet" x1="8%" y1="92%" x2="92%" y2="8%">
+                <stop offset="0%" stop-color="#9a6cff" />
+                <stop offset="50%" stop-color="#d4b0ff" />
+                <stop offset="100%" stop-color="#f0e0ff" />
+              </linearGradient>
+              <linearGradient id="powerup-ring-gradient-plunger" x1="8%" y1="92%" x2="92%" y2="8%">
+                <stop offset="0%" stop-color="#2ec8ff" />
+                <stop offset="50%" stop-color="#7ee8ff" />
+                <stop offset="100%" stop-color="#d8fbff" />
+              </linearGradient>
+              <linearGradient id="powerup-ring-gradient-haymaker" x1="8%" y1="92%" x2="92%" y2="8%">
+                <stop offset="0%" stop-color="#ff7a20" />
+                <stop offset="50%" stop-color="#ffb07a" />
+                <stop offset="100%" stop-color="#ffe8cc" />
+              </linearGradient>
+              <linearGradient id="powerup-ring-gradient-spikes" x1="8%" y1="92%" x2="92%" y2="8%">
+                <stop offset="0%" stop-color="#ff4466" />
+                <stop offset="50%" stop-color="#ff8a9a" />
+                <stop offset="100%" stop-color="#ffd0d8" />
+              </linearGradient>
+              <linearGradient id="powerup-ring-gradient-charging" x1="8%" y1="92%" x2="92%" y2="8%">
+                <stop offset="0%" stop-color="#3d8fff" />
+                <stop offset="50%" stop-color="#7ec8ff" />
+                <stop offset="100%" stop-color="#d8f2ff" />
+              </linearGradient>
+              <linearGradient id="powerup-ring-track-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0.06)" />
+                <stop offset="50%" stop-color="rgba(255,255,255,0.16)" />
+                <stop offset="100%" stop-color="rgba(255,255,255,0.08)" />
+              </linearGradient>
+            </defs>
+            <circle class="power-up-ring__track" cx="50" cy="50" r="40" />
+            <circle class="power-up-ring__fill" id="power-up-ring-fill" cx="50" cy="50" r="40" />
+          </svg>
+          <span id="power-up-center" class="power-up-ring__center">
+            <svg id="power-up-icon" class="power-up-ring__icon" viewBox="0 0 64 64" aria-hidden="true">
+              <use id="power-up-icon-use" href="#powerup-icon-charging" />
+            </svg>
+            <span id="power-up-timer" class="power-up-ring__timer hidden">
+              <span id="power-up-timer-value">0</span><span id="power-up-timer-unit">s</span>
+            </span>
+          </span>
+          <span id="power-up-hint" class="power-up-ring__hint" data-i18n="hud.powerUpUse">R — użyj</span>
+        </div>
+      </div>
+
+      <div id="speed-panel">
+        <span class="hud-slice" aria-hidden="true"></span>
+        <div class="speed-panel__body">
+          <span id="speed-val">0</span>
+          <span class="speed-unit">KM/H</span>
+          <span class="speed-tag">SUPERSONIC</span>
+        </div>
+      </div>
+
+      <div id="ball-offscreen" aria-hidden="true">
+        <div id="ball-offscreen-arrow"></div>
+      </div>
+
+      <canvas id="match-minimap" class="hidden" width="136" height="204" data-i18n-aria="hud.minimapAria" aria-label="Minimapa boiska"></canvas>
+
+      <div id="boost-panel" aria-label="Boost">
+        <div id="boost-ring">
+          <svg class="boost-ring__svg" viewBox="0 0 100 100" width="136" height="136" aria-hidden="true">
+            <defs>
+              <linearGradient id="boost-ring-gradient" x1="8%" y1="92%" x2="92%" y2="8%">
+                <stop offset="0%" stop-color="#4dfff2" />
+                <stop offset="28%" stop-color="#9efcff" />
+                <stop offset="52%" stop-color="#ffe566" />
+                <stop offset="78%" stop-color="#ffb020" />
+                <stop offset="100%" stop-color="#ff6a18" />
+              </linearGradient>
+              <linearGradient id="boost-ring-gradient-low" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#ff8866" />
+                <stop offset="55%" stop-color="#ff5533" />
+                <stop offset="100%" stop-color="#ff2200" />
+              </linearGradient>
+              <linearGradient id="boost-ring-track-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0.06)" />
+                <stop offset="50%" stop-color="rgba(255,255,255,0.16)" />
+                <stop offset="100%" stop-color="rgba(255,255,255,0.08)" />
+              </linearGradient>
+            </defs>
+            <circle class="boost-ring__track" cx="50" cy="50" r="40" />
+            <circle class="boost-ring__fill" id="boost-ring-fill" cx="50" cy="50" r="40" />
+          </svg>
+          <span id="boost-number">100</span>
+        </div>
+      </div>
+
+      <button type="button" id="credits-trigger" title="Credits (C)">©</button>
+    </div>
+
+    <div id="match-pause" class="hidden" role="dialog" aria-labelledby="match-pause-title" aria-modal="true">
+      <div class="match-pause__fx" aria-hidden="true">
+        <div class="match-pause__ring"></div>
+        <div class="match-pause__scanlines"></div>
+      </div>
+      <div class="match-pause__panel">
+        <h2 id="match-pause-title" data-i18n="pause.title">Pauza</h2>
+        <p class="match-pause__hint" data-i18n="pause.hint">Esc — kontynuuj</p>
+        <button type="button" id="match-pause-resume" class="match-pause__btn match-pause__btn--primary" data-i18n="pause.resume">
+          Kontynuuj
+        </button>
+        <button type="button" id="match-pause-menu" class="match-pause__btn match-pause__btn--secondary" data-i18n="pause.menu">
+          Menu główne
+        </button>
+      </div>
+    </div>
+
+    <div id="credits-panel" class="hidden" role="dialog" aria-labelledby="credits-title">
+      <div id="credits-card"></div>
+    </div>
+    <div id="game-container"></div>
+    <script>
+      window.addEventListener("error", (e) => {
+        const box = document.getElementById("error");
+        const msg = document.getElementById("error-msg");
+        const loading = document.getElementById("loading");
+        if (loading) loading.classList.add("hidden");
+        if (box && msg) {
+          box.style.display = "flex";
+          msg.textContent = (e.error && e.error.stack) || e.message || "Nieznany błąd JS";
+        }
+      });
+      window.addEventListener("unhandledrejection", (e) => {
+        const box = document.getElementById("error");
+        const msg = document.getElementById("error-msg");
+        const loading = document.getElementById("loading");
+        if (loading) loading.classList.add("hidden");
+        if (box && msg) {
+          box.style.display = "flex";
+          const err = e.reason;
+          msg.textContent = err instanceof Error ? err.stack || err.message : String(err);
+        }
+      });
+    </script>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

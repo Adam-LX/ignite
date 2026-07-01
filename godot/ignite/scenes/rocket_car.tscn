@@ -1,0 +1,44 @@
+[gd_scene load_steps=9 format=3 uid="uid://rocket_car_scene"]
+
+[ext_resource type="Script" path="res://scripts/physics/rocket_car.gd" id="1_car"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hitbox"]
+size = Vector3(0.84, 0.36, 1.18)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_body"]
+albedo_color = Color(0.2, 0.45, 0.95, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nose"]
+albedo_color = Color(0.95, 0.95, 0.2, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_body"]
+size = Vector3(0.84, 0.36, 1.18)
+material = SubResource("StandardMaterial3D_body")
+
+[sub_resource type="BoxMesh" id="BoxMesh_nose"]
+size = Vector3(0.72, 0.12, 0.08)
+material = SubResource("StandardMaterial3D_nose")
+
+[node name="RocketCar" type="RigidBody3D"]
+mass = 180.0
+continuous_cd = true
+collision_layer = 2
+collision_mask = 5
+script = ExtResource("1_car")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_hitbox")
+
+[node name="VisualRoot" type="Node3D" parent="."]
+
+[node name="BodyMesh" type="MeshInstance3D" parent="VisualRoot"]
+mesh = SubResource("BoxMesh_body")
+
+[node name="NoseMarker" type="MeshInstance3D" parent="VisualRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -0.55)
+mesh = SubResource("BoxMesh_nose")
+
+[node name="RearMarker" type="MeshInstance3D" parent="VisualRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0.55)
+visible = false
+mesh = SubResource("BoxMesh_nose")
