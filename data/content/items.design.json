@@ -1,0 +1,301 @@
+{
+	"schemaVersion": 2,
+	"generatedBy": "gemini-consult-20260713 + v0.3.9 balance",
+	"dropRules": {
+		"categoryWeights": {
+			"car": 0.15,
+			"arena": 0.1,
+			"trail": 0.15,
+			"wheel": 0.2,
+			"topper": 0.15,
+			"decal": 0.15,
+			"goalExplosion": 0.1
+		},
+		"rarityWeights": {
+			"common": 0.5,
+			"rare": 0.2,
+			"epic": 0.2,
+			"legendary": 0.1
+		},
+		"pityRules": {
+			"matchesThreshold": 2,
+			"guaranteedRarity": "epic",
+			"pityResetOnDrop": true
+		},
+		"duplicateRerollMax": 20,
+		"baseChance": 1,
+		"winBonus": 0,
+		"maxDropChance": 1,
+		"minRollsPerMatch": 1,
+		"bonusRollsOnWin": 2,
+		"bonusRollChanceOnLoss": 0.65,
+		"bonusRollsOnBlowout": 1,
+		"paintRules": {
+			"paintedChance": 0.78,
+			"rarityWeights": {
+				"common": 0.25,
+				"uncommon": 0.25,
+				"rare": 0.2,
+				"veryRare": 0.2,
+				"legendary": 0.1
+			}
+		}
+	},
+	"trails": [
+		{
+			"id": "default",
+			"nameKey": "trail.default",
+			"rarity": "common",
+			"defaultUnlocked": true,
+			"colors": {
+				"head": "0xb8ffff",
+				"core": "0xffeeaa",
+				"mid": "0xff7722",
+				"tail": "0xcc4499"
+			}
+		},
+		{
+			"id": "plasma",
+			"nameKey": "trail.plasma",
+			"rarity": "common",
+			"defaultUnlocked": false,
+			"colors": {
+				"head": "0x88ccff",
+				"core": "0x44aaff",
+				"mid": "0x2266dd",
+				"tail": "0x113388"
+			}
+		},
+		{
+			"id": "spark",
+			"nameKey": "trail.spark",
+			"rarity": "common",
+			"defaultUnlocked": false,
+			"colors": {
+				"head": "0xffffff",
+				"core": "0xffff88",
+				"mid": "0xffaa22",
+				"tail": "0xff4400"
+			}
+		},
+		{
+			"id": "nitro",
+			"nameKey": "trail.nitro",
+			"rarity": "rare",
+			"defaultUnlocked": false,
+			"colors": {
+				"head": "0xaaffff",
+				"core": "0x44ddff",
+				"mid": "0x0088ff",
+				"tail": "0x0044aa"
+			}
+		},
+		{
+			"id": "comet",
+			"nameKey": "trail.comet",
+			"rarity": "epic",
+			"defaultUnlocked": false,
+			"colors": {
+				"head": "0xffeeff",
+				"core": "0xcc88ff",
+				"mid": "0x8844cc",
+				"tail": "0x442288"
+			}
+		}
+	],
+	"wheels": [
+		{
+			"id": "default",
+			"nameKey": "wheel.default",
+			"rarity": "common",
+			"defaultUnlocked": true,
+			"glb": "/assets/items/wheels/factory.glb",
+			"referenceDiameterM": 0.35
+		},
+		{
+			"id": "steel",
+			"nameKey": "wheel.steel",
+			"rarity": "common",
+			"defaultUnlocked": false,
+			"glb": "/assets/items/wheels/steel.glb",
+			"referenceDiameterM": 0.35,
+			"trellisPrompt": "Industrial steel rim, 5-spoke, matte finish, game-ready PBR wheel 0.35m"
+		},
+		{
+			"id": "rally",
+			"nameKey": "wheel.rally",
+			"rarity": "common",
+			"defaultUnlocked": false,
+			"glb": "/assets/items/wheels/rally.glb",
+			"referenceDiameterM": 0.35,
+			"trellisPrompt": "Off-road rally wheel, chunky tread, white rim, game-ready PBR"
+		},
+		{
+			"id": "neon",
+			"nameKey": "wheel.neon",
+			"rarity": "rare",
+			"defaultUnlocked": false,
+			"glb": "/assets/items/wheels/neon.glb",
+			"referenceDiameterM": 0.35,
+			"trellisPrompt": "Glowing neon ring wheel, cyan light, futuristic, game-ready PBR"
+		},
+		{
+			"id": "chrome",
+			"nameKey": "wheel.chrome",
+			"rarity": "epic",
+			"defaultUnlocked": false,
+			"glb": "/assets/items/wheels/chrome.glb",
+			"referenceDiameterM": 0.35,
+			"trellisPrompt": "Polished chrome spinner wheel, reflective, luxury, game-ready PBR"
+		}
+	],
+	"toppers": [
+		{
+			"id": "default",
+			"nameKey": "topper.default",
+			"rarity": "common",
+			"defaultUnlocked": true
+		},
+		{
+			"id": "cap",
+			"nameKey": "topper.cap",
+			"rarity": "common",
+			"defaultUnlocked": false,
+			"glb": "/assets/items/toppers/cap.glb",
+			"trellisPrompt": "Baseball cap topper, red, low poly, game-ready PBR 0.25m"
+		},
+		{
+			"id": "antenna",
+			"nameKey": "topper.antenna",
+			"rarity": "common",
+			"defaultUnlocked": false,
+			"glb": "/assets/items/toppers/antenna.glb",
+			"trellisPrompt": "Small antenna topper ball on stick, simple, game-ready PBR"
+		},
+		{
+			"id": "halo",
+			"nameKey": "topper.halo",
+			"rarity": "rare",
+			"defaultUnlocked": false,
+			"glb": "/assets/items/toppers/halo.glb",
+			"trellisPrompt": "Floating glowing angel halo, gold ring, emitting light, game-ready PBR"
+		},
+		{
+			"id": "crown",
+			"nameKey": "topper.crown",
+			"rarity": "epic",
+			"defaultUnlocked": false,
+			"glb": "/assets/items/toppers/crown.glb",
+			"trellisPrompt": "Royal golden crown topper, ornate, detailed, game-ready PBR"
+		}
+	],
+	"decals": [
+		{
+			"id": "default",
+			"nameKey": "decal.default",
+			"rarity": "common",
+			"defaultUnlocked": true,
+			"tint": null,
+			"emissive": 0
+		},
+		{
+			"id": "stripes",
+			"nameKey": "decal.stripes",
+			"rarity": "common",
+			"defaultUnlocked": false,
+			"tint": { "r": 1, "g": 1, "b": 1 },
+			"emissive": 0.08
+		},
+		{
+			"id": "flame",
+			"nameKey": "decal.flame",
+			"rarity": "common",
+			"defaultUnlocked": false,
+			"tint": { "r": 1, "g": 0.45, "b": 0.1 },
+			"emissive": 0.15
+		},
+		{
+			"id": "camo",
+			"nameKey": "decal.camo",
+			"rarity": "rare",
+			"defaultUnlocked": false,
+			"tint": { "r": 0.35, "g": 0.55, "b": 0.3 },
+			"emissive": 0.05
+		},
+		{
+			"id": "cyber",
+			"nameKey": "decal.cyber",
+			"rarity": "epic",
+			"defaultUnlocked": false,
+			"tint": { "r": 0.2, "g": 0.85, "b": 1 },
+			"emissive": 0.22
+		}
+	],
+	"goalExplosions": [
+		{
+			"id": "default",
+			"nameKey": "ge.default",
+			"rarity": "common",
+			"defaultUnlocked": true,
+			"preset": "default",
+			"flashMul": 1,
+			"bloomMul": 1,
+			"chromaticMul": 1,
+			"shakeMul": 1,
+			"vignetteMul": 1
+		},
+		{
+			"id": "pop",
+			"nameKey": "ge.pop",
+			"rarity": "common",
+			"defaultUnlocked": false,
+			"preset": "pop",
+			"flashMul": 0.85,
+			"bloomMul": 0.9,
+			"chromaticMul": 1,
+			"shakeMul": 0.9,
+			"vignetteMul": 1
+		},
+		{
+			"id": "smoke",
+			"nameKey": "ge.smoke",
+			"rarity": "common",
+			"defaultUnlocked": false,
+			"preset": "smoke",
+			"flashMul": 0.6,
+			"bloomMul": 0.85,
+			"chromaticMul": 0.8,
+			"shakeMul": 0.75,
+			"vignetteMul": 1.2
+		},
+		{
+			"id": "fire",
+			"nameKey": "ge.fire",
+			"rarity": "rare",
+			"defaultUnlocked": false,
+			"preset": "fire",
+			"flashMul": 1.35,
+			"bloomMul": 1.15,
+			"chromaticMul": 1.3,
+			"shakeMul": 1.15,
+			"vignetteMul": 1
+		},
+		{
+			"id": "nova",
+			"nameKey": "ge.nova",
+			"rarity": "legendary",
+			"defaultUnlocked": false,
+			"preset": "nova",
+			"flashMul": 1.65,
+			"bloomMul": 1.45,
+			"chromaticMul": 1.55,
+			"shakeMul": 1.4,
+			"vignetteMul": 1.1
+		}
+	],
+	"crate": {
+		"id": "ignite_supply",
+		"glb": "/assets/items/crate/ignite_supply.glb",
+		"trellisPrompt": "Rocket League supply crate, hexagonal sci-fi loot box, orange-cyan Ignite neon trim, glowing seams, game-ready PBR, 0.8m tall"
+	}
+}

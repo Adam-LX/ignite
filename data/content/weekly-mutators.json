@@ -1,0 +1,63 @@
+{
+	"schemaVersion": 1,
+	"mutators": [
+		{
+			"id": "cubeBall",
+			"nameKey": "mutator.cubeBall.name",
+			"descKey": "mutator.cubeBall.desc",
+			"effects": {
+				"ballShape": "cube"
+			}
+		},
+		{
+			"id": "lowGrav",
+			"nameKey": "mutator.lowGrav.name",
+			"descKey": "mutator.lowGrav.desc",
+			"effects": {
+				"carGravityMul": 0.55
+			}
+		},
+		{
+			"id": "giantBall",
+			"nameKey": "mutator.giantBall.name",
+			"descKey": "mutator.giantBall.desc",
+			"effects": {
+				"ballScaleMul": 1.55
+			}
+		},
+		{
+			"id": "doubleBoost",
+			"nameKey": "mutator.doubleBoost.name",
+			"descKey": "mutator.doubleBoost.desc",
+			"effects": {
+				"boostRegenMul": 2
+			}
+		},
+		{
+			"id": "hotPotato",
+			"nameKey": "mutator.hotPotato.name",
+			"descKey": "mutator.hotPotato.desc",
+			"effects": {
+				"ballSpeedMul": 1.28
+			}
+		},
+		{
+			"id": "moonCars",
+			"nameKey": "mutator.moonCars.name",
+			"descKey": "mutator.moonCars.desc",
+			"effects": {
+				"carGravityMul": 0.4,
+				"boostForceMul": 1.08
+			}
+		},
+		{
+			"id": "boostStorm",
+			"nameKey": "mutator.boostStorm.name",
+			"descKey": "mutator.boostStorm.desc",
+			"effects": {
+				"boostRegenMul": 1.65,
+				"boostForceMul": 1.12
+			}
+		}
+	]
+}

@@ -1,0 +1,589 @@
+# Bank komentatora Ignite — EN, radio-net esport (dynamiczny, nie flegmatyczny).
+# Głosy XTTS: commentator_excited / tense / celebration.
+
+defaults: &defaults
+  voice: commentator_excited
+  temperature: 0.72
+  speed: 1.12
+
+tense: &tense
+  voice: commentator_tense
+  temperature: 0.68
+  speed: 1.14
+
+hype: &hype
+  voice: commentator_celebration
+  temperature: 0.78
+  speed: 1.1
+
+locales:
+  en:
+    goal:
+      <<: *hype
+      cooldown_sec: 3.2
+      lines:
+        - { text: "What a strike! Goal!", weight: 2 }
+        - { text: "They find the net! Goal!", weight: 2 }
+        - { text: "Unstoppable! That's a goal!", weight: 1 }
+        - { text: "Ripples the net! Goal!", weight: 1 }
+        - { text: "Put a bow on it! Goal!", weight: 1 }
+        - { text: "That's going on the highlight reel! Goal!", weight: 1 }
+
+    epic_save:
+      <<: *defaults
+      cooldown_sec: 3.8
+      lines:
+        - { text: "What a save!", weight: 2 }
+        - { text: "Denied at the last second!", weight: 2 }
+        - { text: "Incredible stop!", weight: 1 }
+        - { text: "Keeper comes up huge!", weight: 1 }
+        - { text: "Not today! What a denial!", weight: 1 }
+
+    demolish:
+      <<: *defaults
+      cooldown_sec: 2.8
+      lines:
+        - { text: "Demolished!", weight: 2 }
+        - { text: "Taken out of the play!", weight: 1 }
+        - { text: "Absolute demolition!", weight: 1 }
+        - { text: "That car just became modern art!", weight: 1 }
+        - { text: "Send flowers! Demolished!", weight: 1 }
+
+    kickoff:
+      <<: *defaults
+      cooldown_sec: 10.0
+      lines:
+        - { text: "Here we go!", weight: 2 }
+        - { text: "Let's light it up!", weight: 1 }
+        - { text: "Round starts now!", weight: 1 }
+        - { text: "Engines hot! Let's dance!", weight: 1 }
+
+    # Kickoff + ostatnie 10 s meczu — osobne cyfry.
+    countdown_10:
+      <<: *tense
+      speed: 1.18
+      cooldown_sec: 0.35
+      lines:
+        - { text: "Ten!", weight: 1 }
+
+    countdown_9:
+      <<: *tense
+      speed: 1.18
+      cooldown_sec: 0.35
+      lines:
+        - { text: "Nine!", weight: 1 }
+
+    countdown_8:
+      <<: *tense
+      speed: 1.2
+      cooldown_sec: 0.35
+      lines:
+        - { text: "Eight!", weight: 1 }
+
+    countdown_7:
+      <<: *tense
+      speed: 1.2
+      cooldown_sec: 0.35
+      lines:
+        - { text: "Seven!", weight: 1 }
+
+    countdown_6:
+      <<: *tense
+      speed: 1.22
+      cooldown_sec: 0.35
+      lines:
+        - { text: "Six!", weight: 1 }
+
+    countdown_5:
+      <<: *tense
+      speed: 1.22
+      cooldown_sec: 0.35
+      lines:
+        - { text: "Five!", weight: 1 }
+
+    countdown_4:
+      <<: *tense
+      speed: 1.24
+      cooldown_sec: 0.35
+      lines:
+        - { text: "Four!", weight: 1 }
+
+    countdown_3:
+      <<: *tense
+      speed: 1.26
+      cooldown_sec: 0.35
+      lines:
+        - { text: "Three!", weight: 1 }
+
+    countdown_2:
+      <<: *tense
+      speed: 1.28
+      cooldown_sec: 0.35
+      lines:
+        - { text: "Two!", weight: 1 }
+
+    countdown_1:
+      <<: *tense
+      speed: 1.3
+      cooldown_sec: 0.35
+      lines:
+        - { text: "One!", weight: 1 }
+
+    countdown_go:
+      <<: *hype
+      temperature: 0.8
+      speed: 1.05
+      cooldown_sec: 6.0
+      lines:
+        - { text: "Go!", weight: 2 }
+        - { text: "Ignition!", weight: 1 }
+
+    clock_60:
+      <<: *tense
+      cooldown_sec: 25.0
+      lines:
+        - { text: "One minute remaining!", weight: 2 }
+        - { text: "Sixty seconds on the clock!", weight: 1 }
+        - { text: "Final minute! Make it count!", weight: 1 }
+
+    clock_30:
+      <<: *tense
+      cooldown_sec: 20.0
+      lines:
+        - { text: "Thirty seconds left!", weight: 2 }
+        - { text: "Half a minute! Push!", weight: 1 }
+        - { text: "Thirty seconds! This is crunch time!", weight: 1 }
+
+    power_shot:
+      <<: *defaults
+      cooldown_sec: 3.8
+      lines:
+        - { text: "Power shot!", weight: 2 }
+        - { text: "What a rocket!", weight: 1 }
+        - { text: "Cannon fire!", weight: 1 }
+        - { text: "That ball just applied for citizenship in orbit!", weight: 1 }
+
+    flip_reset:
+      <<: *defaults
+      cooldown_sec: 4.5
+      lines:
+        - { text: "Flip reset!", weight: 2 }
+        - { text: "They reset mid-air!", weight: 1 }
+        - { text: "Style points incoming!", weight: 1 }
+
+    aerial:
+      <<: *defaults
+      cooldown_sec: 4.2
+      lines:
+        - { text: "What an aerial!", weight: 2 }
+        - { text: "Airborne challenge!", weight: 1 }
+        - { text: "They're writing poetry up there!", weight: 1 }
+
+    post_hit:
+      <<: *defaults
+      cooldown_sec: 3.8
+      lines:
+        - { text: "Off the post!", weight: 2 }
+        - { text: "Rattles the woodwork!", weight: 1 }
+        - { text: "So close off the bar!", weight: 1 }
+        - { text: "The post says absolutely not!", weight: 1 }
+
+    near_miss:
+      <<: *defaults
+      cooldown_sec: 4.5
+      lines:
+        - { text: "Oh, so close!", weight: 2 }
+        - { text: "Just wide!", weight: 1 }
+        - { text: "Nearly!", weight: 1 }
+        - { text: "The woodwork says no!", weight: 1 }
+        - { text: "That was a postcard away from glory!", weight: 1 }
+
+    blue_ahead:
+      <<: *defaults
+      cooldown_sec: 7.5
+      lines:
+        - { text: "Blue takes the lead!", weight: 2 }
+        - { text: "Blue are ahead!", weight: 1 }
+        - { text: "Blue hit the nitrous!", weight: 1 }
+
+    orange_ahead:
+      <<: *defaults
+      cooldown_sec: 7.5
+      lines:
+        - { text: "Orange takes the lead!", weight: 2 }
+        - { text: "Orange are ahead!", weight: 1 }
+        - { text: "Orange just turned up the heat!", weight: 1 }
+
+    overtime:
+      <<: *hype
+      cooldown_sec: 12.0
+      lines:
+        - { text: "Overtime! Next goal wins!", weight: 2 }
+        - { text: "Sudden death! Who wants it more?!", weight: 1 }
+        - { text: "Extra time! Somebody write a legend!", weight: 1 }
+
+    match_end:
+      <<: *defaults
+      cooldown_sec: 15.0
+      lines:
+        - { text: "That's the match!", weight: 2 }
+        - { text: "Final whistle! What a game!", weight: 1 }
+        - { text: "Match over!", weight: 1 }
+        - { text: "Book it! What a show!", weight: 1 }
+
+    # Sytuacyjne wstawki — scramble / turtle / 50-50 / idle ball.
+    scramble:
+      <<: *defaults
+      cooldown_sec: 9.0
+      lines:
+        - { text: "It's a parking lot out there!", weight: 2 }
+        - { text: "Everybody wants the ball!", weight: 2 }
+        - { text: "Chaos in the box!", weight: 1 }
+        - { text: "Pinball machine activated!", weight: 1 }
+        - { text: "Someone order a traffic cone!", weight: 1 }
+        - { text: "Four bumpers, one ball, zero manners!", weight: 1 }
+        - { text: "Midfield just turned into a mosh pit!", weight: 1 }
+
+    turtle:
+      <<: *defaults
+      cooldown_sec: 8.0
+      lines:
+        - { text: "Somebody call a tow truck!", weight: 2 }
+        - { text: "That's one way to take a nap!", weight: 2 }
+        - { text: "Belly up! Flip it!", weight: 1 }
+        - { text: "Gravity wins that round!", weight: 1 }
+        - { text: "Roof inspection complete!", weight: 1 }
+        - { text: "They are reading the ceiling!", weight: 1 }
+
+    fifty_fifty:
+      <<: *defaults
+      cooldown_sec: 7.5
+      lines:
+        - { text: "Fifty-fifty! Who wants it more?!", weight: 2 }
+        - { text: "Two cars, one ball, zero mercy!", weight: 2 }
+        - { text: "Challenge! Don't blink!", weight: 1 }
+        - { text: "Hard challenge incoming!", weight: 1 }
+        - { text: "Brave souls collide!", weight: 1 }
+        - { text: "This contact will decide the play!", weight: 1 }
+
+    idle_ball:
+      <<: *defaults
+      cooldown_sec: 14.0
+      lines:
+        - { text: "Anybody gonna touch that?", weight: 2 }
+        - { text: "The ball's filing for unemployment!", weight: 2 }
+        - { text: "Free real estate on that ball!", weight: 1 }
+        - { text: "It's lonely in midfield!", weight: 1 }
+        - { text: "That ball is collecting dust!", weight: 1 }
+        - { text: "Someone adopt that ball, please!", weight: 1 }
+
+    big_boom:
+      <<: *hype
+      cooldown_sec: 6.5
+      lines:
+        - { text: "That one left a dent in spacetime!", weight: 2 }
+        - { text: "Physics just filed a complaint!", weight: 2 }
+        - { text: "Absolute thunderclap!", weight: 1 }
+        - { text: "Send that one to NASA!", weight: 1 }
+        - { text: "The stadium felt that!", weight: 1 }
+        - { text: "Microphone just peaked!", weight: 1 }
+
+    # —— Gracz: inicjatywa / docinki / pochwały ——
+    player_lazy:
+      <<: *defaults
+      cooldown_sec: 16.0
+      lines:
+        - { text: "Wake up out there! The ball isn't coming to you!", weight: 2 }
+        - { text: "Sightseeing tour? Get involved!", weight: 2 }
+        - { text: "They're watching the game like it's TV!", weight: 1 }
+        - { text: "Somebody check if that car still has a driver!", weight: 2 }
+        - { text: "Initiative? Never heard of her!", weight: 1 }
+        - { text: "That's a lot of standing around for a car soccer match!", weight: 1 }
+        - { text: "The ball is over THERE! Hint hint!", weight: 1 }
+        - { text: "Passive mode engaged. Not a compliment!", weight: 1 }
+        - { text: "Did they park? Because nothing is happening!", weight: 1 }
+        - { text: "Hello? Controllers still plugged in?", weight: 1 }
+        - { text: "They're buffering while the match loads!", weight: 1 }
+        - { text: "Statue mode. Very avant-garde. Very useless!", weight: 1 }
+
+    player_hot:
+      <<: *hype
+      cooldown_sec: 12.0
+      lines:
+        - { text: "They're everywhere! Absolute menace!", weight: 2 }
+        - { text: "Main character energy! Owning the pitch!", weight: 2 }
+        - { text: "This player is cooking with gas!", weight: 2 }
+        - { text: "Relentless! They want every ball!", weight: 1 }
+        - { text: "That car just filed for overtime!", weight: 1 }
+        - { text: "Initiative through the roof!", weight: 1 }
+        - { text: "They're writing the script tonight!", weight: 1 }
+        - { text: "Hungry! Starving! Devouring plays!", weight: 1 }
+
+    player_praise:
+      <<: *hype
+      cooldown_sec: 9.0
+      lines:
+        - { text: "Beautiful touch! That's how you do it!", weight: 2 }
+        - { text: "Clean play! Textbook!", weight: 2 }
+        - { text: "They make it look easy!", weight: 1 }
+        - { text: "Chef's kiss on that contact!", weight: 2 }
+        - { text: "That's the stuff highlight reels dream of!", weight: 1 }
+        - { text: "Composure! Class! Control!", weight: 1 }
+        - { text: "They just earned a standing ovation!", weight: 1 }
+        - { text: "Ice cold under pressure!", weight: 1 }
+
+    player_roast:
+      <<: *defaults
+      cooldown_sec: 10.0
+      lines:
+        - { text: "Oof! That was a swing and a miss!", weight: 2 }
+        - { text: "They whiffed harder than a summer breeze!", weight: 2 }
+        - { text: "GPS says the ball was over there!", weight: 1 }
+        - { text: "That touch needs a refund!", weight: 2 }
+        - { text: "Somebody hide the replay!", weight: 1 }
+        - { text: "Bold strategy. Terrible results!", weight: 1 }
+        - { text: "The ball said no thank you!", weight: 1 }
+        - { text: "That's going on the blooper reel!", weight: 1 }
+        - { text: "My grandmother would have hit that!", weight: 1 }
+        - { text: "They just invented a new way to miss!", weight: 2 }
+        - { text: "Close! By the standards of another sport!", weight: 1 }
+        - { text: "That was a donation to the other team!", weight: 1 }
+        - { text: "Skill issue detected! Loudly!", weight: 1 }
+        - { text: "They whiffed so hard the ball felt awkward!", weight: 1 }
+        - { text: "Yikes! That one stung the ego!", weight: 1 }
+
+    player_hustle:
+      <<: *defaults
+      cooldown_sec: 11.0
+      lines:
+        - { text: "Look at that hustle! Closing the gap!", weight: 2 }
+        - { text: "They're flying across the pitch!", weight: 2 }
+        - { text: "Recovery run! Pure work rate!", weight: 1 }
+        - { text: "Boots to the metal! Love to see it!", weight: 1 }
+        - { text: "That chase is personal!", weight: 1 }
+        - { text: "They refuse to give up the play!", weight: 1 }
+
+    player_spectator:
+      <<: *defaults
+      cooldown_sec: 15.0
+      lines:
+        - { text: "Great view from the cheap seats!", weight: 2 }
+        - { text: "They're taking notes instead of touches!", weight: 2 }
+        - { text: "Camera operator energy from that car!", weight: 1 }
+        - { text: "The action is happening without them!", weight: 1 }
+        - { text: "Someone page the driver!", weight: 1 }
+        - { text: "Participation trophy still available!", weight: 1 }
+        - { text: "They're spectating their own match!", weight: 1 }
+        - { text: "Front row seats, zero involvement!", weight: 1 }
+        - { text: "Is that car AFK? Asking for a friend!", weight: 1 }
+
+    # —— Drużyny: pochwały / docinki ——
+    blue_praise:
+      <<: *hype
+      cooldown_sec: 11.0
+      lines:
+        - { text: "Blue looking sharp! Clockwork!", weight: 2 }
+        - { text: "Blue are clicking tonight!", weight: 2 }
+        - { text: "That's Blue chemistry right there!", weight: 1 }
+        - { text: "Blue mean business!", weight: 1 }
+        - { text: "Blue with the clinic!", weight: 1 }
+        - { text: "Paint it blue! They own this stretch!", weight: 1 }
+
+    orange_praise:
+      <<: *hype
+      cooldown_sec: 11.0
+      lines:
+        - { text: "Orange on fire! Keep that heat!", weight: 2 }
+        - { text: "Orange are cooking!", weight: 2 }
+        - { text: "That's Orange swagger!", weight: 1 }
+        - { text: "Orange with the answer!", weight: 1 }
+        - { text: "Orange turning up the thermostat!", weight: 1 }
+        - { text: "Sunset squad looking lethal!", weight: 1 }
+
+    blue_roast:
+      <<: *defaults
+      cooldown_sec: 11.0
+      lines:
+        - { text: "Blue, that was amateur hour!", weight: 2 }
+        - { text: "Blue just gifted the ball!", weight: 2 }
+        - { text: "Wake up, Blue! Sleepwalking!", weight: 1 }
+        - { text: "Blue defending with a welcome mat!", weight: 1 }
+        - { text: "Blue, my grandmother hits harder!", weight: 1 }
+        - { text: "Blue looking lost in their own half!", weight: 1 }
+        - { text: "Blue, that turnover was criminal!", weight: 1 }
+        - { text: "Blue are playing hot potato with the ball!", weight: 1 }
+        - { text: "Blue defense just opened a gift shop!", weight: 2 }
+        - { text: "Somebody reboot Blue's firmware!", weight: 1 }
+        - { text: "Blue, that was soft. Marshmallow soft!", weight: 1 }
+
+    orange_roast:
+      <<: *defaults
+      cooldown_sec: 11.0
+      lines:
+        - { text: "Orange, that was a soft serve!", weight: 2 }
+        - { text: "Orange just mailed it in!", weight: 2 }
+        - { text: "Come on, Orange! Tighten up!", weight: 1 }
+        - { text: "Orange defending like it's optional!", weight: 1 }
+        - { text: "Orange, the ball is not a hot potato!", weight: 1 }
+        - { text: "Orange looking allergic to the ball!", weight: 1 }
+        - { text: "Orange, that giveaway was generous!", weight: 1 }
+        - { text: "Orange just donated possession!", weight: 1 }
+        - { text: "Orange defense went on vacation!", weight: 2 }
+        - { text: "Wake up call for Orange! Anyone home?", weight: 1 }
+        - { text: "Orange, that was butter fingers on wheels!", weight: 1 }
+
+    score_taunt:
+      <<: *defaults
+      cooldown_sec: 14.0
+      lines:
+        - { text: "The scoreboard is doing the talking!", weight: 2 }
+        - { text: "One team is writing a statement!", weight: 2 }
+        - { text: "This is turning into a clinic!", weight: 1 }
+        - { text: "The gap is getting rude!", weight: 1 }
+        - { text: "Somebody call a comeback, quick!", weight: 1 }
+        - { text: "Blowout vibes creeping in!", weight: 1 }
+        - { text: "This scoreline is getting personal!", weight: 1 }
+        - { text: "Mercy rule whispering in the hallway!", weight: 1 }
+        - { text: "The underdogs need a miracle and a snack!", weight: 1 }
+
+    # Uwaga TTS: unikaj skrótów (RNG) i samotnego „Ignite”/ALL-CAPS — XTTS literuje.
+    # Linie z nuceniem: wydłużone samogłoski + doo/la/hmm (celebration voice).
+    crate_drop:
+      <<: *hype
+      cooldown_sec: 0.5
+      lines:
+        - { text: "Hold up — is that a loot crate falling from the sky?", weight: 2 }
+        - { text: "Ladies and gentlemen, we have a drop!", weight: 2 }
+        - { text: "Something shiny just crash-landed on the pitch!", weight: 2 }
+        - { text: "Post-match present incoming! Don't blink!", weight: 2 }
+        - { text: "Lady Luck just mailed us a mystery box!", weight: 2 }
+        - { text: "Is it a car? Is it wheels? It's a mystery box!", weight: 2 }
+        - { text: "Someone call security — a crate just trespassed!", weight: 1 }
+        - { text: "Loot drop! The crowd goes mildly unhinged!", weight: 2 }
+        - { text: "That's not a rebound — that's a present!", weight: 1 }
+        - { text: "Special delivery from the rocket gods! Sign here for chaos!", weight: 2 }
+        - { text: "Box from the heavens! Popcorn ready!", weight: 2 }
+        - { text: "Oh no. Oh yes. A crate!", weight: 2 }
+        - { text: "The algorithm felt generous today!", weight: 1 }
+        - { text: "Treasure chest vibes on the pitch!", weight: 1 }
+        - { text: "Don't open it with your bumper. Or do!", weight: 1 }
+        - { text: "A wild crate appears!", weight: 2 }
+        - { text: "Post-game care package! Contents: classified!", weight: 2 }
+        - { text: "That thud was either a goal post or free cosmetics!", weight: 1 }
+        - { text: "Free loot? In this economy? Let's go!", weight: 2 }
+        - { text: "The sky is raining boxes and I am here for it!", weight: 1 }
+        - { text: "It's raining crates and loot!", weight: 2 }
+        - { text: "Somebody ordered chaos and it arrived in a crate!", weight: 2 }
+        - { text: "If this is empty I'm filing a complaint with the universe!", weight: 1 }
+        - { text: "The suspense is thicker than boost smoke!", weight: 2 }
+        - { text: "Please be wheels. Please be wheels. Okay I'll take anything!", weight: 1 }
+        - { text: "That box is vibrating with bad decisions!", weight: 2 }
+        - { text: "I can smell the rarity from here. Or maybe that's the tires.", weight: 1 }
+        - { text: "Open it slow. Or smash it. I'm not your boss!", weight: 1 }
+        - { text: "It's giving main-character energy in cardboard form!", weight: 2 }
+        - { text: "Bonus round unlocked: stare at a box!", weight: 1 }
+        - { text: "My grandma collects stamps. We collect falling crates!", weight: 1 }
+        - { text: "Congratulations, you played yourself into free stuff!", weight: 2 }
+        - { text: "Is this legal? Asking for a friend with a garage!", weight: 1 }
+        - { text: "The crate landed harder than my last aerial!", weight: 2 }
+        - { text: "Plot twist: the real match was the loot we found along the way!", weight: 1 }
+        - { text: "Don't mind me, I'm emotionally attached to this box already!", weight: 1 }
+        - { text: "Shake it! If it rattles, it's either wheels or disappointment!", weight: 2 }
+        - { text: "Crate check! Ego check! Let's get weird!", weight: 1 }
+        - { text: "This is the part where we all pretend we deserved it!", weight: 2 }
+        - { text: "I would trade my boost for a peek inside!", weight: 1 }
+        - { text: "And the crowd whispers: ooh, shiny!", weight: 2 }
+        # Nucenie / mini-śpiew (XTTS celebration lubi melodie w tekście)
+        - { text: "Hmm hmm hmm... look what floated down!", weight: 2 }
+        - { text: "Doo doo doo doo — surprise in a box!", weight: 2 }
+        - { text: "La la laa — crate song, everybody!", weight: 2 }
+        - { text: "Bum bum buuum — loot o'clock!", weight: 2 }
+        - { text: "Naa naa naa, naa naa naa — open the crate!", weight: 1 }
+        - { text: "I'm humming the jackpot tune, don't judge me!", weight: 2 }
+        - { text: "Doobie doo — something rare this way comes!", weight: 1 }
+        - { text: "Hmm-mm, that thud had melody!", weight: 1 }
+        - { text: "Laa-dee-daa, free cosmetics falling from heaven!", weight: 2 }
+        - { text: "Doo-wop doo-wop — crate drop harmony!", weight: 1 }
+        # Popkultura / inne gry (unikaj skrótów typu CS:GO — XTTS literuje)
+        - { text: "The bomb has been planted! Wait — wrong game. It's a crate!", weight: 2 }
+        - { text: "Case opening energy! Somebody call the trade-up gods!", weight: 2 }
+        - { text: "Field-tested? Minimal wear? This crate looks factory new!", weight: 2 }
+        - { text: "Don't overpay for stickers — just open the box!", weight: 1 }
+        - { text: "One-tap the lid! Crisp as a dusty mid headshot!", weight: 2 }
+        - { text: "More tension than overtime on Dust Two!", weight: 2 }
+        - { text: "Unbox protocol initiated! Gloves optional, vibes mandatory!", weight: 2 }
+        - { text: "Skin market who? We rain free cosmetics now!", weight: 1 }
+        - { text: "Hotter than a crimson web and twice as suspicious!", weight: 2 }
+        - { text: "Call mid! Call B! Call the crate!", weight: 2 }
+        - { text: "This drop has Eco-round desperation and full-buy swagger!", weight: 1 }
+        - { text: "Clutch crate! Save it for the highlight reel!", weight: 2 }
+        - { text: "Ace energy in cardboard form — open it!", weight: 2 }
+        - { text: "That's not a decoy — that's premium loot!", weight: 1 }
+        - { text: "Flashbang the suspense! I'm peeking the box!", weight: 1 }
+        - { text: "It's dangerous to go alone — take this crate!", weight: 2 }
+        - { text: "It's-a me! Mystery box!", weight: 2 }
+        - { text: "Hey you. You're finally awake. Here's a crate.", weight: 2 }
+        - { text: "Hmm. A crate. Interesting.", weight: 1 }
+        - { text: "The cake is a crate!", weight: 2 }
+        - { text: "These aren't the crates you're looking for. Oh wait — they are!", weight: 2 }
+        - { text: "One crate to rule them all!", weight: 2 }
+        - { text: "There is no crate... there is a crate!", weight: 1 }
+        - { text: "It belongs in a museum! Or your garage!", weight: 2 }
+        - { text: "Mission passed! Respect plus bonus crate!", weight: 2 }
+        - { text: "Ping the loot! Apex instincts kicking in!", weight: 1 }
+        - { text: "Engram vibes — but make it a crate!", weight: 1 }
+        - { text: "Victory Royale energy, but the prize is a box!", weight: 2 }
+        - { text: "Diamond pickaxe energy in cardboard packaging!", weight: 1 }
+        - { text: "Sus crate. Definitely not the impostor. Probably.", weight: 2 }
+        - { text: "High noon for loot! Draw on that lid!", weight: 1 }
+        - { text: "Press F to pay respects to your empty inventory!", weight: 2 }
+        - { text: "This is the way. The crate way.", weight: 2 }
+        - { text: "I am inevitable... and so is this drop!", weight: 1 }
+        - { text: "Winter is coming — and so is free cosmetics!", weight: 1 }
+        - { text: "May the loot be with you!", weight: 2 }
+        - { text: "To infinity... and the inventory!", weight: 1 }
+        - { text: "Say hello to my little crate!", weight: 2 }
+        - { text: "I'll be back — after I open this!", weight: 1 }
+        - { text: "Houston, we have a drop!", weight: 2 }
+        - { text: "Life finds a way... into your loadout!", weight: 1 }
+        - { text: "Why so serious? It's just free stuff!", weight: 2 }
+        - { text: "You shall not pass... unless you open the crate!", weight: 2 }
+        - { text: "My preciousss... crate!", weight: 1 }
+        - { text: "Bond. James Bond. And this is my crate.", weight: 1 }
+        - { text: "Wakanda has garages too — open it!", weight: 1 }
+        - { text: "Avengers assemble... around the box!", weight: 1 }
+        - { text: "This is fine. Everything is fine. Beautiful crate.", weight: 1 }
+        - { text: "Big brain play: receive free loot after the match!", weight: 2 }
+        - { text: "Touch grass? Nah. Touch crate!", weight: 1 }
+        - { text: "Sheeeesh — look at that drop!", weight: 2 }
+        - { text: "No cap, this crate is fire!", weight: 2 }
+        - { text: "Absolute cinema. Absolute crate.", weight: 2 }
+        - { text: "We got a situation — a shiny situation!", weight: 1 }
+        - { text: "Boss music just started for a cardboard box!", weight: 2 }
+        - { text: "Final boss of restraint: don't smash-open yet!", weight: 1 }
+        - { text: "Speedrun any percent: open the crate!", weight: 1 }
+        - { text: "New side quest unlocked: stare at loot!", weight: 2 }
+        - { text: "Achievement unlocked: emotionally invested in cardboard!", weight: 2 }
+        - { text: "Loading screen tip: crates contain vibes and maybe wheels!", weight: 1 }
+        - { text: "Patch notes: added one extremely juicy box!", weight: 1 }
+        - { text: "Server lag? No — just your heart before the open!", weight: 1 }
+        - { text: "That thud had more aura than the whole highlight reel!", weight: 2 }
+        # Counter-Strike unbox jokes — noże / bronie (bez skrótu CS:GO — XTTS literuje)
+        - { text: "Knowing my luck this dropped a blue knife... wait, wrong game!", weight: 2 }
+        - { text: "Please be a knife skin! Oh right — this is car soccer.", weight: 2 }
+        - { text: "Somewhere a Counter-Strike player just felt a disturbance in the knife market!", weight: 2 }
+        - { text: "If this were a weapon case I'd already be checking the float!", weight: 2 }
+        - { text: "Butterfly knife dreams die here — welcome to wheels!", weight: 2 }
+        - { text: "Karambit? No. Car-ambit. Get in the garage!", weight: 2 }
+        - { text: "StatTrak for boost pads? Honestly I'd buy that.", weight: 1 }
+        - { text: "Relax — it's not another battle-scarred rifle. It's a crate!", weight: 2 }
+        - { text: "Trade up for a knife? Nah. Trade up for a paint job!", weight: 2 }
+        - { text: "Gold knife energy... applied to cardboard. Still valid!", weight: 2 }
+        - { text: "Doppler fade? Sorry buddy — this crate fades into cosmetics!", weight: 1 }
+        - { text: "Don't sell your knife yet — this drop might be wheels instead!", weight: 2 }
+        - { text: "Case hardened heart, factory-new hopes, car-soccer reality!", weight: 1 }
+        - { text: "I opened for a knife and got... emotional damage and a box!", weight: 2 }
+        - { text: "Talon knife who? Talon wheels when?", weight: 1 }
+        - { text: "That shimmer looks like a gamma Doppler... of disappointment!", weight: 1 }
+        - { text: "Market listing: rare crate, low float, zero knives, all vibes!", weight: 2 }
+        - { text: "Unboxed a dream — packed a car part. Classic!", weight: 2 }

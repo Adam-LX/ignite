@@ -1,0 +1,195 @@
+{
+	"schemaVersion": 1,
+	"arenas": [
+		{
+			"id": "standard",
+			"nameKey": "arena.standard",
+			"defaultUnlocked": true,
+			"dimensions": {
+				"width": 80,
+				"length": 120,
+				"height": 40,
+				"cornerCut": 16.5,
+				"goalWidth": 17.86,
+				"goalHeight": 6.43,
+				"goalDepth": 8.8,
+				"rampSize": 3.2
+			},
+			"perimeterPreset": "rlOctagon",
+			"manifest": "/assets/arenas/standard/manifest.json",
+			"spawns": {
+				"preset": "rlKickoff",
+				"scaleFromStandard": 1.0
+			},
+			"boostPads": {
+				"preset": "rlSoccar",
+				"enabled": false
+			},
+			"atmosphere": {
+				"skyPreset": "cyberpunk",
+				"neonAccent": "cyan"
+			}
+		},
+		{
+			"id": "compact",
+			"nameKey": "arena.compact",
+			"defaultUnlocked": true,
+			"dimensions": {
+				"width": 64,
+				"length": 96,
+				"height": 36,
+				"cornerCut": 13,
+				"goalWidth": 15,
+				"goalHeight": 5.5,
+				"goalDepth": 7.5,
+				"rampSize": 3.0
+			},
+			"perimeterPreset": "rlOctagon",
+			"manifest": "/assets/arenas/compact/manifest.json",
+			"spawns": {
+				"preset": "rlKickoff",
+				"scaleFromStandard": 0.8
+			},
+			"boostPads": {
+				"preset": "rlSoccar",
+				"enabled": false
+			},
+			"atmosphere": {
+				"skyPreset": "cyberpunk",
+				"neonAccent": "orange"
+			}
+		},
+		{
+			"id": "wide",
+			"nameKey": "arena.wide",
+			"defaultUnlocked": false,
+			"dimensions": {
+				"width": 96,
+				"length": 120,
+				"height": 40,
+				"cornerCut": 18,
+				"goalWidth": 19.5,
+				"goalHeight": 6.43,
+				"goalDepth": 8.8,
+				"rampSize": 3.2
+			},
+			"perimeterPreset": "rlOctagon",
+			"manifest": "/assets/arenas/wide/manifest.json",
+			"spawns": {
+				"preset": "rlKickoff",
+				"scaleFromStandard": 1.2
+			},
+			"boostPads": {
+				"preset": "rlSoccar",
+				"enabled": false
+			},
+			"atmosphere": {
+				"skyPreset": "cyberpunk",
+				"neonAccent": "magenta"
+			}
+		},
+		{
+			"id": "vault",
+			"nameKey": "arena.vault",
+			"defaultUnlocked": false,
+			"dimensions": {
+				"width": 72,
+				"length": 108,
+				"height": 38,
+				"cornerCut": 14,
+				"goalWidth": 16.5,
+				"goalHeight": 6.2,
+				"goalDepth": 8.0,
+				"rampSize": 3.0
+			},
+			"perimeterPreset": "custom",
+			"customEdges": [
+				{
+					"ax": -20,
+					"az": -54,
+					"bx": -8,
+					"bz": -54
+				},
+				{
+					"ax": 8,
+					"az": -54,
+					"bx": 20,
+					"bz": -54
+				},
+				{
+					"ax": 20,
+					"az": -54,
+					"bx": 36,
+					"bz": -40
+				},
+				{
+					"ax": 36,
+					"az": -40,
+					"bx": 36,
+					"bz": 0
+				},
+				{
+					"ax": 36,
+					"az": 0,
+					"bx": 36,
+					"bz": 40
+				},
+				{
+					"ax": 36,
+					"az": 40,
+					"bx": 20,
+					"bz": 54
+				},
+				{
+					"ax": 20,
+					"az": 54,
+					"bx": 8,
+					"bz": 54
+				},
+				{
+					"ax": -8,
+					"az": 54,
+					"bx": -20,
+					"bz": 54
+				},
+				{
+					"ax": -20,
+					"az": 54,
+					"bx": -36,
+					"bz": 40
+				},
+				{
+					"ax": -36,
+					"az": 40,
+					"bx": -36,
+					"bz": 0
+				},
+				{
+					"ax": -36,
+					"az": 0,
+					"bx": -36,
+					"bz": -40
+				},
+				{
+					"ax": -36,
+					"az": -40,
+					"bx": -20,
+					"bz": -54
+				}
+			],
+			"manifest": "/assets/arenas/vault/manifest.json",
+			"spawns": {
+				"preset": "rlKickoff",
+				"scaleFromStandard": 0.9
+			},
+			"boostPads": {
+				"preset": "rlSoccar",
+				"enabled": false
+			},
+			"atmosphere": {
+				"skyPreset": "cyberpunk",
+				"neonAccent": "gold"
+			}
+		}
+	]
+}

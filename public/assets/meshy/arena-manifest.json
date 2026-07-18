@@ -1,0 +1,18 @@
+{
+	"grassColor": "/assets/textures/meshy_grass_color.jpg",
+	"grassNormal": "/assets/textures/meshy_grass_normal.jpg",
+	"grassRoughness": "/assets/textures/meshy_grass_roughness.jpg",
+	"wallPanel": "/assets/textures/meshy_arena_wall.png",
+	"bannerPanel": "/assets/textures/meshy_banner_panel.png",
+	"goalFrame": "/assets/models/stadium_goal_complete.glb",
+	"carModel": "/assets/models/car.glb",
+	"carOrangeModel": "/assets/models/car_orange.glb",
+	"ballAlbedo": "/assets/textures/meshy_ball_albedo.jpg",
+	"ballModel": "/assets/models/ball_meshy.glb",
+	"updatedAt": "2026-07-04T21:59:55.443Z",
+	"ceilingPanel": "/assets/textures/meshy_arena_ceiling.png",
+	"powerUp_magnet": "/assets/models/powerup_magnet.glb",
+	"powerUp_plunger": "/assets/models/powerup_plunger.glb",
+	"powerUp_haymaker": "/assets/models/powerup_haymaker.glb",
+	"powerUp_spikes": "/assets/models/powerup_spikes.glb"
+}

@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Ignite
+GenericName=Car Soccer
+Comment=Car soccer — pełnoekranowa aplikacja Electron
+Exec=__LAUNCHER__
+Icon=__ICON__
+Terminal=false
+Categories=Game;
+StartupNotify=true
+StartupWMClass=ignite
+Keywords=ignite;car;soccer;game;electron;desktop;
+SingleMainWindow=true

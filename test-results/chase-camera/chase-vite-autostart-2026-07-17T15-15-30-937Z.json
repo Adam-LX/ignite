@@ -1,0 +1,70 @@
+{
+  "generatedAt": "2026-07-17T15:15:57.925Z",
+  "target": "vite",
+  "path": "autostart",
+  "pass": true,
+  "fails": [],
+  "audit": {
+    "ok": true,
+    "pass": true,
+    "dist": 6.090435472487416,
+    "ndc": {
+      "x": -5.148395428728631e-16,
+      "y": -0.42873260790623047,
+      "z": 0.9662317718563239
+    },
+    "carScreen": {
+      "nx": 0.4999999999999997,
+      "ny": 0.7143663039531152
+    },
+    "tagErr": 0.13948742485326687,
+    "tags": [
+      {
+        "text": "You",
+        "nx": 0.500002555847168,
+        "ny": 0.5748788791232639
+      },
+      {
+        "text": "Rook",
+        "nx": 0.4999998092651367,
+        "ny": 0.4563996378580729
+      }
+    ],
+    "cam": {
+      "x": -23.217230470140553,
+      "y": 2.0876200708352126,
+      "z": -34.82590770198752,
+      "fov": 60.44038501164302
+    },
+    "car": {
+      "x": -19.99997329711914,
+      "y": 0.2292863428592682,
+      "z": -30.00001335144043
+    },
+    "lookDir": {
+      "x": 0.5535157406999227,
+      "y": -0.06529625732116014,
+      "z": 0.8302750890983452
+    },
+    "ballCam": true,
+    "menuPresentation": false,
+    "garagePresentation": false,
+    "phase": "countdown",
+    "body": "in-match",
+    "inner": {
+      "w": 1600,
+      "h": 900,
+      "dpr": 1
+    }
+  },
+  "screenshot": "/home/adam/Dokumenty/Projekty/Ignite/test-results/chase-camera/chase-vite-autostart-2026-07-17T15-15-30-937Z.png",
+  "logs": [
+    "[Boot] [0.33s] start",
+    "[Boot] [10.65s] menu ready",
+    "[Boot] [10.65s] autostart 1v1",
+    "[Match] [10.66s] start 1v1",
+    "[Match] [11.21s] session ready",
+    "[Match] [20.46s] match live"
+  ],
+  "hints": []
+}

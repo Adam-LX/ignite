@@ -1,0 +1,117 @@
+{
+  "generatedAt": "2026-07-18T02:09:27.975Z",
+  "target": "vite",
+  "path": "autostart",
+  "survey": false,
+  "pass": true,
+  "fails": [],
+  "audit": {
+    "ok": true,
+    "pass": true,
+    "dist": 6.090433469790198,
+    "ndc": {
+      "x": 1.43267418672904e-16,
+      "y": -0.32091923029730485,
+      "z": 0.9666714696020748
+    },
+    "carScreen": {
+      "nx": 0.5000000000000001,
+      "ny": 0.6604596151486524
+    },
+    "tagErr": 0.13718138300570354,
+    "tags": [
+      {
+        "text": "You",
+        "nx": 0.500001449584961,
+        "ny": 0.5232782321506076
+      },
+      {
+        "text": "Rook",
+        "nx": 0.49999988555908204,
+        "ny": 0.4037599690755208
+      }
+    ],
+    "cam": {
+      "x": -23.217318798518992,
+      "y": 2.0879534176455725,
+      "z": -34.825911758906415,
+      "fov": 60.44038501164302,
+      "aspect": 1.7777777777777777
+    },
+    "car": {
+      "x": -20.00005340576172,
+      "y": 0.22962625324726105,
+      "z": -30.000022888183594
+    },
+    "lookDir": {
+      "x": 0.5503543626172671,
+      "y": -0.12494138279829035,
+      "z": 0.8255299669985292
+    },
+    "ballCam": true,
+    "menuPresentation": false,
+    "garagePresentation": false,
+    "phase": "countdown",
+    "body": "in-match",
+    "inner": {
+      "w": 1600,
+      "h": 900,
+      "dpr": 1
+    },
+    "canvases": {
+      "source": {
+        "display": "block",
+        "visibility": "visible",
+        "w": 1600,
+        "h": 900,
+        "cssW": "1600px",
+        "cssH": "900px"
+      },
+      "present": {
+        "display": "block",
+        "visibility": "visible",
+        "w": 1600,
+        "h": 900,
+        "cssW": "1600px",
+        "cssH": "900px"
+      }
+    },
+    "pixelAtCar": {
+      "rgb": [
+        45,
+        39,
+        34
+      ],
+      "kind": "dark",
+      "canvas": "present",
+      "washN": 0,
+      "grassN": 0,
+      "darkN": 20,
+      "otherN": 5
+    },
+    "pixelAtCarGl": {
+      "rgb": [
+        45,
+        39,
+        34
+      ],
+      "kind": "dark",
+      "canvas": "webgl-copy",
+      "washN": 0,
+      "grassN": 0,
+      "darkN": 20,
+      "otherN": 5
+    },
+    "frameWashout": 0.041666666666666664
+  },
+  "screenshot": "/home/adam/Dokumenty/Projekty/Ignite/test-results/chase-camera/chase-vite-autostart-2026-07-18T02-08-57-571Z.png",
+  "logs": [
+    "[Boot] [0.28s] start",
+    "[Boot] [11.14s] menu ready",
+    "[Boot] [11.14s] autostart 1v1",
+    "[Match] [11.14s] start 1v1",
+    "[Match] [11.76s] session ready",
+    "[Match] [23.21s] match live"
+  ],
+  "hints": []
+}

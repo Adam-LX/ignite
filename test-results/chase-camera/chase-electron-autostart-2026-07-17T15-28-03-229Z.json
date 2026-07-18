@@ -1,0 +1,100 @@
+{
+  "generatedAt": "2026-07-17T15:28:05.532Z",
+  "target": "electron",
+  "path": "autostart",
+  "pass": true,
+  "fails": [],
+  "audit": {
+    "ok": true,
+    "pass": true,
+    "dist": 6.0904400768285445,
+    "ndc": {
+      "x": -4.2638806293468003e-16,
+      "y": -0.5761428395148563,
+      "z": 0.9662316822518782
+    },
+    "carScreen": {
+      "nx": 0.4999999999999998,
+      "ny": 0.7880714197574281
+    },
+    "tagErr": 0.1770882974792854,
+    "tags": [
+      {
+        "text": "You",
+        "nx": 0.5000000073928241,
+        "ny": 0.6109831222781429
+      },
+      {
+        "text": "Rook",
+        "nx": 0.5000000147856483,
+        "ny": 0.4377623465326097
+      }
+    ],
+    "cam": {
+      "x": -23.21726213376752,
+      "y": 2.087061779098477,
+      "z": -34.82584781014843,
+      "fov": 46.871322946307586,
+      "aspect": 2.388888888888889
+    },
+    "car": {
+      "x": -19.999998092651367,
+      "y": 0.22871296107769012,
+      "z": -29.999958038330078
+    },
+    "lookDir": {
+      "x": 0.5535173304071258,
+      "y": -0.06528501365166979,
+      "z": 0.830274913466299
+    },
+    "ballCam": true,
+    "menuPresentation": false,
+    "garagePresentation": false,
+    "phase": "countdown",
+    "body": "in-match",
+    "inner": {
+      "w": 2064,
+      "h": 864,
+      "dpr": 1.6666666269302368
+    },
+    "canvases": {
+      "source": {
+        "display": "block",
+        "visibility": "visible",
+        "w": 2064,
+        "h": 864,
+        "cssW": "2064px",
+        "cssH": "864px"
+      },
+      "present": {
+        "display": "block",
+        "visibility": "visible",
+        "w": 2064,
+        "h": 864,
+        "cssW": "2064px",
+        "cssH": "864px"
+      }
+    },
+    "pixelAtCar": {
+      "rgb": [
+        10,
+        10,
+        12
+      ],
+      "kind": "dark",
+      "canvas": "present"
+    },
+    "pixelAtCarGl": {
+      "rgb": [
+        10,
+        10,
+        12
+      ],
+      "kind": "dark",
+      "canvas": "webgl-copy"
+    }
+  },
+  "screenshot": "/home/adam/Dokumenty/Projekty/Ignite/test-results/chase-camera/chase-electron-autostart-2026-07-17T15-28-03-229Z.png",
+  "logs": [],
+  "hints": []
+}

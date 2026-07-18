@@ -1,0 +1,99 @@
+{
+  "generatedAt": "2026-07-17T15:21:12.583Z",
+  "target": "electron",
+  "path": "autostart",
+  "pass": false,
+  "fails": [
+    "pixelGrassAtCar"
+  ],
+  "audit": {
+    "ok": true,
+    "pass": true,
+    "dist": 6.090440132063437,
+    "ndc": {
+      "x": 1.2973084127099053e-15,
+      "y": -0.5761433144060415,
+      "z": 0.9662316809208353
+    },
+    "carScreen": {
+      "nx": 0.5000000000000007,
+      "ny": 0.7880716572030207
+    },
+    "tagErr": 0.17709104273511872,
+    "tags": [
+      {
+        "text": "You",
+        "nx": 0.49999997782152755,
+        "ny": 0.6109806144679034
+      },
+      {
+        "text": "Rook",
+        "nx": 0.5000000443569449,
+        "ny": 0.44134413533740574
+      }
+    ],
+    "cam": {
+      "x": -23.217255486865515,
+      "y": 2.08705401780305,
+      "z": -34.82588212321294,
+      "fov": 46.871322946307586,
+      "aspect": 2.388888888888889
+    },
+    "car": {
+      "x": -19.9999942779541,
+      "y": 0.2287050187587738,
+      "z": -29.999990463256836
+    },
+    "lookDir": {
+      "x": 0.553516849129731,
+      "y": -0.06528484854091413,
+      "z": 0.8302752473008482
+    },
+    "ballCam": true,
+    "menuPresentation": false,
+    "garagePresentation": false,
+    "phase": "countdown",
+    "body": "in-match",
+    "inner": {
+      "w": 2064,
+      "h": 864,
+      "dpr": 1.6666666269302368
+    },
+    "canvases": {
+      "source": {
+        "display": "none",
+        "visibility": "visible",
+        "w": 3439,
+        "h": 1439,
+        "cssW": "100%",
+        "cssH": "100%"
+      },
+      "present": {
+        "display": "block",
+        "visibility": "visible",
+        "w": 3439,
+        "h": 1439,
+        "cssW": "2064px",
+        "cssH": "864px"
+      }
+    },
+    "pixelAtCar": {
+      "rgb": [
+        35,
+        77,
+        17
+      ],
+      "kind": "grass",
+      "canvas": "webgl-present-canvas"
+    }
+  },
+  "screenshot": "/home/adam/Dokumenty/Projekty/Ignite/test-results/chase-camera/chase-electron-autostart-2026-07-17T15-21-10-310Z.png",
+  "logs": [],
+  "hints": [
+    "src/Renderer.ts (followPlayer / snapChaseCamera)",
+    "src/game/GameSession.ts (applyMatchCamera)",
+    "src/main.ts (startMatch snap + menu loop)",
+    "src/visual/menuCinematicCamera.ts / crateBackdropOrbit.ts",
+    "src/visual/cameraFollow.ts"
+  ]
+}

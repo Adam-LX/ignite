@@ -1,0 +1,63 @@
+{
+  "generatedAt": "2026-07-17T15:17:52.407Z",
+  "target": "electron",
+  "path": "autostart",
+  "pass": true,
+  "fails": [],
+  "audit": {
+    "ok": true,
+    "pass": true,
+    "dist": 6.090440089989522,
+    "ndc": {
+      "x": -1.4742140644256909e-16,
+      "y": -0.5761429741832531,
+      "z": 0.9662316818605173
+    },
+    "carScreen": {
+      "nx": 0.49999999999999994,
+      "ny": 0.7880714870916266
+    },
+    "tagErr": 0.17708910656017435,
+    "tags": [
+      {
+        "text": "You",
+        "nx": 0.5000000073928241,
+        "ny": 0.6109823805314524
+      },
+      {
+        "text": "Rook",
+        "nx": 0.5000000443569449,
+        "ny": 0.4377623818538807
+      }
+    ],
+    "cam": {
+      "x": -23.217265382023076,
+      "y": 2.087059929784004,
+      "z": -34.82586153921711,
+      "fov": 46.871322946307586
+    },
+    "car": {
+      "x": -20.000001907348633,
+      "y": 0.2287110686302185,
+      "z": -29.999971389770508
+    },
+    "lookDir": {
+      "x": 0.5535172346987558,
+      "y": -0.0652849655503798,
+      "z": 0.8302749810541856
+    },
+    "ballCam": true,
+    "menuPresentation": false,
+    "garagePresentation": false,
+    "phase": "countdown",
+    "body": "in-match",
+    "inner": {
+      "w": 2064,
+      "h": 864,
+      "dpr": 1.6666666269302368
+    }
+  },
+  "screenshot": "/home/adam/Dokumenty/Projekty/Ignite/test-results/chase-camera/chase-electron-autostart-2026-07-17T15-17-50-122Z.png",
+  "logs": [],
+  "hints": []
+}

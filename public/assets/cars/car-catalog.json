@@ -1,0 +1,172 @@
+{
+	"schemaVersion": 2,
+	"hitboxProfile": "octane",
+	"cars": [
+		{
+			"id": "octane",
+			"nameKey": "garage.car.octane",
+			"glb": "/assets/models/car.glb",
+			"glbOrange": "/assets/models/car_orange.glb",
+			"rarity": "common",
+			"bodyStyle": "standard",
+			"source": "meshy",
+			"tintable": true,
+			"defaultUnlocked": true,
+			"wheelWellMode": "stock",
+			"wheelMounts": {
+				"frontDiameterM": 0.25,
+				"rearDiameterM": 0.25
+			}
+		},
+		{
+			"id": "muscle",
+			"nameKey": "garage.car.muscle",
+			"glb": "/assets/cars/muscle.glb",
+			"rarity": "rare",
+			"bodyStyle": "wide",
+			"source": "trellis",
+			"tintable": true,
+			"defaultUnlocked": false,
+			"wheelWellMode": "empty",
+			"defaultWheelId": "muscleforge",
+			"generationPrompt": "Wide muscle hover car, aggressive fenders, orange neon underglow, brushed metal panels, game-ready PBR vehicle, empty wheel arch cutouts, NO wheels, NO tires, body shell only",
+			"wheelMounts": {
+				"frontDiameterM": 0.28,
+				"rearDiameterM": 0.28
+			}
+		},
+		{
+			"id": "sleek",
+			"nameKey": "garage.car.sleek",
+			"glb": "/assets/cars/sleek.glb",
+			"rarity": "epic",
+			"bodyStyle": "low",
+			"source": "trellis",
+			"tintable": true,
+			"defaultUnlocked": false,
+			"wheelWellMode": "empty",
+			"defaultWheelId": "default",
+			"generationPrompt": "Low profile sleek supercar hover, aerodynamic wedge shape, purple neon accents, glossy paint, game-ready PBR, empty wheel arch cutouts, NO wheels, NO tires",
+			"wheelMounts": {
+				"frontDiameterM": 0.24,
+				"rearDiameterM": 0.24
+			}
+		},
+		{
+			"id": "hatch",
+			"nameKey": "garage.car.hatch",
+			"glb": "/assets/cars/hatch.glb",
+			"rarity": "rare",
+			"bodyStyle": "hatch",
+			"source": "trellis",
+			"tintable": true,
+			"defaultUnlocked": false,
+			"wheelWellMode": "empty",
+			"generationPrompt": "Compact hatchback hover car, short wheelbase, lime green neon trim, rally-inspired, game-ready PBR, empty wheel arch cutouts, NO wheels",
+			"wheelMounts": {
+				"frontDiameterM": 0.25,
+				"rearDiameterM": 0.25
+			}
+		},
+		{
+			"id": "truck",
+			"nameKey": "garage.car.truck",
+			"glb": "/assets/cars/truck.glb",
+			"rarity": "legendary",
+			"bodyStyle": "tall",
+			"source": "trellis",
+			"tintable": true,
+			"defaultUnlocked": false,
+			"wheelWellMode": "empty",
+			"defaultWheelId": "truckforge",
+			"generationPrompt": "Tall pickup truck hover car, boxy cab, red neon roll bar, game-ready PBR, empty wheel arch cutouts, NO wheels, NO tires",
+			"wheelMounts": {
+				"frontDiameterM": 0.3,
+				"rearDiameterM": 0.3
+			}
+		},
+		{
+			"id": "blade",
+			"nameKey": "garage.car.blade",
+			"glb": "/assets/cars/blade.glb",
+			"rarity": "epic",
+			"bodyStyle": "low",
+			"source": "trellis",
+			"tintable": true,
+			"defaultUnlocked": false,
+			"wheelWellMode": "empty",
+			"generationPrompt": "Blade-shaped hover car, sharp angular panels, ice blue LED edges, matte black body, game-ready PBR, empty wheel arch cutouts, NO wheels",
+			"wheelMounts": {
+				"frontDiameterM": 0.24,
+				"rearDiameterM": 0.24
+			}
+		},
+		{
+			"id": "buggy",
+			"nameKey": "garage.car.buggy",
+			"glb": "/assets/cars/buggy.glb",
+			"rarity": "rare",
+			"bodyStyle": "wide",
+			"source": "trellis",
+			"tintable": true,
+			"defaultUnlocked": false,
+			"wheelWellMode": "empty",
+			"defaultWheelId": "dune",
+			"generationPrompt": "Off-road buggy hover car, exposed suspension, yellow neon accents, wide stance, game-ready PBR, empty wheel arch cutouts, NO wheels",
+			"wheelMounts": {
+				"frontDiameterM": 0.28,
+				"rearDiameterM": 0.28
+			}
+		},
+		{
+			"id": "phantom",
+			"nameKey": "garage.car.phantom",
+			"glb": "/assets/cars/phantom.glb",
+			"rarity": "legendary",
+			"bodyStyle": "low",
+			"source": "trellis",
+			"tintable": true,
+			"defaultUnlocked": false,
+			"wheelWellMode": "empty",
+			"generationPrompt": "Stealth phantom hover car, dark chrome, subtle cyan edge lighting, smooth curves, game-ready PBR, empty wheel arch cutouts, NO wheels",
+			"wheelMounts": {
+				"frontDiameterM": 0.24,
+				"rearDiameterM": 0.24
+			}
+		},
+		{
+			"id": "bruiser",
+			"nameKey": "garage.car.bruiser",
+			"glb": "/assets/cars/bruiser.glb",
+			"rarity": "legendary",
+			"bodyStyle": "wide",
+			"source": "trellis",
+			"generationPrompt": "High-quality watertight 1970s American muscle coupe hover car, Challenger-inspired long-hood short-deck fastback, wide flared fenders, cherry red metallic paint, red neon underglow. SOLID manifold closed body mesh: filled front grille and bumper with dual round headlight lenses as solid geometry, filled rear bumper and taillight panel, NO holes, NO hollow voids, NO missing polygons. Dark opaque tinted glass windows, deep charcoal reflective glass, NEVER milky white, NEVER chalky white. Clean empty wheel arches only, NO wheels, NO tires, game-ready PBR body shell",
+			"tintable": true,
+			"defaultUnlocked": false,
+			"wheelWellMode": "empty",
+			"wheelMounts": {
+				"frontDiameterM": 0.28,
+				"rearDiameterM": 0.28
+			},
+			"defaultWheelId": "muscleforge"
+		},
+		{
+			"id": "bruiserNeo",
+			"nameKey": "garage.car.bruiserNeo",
+			"glb": "/assets/cars/bruiserNeo.glb",
+			"rarity": "legendary",
+			"bodyStyle": "wide",
+			"source": "trellis",
+			"tintable": true,
+			"defaultUnlocked": false,
+			"generationPrompt": "High-quality watertight modern American muscle coupe hover car, 2010s–2020s Challenger SRT widebody style, long flat hood short rear deck, aggressive widebody fender flares, planted low stance. Front: deep recessed full-width black mesh grille with FOUR circular halo LED headlights (two per side), central hood scoop, bold black front splitter lip. Rear: dual rectangular ring-style LED taillights, subtle trunk lip spoiler. Glossy metallic burgundy or cherry red body, black roof and trim accents, neon underglow optional. SOLID manifold closed body mesh: filled grille bumper and light lenses as solid geometry, filled rear bumper and taillight panel, NO holes, NO hollow voids, NO missing polygons. Dark opaque tinted glass, deep charcoal reflective windows, NEVER milky white. Clean empty wheel arches only, NO wheels, NO tires, game-ready PBR body shell",
+			"wheelWellMode": "empty",
+			"wheelMounts": {
+				"frontDiameterM": 0.28,
+				"rearDiameterM": 0.28
+			},
+			"defaultWheelId": "muscleforge"
+		}
+	]
+}

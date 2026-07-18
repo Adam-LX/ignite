@@ -1,0 +1,28 @@
+{
+  "generatedAt": "2026-07-17T16:29:09.808Z",
+  "pass": false,
+  "fails": [
+    "no-replay-phase"
+  ],
+  "enteredReplay": false,
+  "ballTravel": 0,
+  "maxCamJump": 0,
+  "camY": {
+    "min": 99,
+    "max": 0
+  },
+  "maxSpeed": 0,
+  "sampleCount": 0,
+  "samples": [],
+  "logs": [
+    "[Match] [10.09s] start 1v1",
+    "[Match] [10.76s] session ready",
+    "[Match] [20.83s] match live"
+  ],
+  "hints": [
+    "src/game/GoalReplay.ts (buildClip / hold frames)",
+    "src/game/GameSession.ts (startGoalReplayClip — visual vs physics)",
+    "src/modes/MatchController.ts (shouldRecordReplay + goal_bounce)",
+    "src/Renderer.ts (followReplayBall)"
+  ]
+}

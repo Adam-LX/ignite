@@ -1,0 +1,492 @@
+{
+  "generatedAt": "2026-07-17T16:02:28.874Z",
+  "target": "vite",
+  "path": "autostart",
+  "survey": true,
+  "pass": false,
+  "fails": [
+    "midfield:pixelWashoutAtCar",
+    "midfield:pixelWashoutAtCarGl",
+    "blue-corner-L:pixelWashoutAtCar",
+    "blue-corner-L:pixelWashoutAtCarGl",
+    "orange-goal:pixelWashoutAtCar",
+    "orange-goal:pixelWashoutAtCarGl"
+  ],
+  "samples": [
+    {
+      "id": "kickoff-blue",
+      "probe": {
+        "id": "kickoff-blue",
+        "x": 0,
+        "z": -40,
+        "yaw": 0,
+        "ballCam": true
+      },
+      "pass": true,
+      "fails": [],
+      "dist": 6.090562499764205,
+      "ndc": {
+        "x": 0,
+        "y": -0.37088332185209455,
+        "z": 0.9664834271632329
+      },
+      "cam": {
+        "x": 0,
+        "y": 2.308749988357226,
+        "z": -45.8,
+        "fov": 60.44038501164302,
+        "aspect": 1.7777777777777777
+      },
+      "car": {
+        "x": 0,
+        "y": 0.44999998807907104,
+        "z": -40
+      },
+      "pixelAtCar": {
+        "rgb": [
+          44,
+          51,
+          55
+        ],
+        "kind": "dark",
+        "canvas": "present",
+        "washN": 0,
+        "grassN": 0,
+        "darkN": 22,
+        "otherN": 3
+      },
+      "frameWashout": 0,
+      "screenshot": "/home/adam/Dokumenty/Projekty/Ignite/test-results/chase-camera/survey/2026-07-17T16-00-58-171Z-kickoff-blue.png"
+    },
+    {
+      "id": "midfield",
+      "probe": {
+        "id": "midfield",
+        "x": 0,
+        "z": 0,
+        "yaw": 0.4,
+        "ballCam": true
+      },
+      "pass": false,
+      "fails": [
+        "pixelWashoutAtCar",
+        "pixelWashoutAtCarGl"
+      ],
+      "dist": 6.090562499764208,
+      "ndc": {
+        "x": 2.3597714817226545e-16,
+        "y": -0.3708833218520938,
+        "z": 0.9664834271632329
+      },
+      "cam": {
+        "x": -2.2586263853901727,
+        "y": 2.308749988357226,
+        "z": -5.342153765216733,
+        "fov": 60.44038501164302,
+        "aspect": 1.7777777777777777
+      },
+      "car": {
+        "x": 0,
+        "y": 0.44999998807907104,
+        "z": 0
+      },
+      "pixelAtCar": {
+        "rgb": [
+          238,
+          230,
+          223
+        ],
+        "kind": "washout",
+        "canvas": "present",
+        "washN": 16,
+        "grassN": 0,
+        "darkN": 0,
+        "otherN": 9
+      },
+      "frameWashout": 0,
+      "screenshot": "/home/adam/Dokumenty/Projekty/Ignite/test-results/chase-camera/survey/2026-07-17T16-00-58-171Z-midfield.png"
+    },
+    {
+      "id": "orange-half",
+      "probe": {
+        "id": "orange-half",
+        "x": 12,
+        "z": 55,
+        "yaw": 3.141592653589793,
+        "ballCam": true
+      },
+      "pass": true,
+      "fails": [],
+      "dist": 6.0905627439525105,
+      "ndc": {
+        "x": -2.8814767712191276e-16,
+        "y": -0.37088511299205934,
+        "z": 0.966483421275469
+      },
+      "cam": {
+        "x": 12,
+        "y": 2.2755965094948065,
+        "z": 60.8,
+        "fov": 60.44038501164302,
+        "aspect": 1.7777777777777777
+      },
+      "car": {
+        "x": 12,
+        "y": 0.4168457090854645,
+        "z": 55
+      },
+      "pixelAtCar": {
+        "rgb": [
+          220,
+          209,
+          201
+        ],
+        "kind": "other",
+        "canvas": "present",
+        "washN": 7,
+        "grassN": 0,
+        "darkN": 0,
+        "otherN": 18
+      },
+      "frameWashout": 0,
+      "screenshot": "/home/adam/Dokumenty/Projekty/Ignite/test-results/chase-camera/survey/2026-07-17T16-00-58-171Z-orange-half.png"
+    },
+    {
+      "id": "blue-corner-L",
+      "probe": {
+        "id": "blue-corner-L",
+        "x": -45,
+        "z": -70,
+        "yaw": 0.8,
+        "ballCam": true
+      },
+      "pass": false,
+      "fails": [
+        "pixelWashoutAtCar",
+        "pixelWashoutAtCarGl"
+      ],
+      "dist": 6.090562499764205,
+      "ndc": {
+        "x": 0,
+        "y": -0.3708833218520954,
+        "z": 0.9664834271632328
+      },
+      "cam": {
+        "x": -49.16066532721723,
+        "y": 2.308749988357226,
+        "z": -74.04089891421356,
+        "fov": 60.44038501164302,
+        "aspect": 1.7777777777777777
+      },
+      "car": {
+        "x": -45,
+        "y": 0.44999998807907104,
+        "z": -70
+      },
+      "pixelAtCar": {
+        "rgb": [
+          214,
+          205,
+          196
+        ],
+        "kind": "washout",
+        "canvas": "present",
+        "washN": 12,
+        "grassN": 0,
+        "darkN": 0,
+        "otherN": 13
+      },
+      "frameWashout": 0,
+      "screenshot": "/home/adam/Dokumenty/Projekty/Ignite/test-results/chase-camera/survey/2026-07-17T16-00-58-171Z-blue-corner-L.png"
+    },
+    {
+      "id": "blue-corner-R",
+      "probe": {
+        "id": "blue-corner-R",
+        "x": 45,
+        "z": -70,
+        "yaw": -0.8,
+        "ballCam": true
+      },
+      "pass": true,
+      "fails": [],
+      "dist": 6.0905627439525185,
+      "ndc": {
+        "x": -1.152590709536577e-15,
+        "y": -0.37088512056162737,
+        "z": 0.9664834212448941
+      },
+      "cam": {
+        "x": 49.16066531806522,
+        "y": 2.2755965094948065,
+        "z": -74.04089892363683,
+        "fov": 60.44038501164302,
+        "aspect": 1.7777777777777777
+      },
+      "car": {
+        "x": 45,
+        "y": 0.4168457090854645,
+        "z": -70
+      },
+      "pixelAtCar": {
+        "rgb": [
+          206,
+          192,
+          181
+        ],
+        "kind": "other",
+        "canvas": "present",
+        "washN": 4,
+        "grassN": 0,
+        "darkN": 0,
+        "otherN": 21
+      },
+      "frameWashout": 0.041666666666666664,
+      "screenshot": "/home/adam/Dokumenty/Projekty/Ignite/test-results/chase-camera/survey/2026-07-17T16-00-58-171Z-blue-corner-R.png"
+    },
+    {
+      "id": "sideline-L",
+      "probe": {
+        "id": "sideline-L",
+        "x": -55,
+        "z": 10,
+        "yaw": 1.2,
+        "ballCam": false
+      },
+      "pass": true,
+      "fails": [],
+      "dist": 6.087897830942958,
+      "ndc": {
+        "x": 5.804043802209462e-16,
+        "y": -0.42304366361700674,
+        "z": 0.9662438753085367
+      },
+      "cam": {
+        "x": -60.405826792973315,
+        "y": 2.299999988079071,
+        "z": 7.898325266752295,
+        "fov": 60.44038501164302,
+        "aspect": 1.7777777777777777
+      },
+      "car": {
+        "x": -55,
+        "y": 0.44999998807907104,
+        "z": 10
+      },
+      "pixelAtCar": {
+        "rgb": [
+          183,
+          177,
+          174
+        ],
+        "kind": "other",
+        "canvas": "present",
+        "washN": 2,
+        "grassN": 0,
+        "darkN": 0,
+        "otherN": 23
+      },
+      "frameWashout": 0,
+      "screenshot": "/home/adam/Dokumenty/Projekty/Ignite/test-results/chase-camera/survey/2026-07-17T16-00-58-171Z-sideline-L.png"
+    },
+    {
+      "id": "sideline-R",
+      "probe": {
+        "id": "sideline-R",
+        "x": 55,
+        "z": -10,
+        "yaw": -1.2,
+        "ballCam": true
+      },
+      "pass": true,
+      "fails": [],
+      "dist": 6.090331902684977,
+      "ndc": {
+        "x": -2.880988272097952e-16,
+        "y": -0.36915596709425713,
+        "z": 0.9664891169315675
+      },
+      "cam": {
+        "x": 60.405826681373284,
+        "y": 2.307994252026732,
+        "z": -12.10167502029993,
+        "fov": 60.44038501164302,
+        "aspect": 1.7777777777777777
+      },
+      "car": {
+        "x": 55,
+        "y": 0.44999998807907104,
+        "z": -10
+      },
+      "pixelAtCar": {
+        "rgb": [
+          186,
+          173,
+          164
+        ],
+        "kind": "other",
+        "canvas": "present",
+        "washN": 0,
+        "grassN": 0,
+        "darkN": 0,
+        "otherN": 25
+      },
+      "frameWashout": 0,
+      "screenshot": "/home/adam/Dokumenty/Projekty/Ignite/test-results/chase-camera/survey/2026-07-17T16-00-58-171Z-sideline-R.png"
+    },
+    {
+      "id": "orange-goal",
+      "probe": {
+        "id": "orange-goal",
+        "x": 0,
+        "z": 85,
+        "yaw": 3.141592653589793,
+        "ballCam": true
+      },
+      "pass": false,
+      "fails": [
+        "pixelWashoutAtCar",
+        "pixelWashoutAtCarGl"
+      ],
+      "dist": 6.090331902684974,
+      "ndc": {
+        "x": 0,
+        "y": -0.37863803935993545,
+        "z": 0.9664505186617169
+      },
+      "cam": {
+        "x": -6.372741599471506e-16,
+        "y": 2.307994252026732,
+        "z": 90.8,
+        "fov": 60.44038501164302,
+        "aspect": 1.7777777777777777
+      },
+      "car": {
+        "x": 0,
+        "y": 0.44999998807907104,
+        "z": 85
+      },
+      "pixelAtCar": {
+        "rgb": [
+          254,
+          253,
+          250
+        ],
+        "kind": "washout",
+        "canvas": "present",
+        "washN": 25,
+        "grassN": 0,
+        "darkN": 0,
+        "otherN": 0
+      },
+      "frameWashout": 0,
+      "screenshot": "/home/adam/Dokumenty/Projekty/Ignite/test-results/chase-camera/survey/2026-07-17T16-00-58-171Z-orange-goal.png"
+    },
+    {
+      "id": "blue-goal",
+      "probe": {
+        "id": "blue-goal",
+        "x": 0,
+        "z": -85,
+        "yaw": 0,
+        "ballCam": true
+      },
+      "pass": true,
+      "fails": [],
+      "dist": 6.0903317477669585,
+      "ndc": {
+        "x": 0,
+        "y": -0.3786369064144282,
+        "z": 0.9664505224739182
+      },
+      "cam": {
+        "x": 0,
+        "y": 2.3079937442198637,
+        "z": -90.8,
+        "fov": 60.44038501164302,
+        "aspect": 1.7777777777777777
+      },
+      "car": {
+        "x": 0,
+        "y": 0.44999998807907104,
+        "z": -85
+      },
+      "pixelAtCar": {
+        "rgb": [
+          216,
+          206,
+          196
+        ],
+        "kind": "other",
+        "canvas": "present",
+        "washN": 8,
+        "grassN": 0,
+        "darkN": 0,
+        "otherN": 17
+      },
+      "frameWashout": 0,
+      "screenshot": "/home/adam/Dokumenty/Projekty/Ignite/test-results/chase-camera/survey/2026-07-17T16-00-58-171Z-blue-goal.png"
+    },
+    {
+      "id": "near-jupiter",
+      "probe": {
+        "id": "near-jupiter",
+        "x": -50,
+        "z": -80,
+        "yaw": 0.3,
+        "ballCam": true
+      },
+      "pass": true,
+      "fails": [],
+      "dist": 5.664256839294504,
+      "ndc": {
+        "x": 0.1740835835914411,
+        "y": -0.4484728270853692,
+        "z": 0.9630335781632116
+      },
+      "cam": {
+        "x": -53.64211683112107,
+        "y": 2.3083273813392884,
+        "z": -83.91987370069724,
+        "fov": 60.44038501164302,
+        "aspect": 1.7777777777777777
+      },
+      "car": {
+        "x": -50,
+        "y": 0.44999998807907104,
+        "z": -80
+      },
+      "pixelAtCar": {
+        "rgb": [
+          212,
+          206,
+          207
+        ],
+        "kind": "other",
+        "canvas": "present",
+        "washN": 11,
+        "grassN": 0,
+        "darkN": 0,
+        "otherN": 14
+      },
+      "frameWashout": 0,
+      "screenshot": "/home/adam/Dokumenty/Projekty/Ignite/test-results/chase-camera/survey/2026-07-17T16-00-58-171Z-near-jupiter.png"
+    }
+  ],
+  "screenshot": "/home/adam/Dokumenty/Projekty/Ignite/test-results/chase-camera/chase-vite-autostart-2026-07-17T16-00-58-171Z.png",
+  "logs": [
+    "[Boot] [0.28s] start",
+    "[Boot] [9.87s] menu ready",
+    "[Boot] [9.87s] autostart 1v1",
+    "[Match] [9.87s] start 1v1",
+    "[Match] [10.48s] session ready",
+    "[Match] [19.92s] match live"
+  ],
+  "hints": [
+    "src/Renderer.ts (followPlayer / snapChaseCamera)",
+    "src/game/GameSession.ts (applyMatchCamera)",
+    "src/main.ts (startMatch snap + menu loop)",
+    "src/visual/cameraFollow.ts",
+    "src/visual/shaders/lensFlarePost.ts (washout)"
+  ]
+}

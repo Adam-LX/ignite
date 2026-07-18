@@ -1,0 +1,14 @@
+{
+	"fetch": [
+		"https://raw.githubusercontent.com/Adam-LX/ignite-releases/bot-brain/global-bot-policy.json",
+		"/assets/ai/bot-policy.json"
+	],
+	"sync": [],
+	"github": {
+		"owner": "Adam-LX",
+		"repo": "ignite-releases",
+		"branch": "bot-brain",
+		"path": "global-bot-policy.json"
+	},
+	"updatedAt": "2026-07-10T13:40:00.000Z"
+}

@@ -1,0 +1,42 @@
+# Mirror CI na GitHub — E2E online (roomServer + Playwright).
+
+name: E2E online
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "server/**"
+      - "scripts/match-online-trace.mjs"
+      - "scripts/run-e2e-online.sh"
+      - "tests/net/**"
+      - "package.json"
+      - "package-lock.json"
+  workflow_dispatch:
+
+jobs:
+  e2e-online:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Zależności
+        run: npm ci
+
+      - name: Vitest — room server HTTP/WS
+        run: npm run test -- tests/net/roomOnlineFlow.test.ts
+
+      - name: E2E online (Playwright trace)
+        env:
+          SKIP_E2E_BUILD: "1"
+          PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS: "1"
+        run: npm run test:e2e:online

@@ -1,0 +1,462 @@
+/* Showcase 3D — ghosting = HTML nad środkiem canvas (Wayland/Electron).
+   Przejście garaż↔menu: garage-entering = sam canvas, snap kamery przed UI. */
+
+#webgl-stack {
+	position: fixed;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	isolation: isolate;
+	transform: translateZ(0);
+	backface-visibility: hidden;
+}
+
+#webgl-stack #game-container {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	background: #0b1424;
+	pointer-events: none;
+}
+
+#webgl-stack #game-container canvas.webgl-source-canvas {
+	/* Zawsze w layoutcie — display:none zamraża WebGL (Electron). */
+	display: block;
+	opacity: 0;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+}
+
+#webgl-stack #game-container canvas.webgl-present-canvas {
+	display: block;
+	width: 100%;
+	height: 100%;
+	position: relative;
+	z-index: 0;
+	pointer-events: auto;
+	transform: translateZ(0);
+	backface-visibility: hidden;
+	filter: none !important;
+	image-rendering: auto;
+}
+
+body.in-match #webgl-stack canvas.webgl-present-canvas {
+	display: block !important;
+	pointer-events: auto;
+	position: relative;
+	z-index: 1;
+}
+
+body.in-match #webgl-stack canvas.webgl-source-canvas {
+	/* Widoczny dla GPU (nie display:none) — inaczej zamrożony kadr menu. */
+	display: block !important;
+	opacity: 0 !important;
+	pointer-events: none !important;
+	position: absolute !important;
+	inset: 0 !important;
+	z-index: 0 !important;
+}
+
+body.menu-active #webgl-stack #game-container canvas.webgl-source-canvas,
+body.garage-open #webgl-stack #game-container canvas.webgl-source-canvas {
+	display: block !important;
+	opacity: 0 !important;
+	pointer-events: none !important;
+	position: absolute !important;
+	inset: 0 !important;
+	z-index: 0 !important;
+}
+
+/* Menu — pełnoekranowy shell, panele tylko na brzegach */
+body.menu-active #main-menu:not(.hidden) {
+	display: block;
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	z-index: 12;
+	background: transparent !important;
+}
+
+/* Garaż — BEZ pełnoekranowego wrappera (display:contents = zero warstwy nad canvasem) */
+body.garage-open .garage-overlay:not(.hidden) {
+	display: contents !important;
+	position: static !important;
+	inset: auto !important;
+	width: auto !important;
+	height: auto !important;
+	z-index: auto !important;
+	opacity: 1 !important;
+	overflow: visible !important;
+	background: transparent !important;
+	pointer-events: none;
+}
+
+body.garage-open .garage-overlay__vignette {
+	display: none !important;
+}
+
+body.menu-active #webgl-stack,
+body.garage-open #webgl-stack,
+body.garage-entering #webgl-stack {
+	z-index: 0;
+}
+
+body.menu-active #webgl-stack .car-name-tag-layer,
+body.garage-open #webgl-stack .car-name-tag-layer {
+	display: none !important;
+}
+
+body.showcase-canvas-only #main-menu,
+body.showcase-canvas-only .garage-overlay {
+	display: none !important;
+}
+
+/* ── Środek ekranu = tylko WebGL (menu) ── */
+body.menu-active .main-menu__fx,
+body.menu-active .main-menu__rl-stage,
+body.menu-active .main-menu__cosmos-void,
+body.menu-active .main-menu__stage-chrome,
+body.menu-active .main-menu__apex-backdrop,
+body.menu-active .main-menu__apex-aurora,
+body.menu-active .main-menu__apex-aurora--b,
+body.menu-active .main-menu__apex-mesh,
+body.menu-active .main-menu__apex-prisms,
+body.menu-active .main-menu__grain,
+body.menu-active .main-menu__scanlines,
+body.menu-active .main-menu__beams,
+body.menu-active .main-menu__sparks,
+body.menu-active .main-menu__speed-streaks,
+body.menu-active .main-menu__diag-stripes,
+body.menu-active .main-menu__apex-noise {
+	display: none !important;
+}
+
+/* Soft vignette — tło = WebGL stadion (bez fake aurora / void). */
+body.menu-active .main-menu__fx.main-menu__fx--stadium-orbit {
+	display: block !important;
+	pointer-events: none;
+}
+body.menu-active .main-menu__vignette.main-menu__vignette--soft {
+	display: block !important;
+	opacity: 0.22;
+	pointer-events: none;
+}
+
+body.menu-active #main-menu,
+body.menu-active #main-menu *,
+body.garage-open .garage-top,
+body.garage-open .garage-layout,
+body.garage-open .garage-back-dock,
+body.garage-open .garage-top *,
+body.garage-open .garage-layout *,
+body.garage-open .garage-back-dock * {
+	mix-blend-mode: normal !important;
+	backdrop-filter: none !important;
+	-webkit-backdrop-filter: none !important;
+}
+
+body.menu-active #main-menu .main-menu__modes-blur {
+	backdrop-filter: none !important;
+	-webkit-backdrop-filter: none !important;
+	filter: none !important;
+}
+
+body.menu-active #main-menu .main-menu__layout {
+	animation: none !important;
+}
+
+body.menu-active #main-menu .mode-card--wypas.active,
+body.menu-active #main-menu .mode-card--wypas.active .mode-card__shimmer::after,
+body.menu-active #main-menu .mode-card--wypas.active .cosmos-shimmer-hover {
+	animation: none !important;
+}
+
+body.menu-active #main-menu .cosmos-shimmer-hover,
+body.menu-active #main-menu .cosmos-shimmer-text {
+	animation: none !important;
+	transition: none !important;
+}
+
+body.menu-active .main-menu__layout {
+	position: fixed;
+	inset: 0;
+	z-index: 14;
+	pointer-events: none;
+	display: grid;
+	grid-template-columns: minmax(11rem, 13.5rem) 1fr;
+	grid-template-rows: auto 1fr auto auto;
+	grid-template-areas:
+		"hud hud"
+		"rail ."
+		"modes modes"
+		"rail dock";
+	padding: clamp(0.75rem, 2vh, 1.25rem);
+	gap: clamp(0.5rem, 1.2vh, 0.85rem);
+	box-sizing: border-box;
+}
+
+body.menu-active .main-menu__cosmos-hud {
+	grid-area: hud;
+	pointer-events: none;
+}
+
+body.menu-active .main-menu__cosmos-brand-block {
+	pointer-events: auto;
+}
+
+body.menu-active .main-menu__rl-rail {
+	grid-area: rail;
+	pointer-events: auto;
+}
+
+body.menu-active .main-menu__rl-modes {
+	grid-area: modes;
+	grid-column: 1 / -1;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	pointer-events: none;
+	z-index: 6;
+}
+
+body.menu-active .main-menu__modes-block {
+	margin-inline: auto;
+	pointer-events: none;
+}
+
+body.menu-active .main-menu__rl-modes .main-menu__rl-stage-head,
+body.menu-active .main-menu__rl-modes .main-menu__rl-carousel,
+body.menu-active .main-menu__modes-block .main-menu__rl-stage-head,
+body.menu-active .main-menu__modes-block .main-menu__rl-carousel {
+	pointer-events: auto;
+}
+
+body.menu-active #main-menu .main-menu__modes-blur,
+body.menu-active #main-menu .main-menu__modes-blur::before,
+body.menu-active #main-menu .main-menu__modes-blur::after,
+body.menu-active #main-menu .mode-card__art-glow {
+	display: none !important;
+}
+
+body.menu-active .main-menu__rl-dock {
+	grid-area: dock;
+	pointer-events: auto;
+}
+
+/* ── Faza wejścia/wyjścia — sam canvas, zero HTML ── */
+body.garage-entering {
+	overflow: hidden;
+}
+
+body.garage-entering #main-menu,
+body.garage-entering .garage-overlay {
+	visibility: hidden !important;
+	pointer-events: none !important;
+	opacity: 0 !important;
+}
+
+/* ── Garaż: UI tylko lewa kolumna — środek = wyłącznie WebGL ── */
+body.garage-open {
+	overflow: hidden;
+}
+
+body.garage-open .garage-top {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: min(50vw, 42rem);
+	max-width: calc(5.25rem + 0.85rem + min(44vw, 36rem) + 2.5rem);
+	z-index: 20;
+	pointer-events: auto;
+}
+
+body.garage-open .garage-layout {
+	position: fixed;
+	top: clamp(3.5rem, 8vh, 4.5rem);
+	left: 0;
+	width: min(50vw, 42rem);
+	max-width: calc(5.25rem + 0.85rem + min(44vw, 36rem) + 2.5rem);
+	bottom: clamp(5rem, 14vh, 7rem);
+	right: auto;
+	z-index: 20;
+	display: grid;
+	grid-template-columns: 5.25rem minmax(0, 1fr);
+	grid-template-rows: 1fr;
+	align-items: stretch;
+	padding: 0 clamp(0.75rem, 2vw, 1.25rem);
+	pointer-events: none;
+}
+
+body.garage-open .garage-sidebar,
+body.garage-open .garage-top,
+body.garage-open .garage-hint {
+	pointer-events: auto;
+}
+
+body.garage-open .garage-main {
+	pointer-events: auto;
+	max-height: 100%;
+	height: 100%;
+	overflow: hidden;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+body.garage-open .garage-inventory,
+body.garage-open .garage-dock,
+body.garage-open .garage-dock__grid,
+body.garage-open .garage-dock__grid .garage-tile {
+	pointer-events: auto;
+}
+
+body.garage-open .garage-main .garage-hero__actions[data-garage-car-actions] {
+	pointer-events: auto;
+}
+
+body.garage-open .garage-inventory {
+	flex: 1 1 0;
+	min-height: 0;
+}
+
+body.garage-open .garage-main .garage-hero {
+	position: static;
+	transform: none;
+	padding: 0 0 0.25rem;
+	text-align: left;
+	pointer-events: none;
+	flex-shrink: 0;
+}
+
+body.garage-open .garage-main .garage-filters {
+	flex-shrink: 0;
+	margin-bottom: 0.45rem;
+	justify-content: flex-start;
+}
+
+/* Garaż — 3 kolumny od lewej krawędzi panelu (bez pustego pasa po lewej) */
+body.garage-open .garage-dock__grid {
+	display: flex !important;
+	flex-wrap: wrap !important;
+	justify-content: flex-start !important;
+	align-content: start;
+	gap: 0.65rem !important;
+	padding-inline: 0 !important;
+	width: 100% !important;
+	grid-template-columns: unset !important;
+}
+
+body.garage-open .garage-dock__grid .garage-tile {
+	flex: 0 1 calc((100% - 1.3rem) / 3) !important;
+	width: calc((100% - 1.3rem) / 3) !important;
+	min-width: 0 !important;
+	max-width: calc((100% - 1.3rem) / 3) !important;
+	scroll-snap-align: unset;
+	box-sizing: border-box !important;
+}
+
+body.garage-open .garage-main .garage-hero__actions {
+	pointer-events: auto;
+}
+
+body.garage-open .garage-main .garage-hero__plate {
+	align-items: flex-start;
+	text-align: left;
+	padding: 0.4rem 0.6rem;
+	box-shadow: none;
+	background: rgba(4, 8, 16, 0.72);
+}
+
+body.garage-open .garage-main .garage-hero__name {
+	font-size: clamp(0.95rem, 1.6vw, 1.2rem);
+}
+
+body.garage-open .garage-main .garage-hero__meta {
+	gap: 0.3rem;
+	margin-top: 0.1rem;
+}
+
+body.garage-open .garage-main .garage-hero__actions {
+	margin-top: 0.4rem;
+	gap: 0.3rem;
+}
+
+body.garage-open .garage-back-dock {
+	position: fixed;
+	left: clamp(0.75rem, 2vw, 1.25rem);
+	bottom: clamp(0.75rem, 2vh, 1.25rem);
+	z-index: 21;
+	pointer-events: auto;
+}
+
+body.menu-active #main-menu .main-menu__rl-modes {
+	grid-area: modes;
+	pointer-events: none;
+	overflow: visible;
+}
+
+body.menu-active #main-menu .main-menu__rl-carousel {
+	position: relative;
+	isolation: isolate;
+	overflow: visible;
+}
+
+body.menu-active #main-menu .main-menu__modes-track {
+	position: relative;
+	z-index: 0;
+}
+
+body.menu-active #main-menu .main-menu__rl-stage-head,
+body.menu-active #main-menu .main-menu__rl-playlist {
+	position: relative;
+	z-index: 8;
+}
+
+/* Garaż — 3 kolumny od lewej krawędzi panelu (bez pustego pasa / bez center override) */
+body.garage-open .garage-dock__grid {
+	display: flex !important;
+	flex-wrap: wrap !important;
+	justify-content: flex-start !important;
+	align-content: start;
+	gap: 0.65rem !important;
+	padding-inline: 0 !important;
+	width: 100% !important;
+	grid-template-columns: unset !important;
+}
+
+body.garage-open .garage-dock__grid .garage-tile {
+	flex: 0 1 calc((100% - 1.3rem) / 3) !important;
+	width: calc((100% - 1.3rem) / 3) !important;
+	min-width: 0 !important;
+	max-width: calc((100% - 1.3rem) / 3) !important;
+	scroll-snap-align: unset;
+	box-sizing: border-box !important;
+}
+
+body.garage-open .garage-dock__grid .garage-tile--selected {
+	transform: none;
+}
+
+body.garage-open .garage-dock__grid .garage-tile__frame {
+	aspect-ratio: 1 / 1 !important;
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+}
+
+body.garage-open .garage-sidebar__btn {
+	width: 5.5rem;
+	height: 5.5rem;
+}
+
+body.garage-open .garage-sidebar__svg {
+	width: 2.9rem;
+	height: 2.9rem;
+}

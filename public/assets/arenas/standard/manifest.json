@@ -1,0 +1,14 @@
+{
+	"grassColor": "/assets/textures/meshy_grass_color.jpg",
+	"grassNormal": "/assets/textures/meshy_grass_normal.jpg",
+	"grassRoughness": "/assets/textures/meshy_grass_roughness.jpg",
+	"wallPanel": "/assets/textures/meshy_arena_wall.png",
+	"bannerPanel": "/assets/textures/meshy_banner_panel.png",
+	"ceilingPanel": "/assets/textures/meshy_arena_ceiling.png",
+	"goalFrame": "/assets/models/stadium_goal_complete.glb",
+	"carModel": "/assets/models/car.glb",
+	"carOrangeModel": "/assets/models/car_orange.glb",
+	"ballAlbedo": "/assets/textures/meshy_ball_albedo.jpg",
+	"ballModel": "/assets/models/ball_meshy.glb",
+	"updatedAt": "2026-07-12T01:01:36.461Z"
+}

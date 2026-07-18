@@ -1,0 +1,99 @@
+{
+  "generatedAt": "2026-07-17T15:23:58.388Z",
+  "target": "electron",
+  "path": "autostart",
+  "pass": false,
+  "fails": [
+    "pixelGrassAtCar"
+  ],
+  "audit": {
+    "ok": true,
+    "pass": true,
+    "dist": 6.090440120456803,
+    "ndc": {
+      "x": 7.257669350491241e-17,
+      "y": -0.5761431723339066,
+      "z": 0.9662316813463722
+    },
+    "carScreen": {
+      "nx": 0.5,
+      "ny": 0.7880715861669533
+    },
+    "tagErr": 0.1770903712374446,
+    "tags": [
+      {
+        "text": "You",
+        "nx": 0.49999997782152755,
+        "ny": 0.6109812149295101
+      },
+      {
+        "text": "Rook",
+        "nx": 0.4999999852143517,
+        "ny": 0.44063852230707806
+      }
+    ],
+    "cam": {
+      "x": -23.217246162537748,
+      "y": 2.0870556486942338,
+      "z": -34.82586481546497,
+      "fov": 46.871322946307586,
+      "aspect": 2.388888888888889
+    },
+    "car": {
+      "x": -19.999984741210938,
+      "y": 0.22870668768882751,
+      "z": -29.99997329711914
+    },
+    "lookDir": {
+      "x": 0.55351688379106,
+      "y": -0.065284900451517,
+      "z": 0.8302752201115422
+    },
+    "ballCam": true,
+    "menuPresentation": false,
+    "garagePresentation": false,
+    "phase": "countdown",
+    "body": "in-match",
+    "inner": {
+      "w": 2064,
+      "h": 864,
+      "dpr": 1.6666666269302368
+    },
+    "canvases": {
+      "source": {
+        "display": "block",
+        "visibility": "visible",
+        "w": 3439,
+        "h": 1439,
+        "cssW": "2064px",
+        "cssH": "864px"
+      },
+      "present": {
+        "display": "block",
+        "visibility": "visible",
+        "w": 3439,
+        "h": 1439,
+        "cssW": "2064px",
+        "cssH": "864px"
+      }
+    },
+    "pixelAtCar": {
+      "rgb": [
+        33,
+        74,
+        15
+      ],
+      "kind": "grass",
+      "canvas": "webgl-present-canvas"
+    }
+  },
+  "screenshot": "/home/adam/Dokumenty/Projekty/Ignite/test-results/chase-camera/chase-electron-autostart-2026-07-17T15-23-56-109Z.png",
+  "logs": [],
+  "hints": [
+    "src/Renderer.ts (followPlayer / snapChaseCamera)",
+    "src/game/GameSession.ts (applyMatchCamera)",
+    "src/main.ts (startMatch snap + menu loop)",
+    "src/visual/menuCinematicCamera.ts / crateBackdropOrbit.ts",
+    "src/visual/cameraFollow.ts"
+  ]
+}
