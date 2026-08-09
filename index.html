@@ -1,0 +1,676 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/assets/icon.png" />
+    <link rel="icon" type="image/svg+xml" href="/assets/flyball.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ignite | Car Soccer</title>
+    <style>
+      html, body { margin: 0; background: #000; color-scheme: dark; }
+      #game-container { background: #0b1424; }
+      #game-container canvas { background: #0b1424; display: block; }
+      .hidden { display: none !important; }
+      #hud { position: fixed; inset: 0; pointer-events: none; }
+      #boost-panel { position: absolute; right: 1.35rem; bottom: 2rem; }
+      #boost-ring { width: 136px; height: 136px; }
+      #boost-ring svg { display: block; width: 136px; height: 136px; }
+      #speed-panel { display: none !important; }
+      /**
+       * Boot 3D intro: ukryj video/logo z autami TYLKO przed startem cinematic.
+       * NIE ustawiaj #loading { background:#000 !important } — zasłania WebGL intro.
+       */
+      html.ignite-boot-cinematic #loading .boot-intro__video,
+      html.ignite-boot-cinematic #loading .boot-intro__shade,
+      html.ignite-boot-cinematic #loading .boot-intro__brand { display: none !important; }
+      html.ignite-boot-cinematic:not(.ignite-boot-cinematic-ready) #loading .boot-intro__ui {
+        opacity: 0 !important;
+      }
+      html.ignite-boot-cinematic #error,
+      html.ignite-boot-cinematic #supersonic-banner,
+      html.ignite-boot-cinematic #power-shot-banner,
+      html.ignite-boot-cinematic #demolish-banner,
+      html.ignite-boot-cinematic #epic-save-banner,
+      html.ignite-boot-cinematic #post-hit-banner,
+      html.ignite-boot-cinematic #cam-indicator {
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+      html.ignite-boot-cinematic #error { display: none !important; }
+      /* Crash preview: zero flash dużego boot logo — zanim body się namaluje */
+      html.preview-crash #loading { display: none !important; }
+      html.preview-crash #error {
+        display: flex !important;
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        align-items: center;
+        justify-content: center;
+        background:
+          radial-gradient(ellipse 70% 55% at 50% 38%, rgba(255, 140, 40, 0.14), transparent 62%),
+          radial-gradient(ellipse 120% 90% at 50% 40%, #152033 0%, #0c141e 58%, #070b12 100%);
+        padding: 1.5rem;
+        box-sizing: border-box;
+        overflow: hidden;
+      }
+      /*
+       * Krytyczny layout crash UI w <head> — bez FOUC (auto/SVG bez style.css
+       * malują się w naturalnym rozmiarze: car ~728px, trójkąt ogromny).
+       */
+      #error {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        align-items: center;
+        justify-content: center;
+        background:
+          radial-gradient(ellipse 70% 55% at 50% 38%, rgba(255, 140, 40, 0.14), transparent 62%),
+          radial-gradient(ellipse 120% 90% at 50% 40%, #152033 0%, #0c141e 58%, #070b12 100%);
+        padding: 1.5rem;
+        box-sizing: border-box;
+        overflow: hidden;
+        color: #fff;
+        font-family: system-ui, sans-serif;
+      }
+      .error-crash {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.55rem;
+        max-width: 28rem;
+        width: 100%;
+        text-align: center;
+      }
+      .error-crash__logo {
+        display: block;
+        width: min(260px, 58vw);
+        height: auto;
+        margin: 0 auto;
+      }
+      .error-crash__stage {
+        position: relative;
+        display: block;
+        width: min(420px, 34vw);
+        margin: 0.2rem auto 0.05rem;
+        overflow: visible;
+      }
+      .error-crash__warn {
+        position: absolute;
+        left: 2%;
+        top: -6%;
+        z-index: 3;
+        width: 42%;
+        height: auto;
+        display: block;
+        transform: rotate(-8deg);
+        pointer-events: none;
+      }
+      .error-crash__car {
+        position: relative;
+        z-index: 1;
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        margin: 0;
+        object-fit: contain;
+      }
+      .error-crash__title {
+        margin: 0.35rem 0 0;
+        font-size: clamp(1.35rem, 4vw, 1.85rem);
+        font-weight: 900;
+        color: #fff4d6;
+      }
+      .error-crash__hint {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 500;
+        line-height: 1.45;
+        color: #a8b4c4;
+        max-width: 26rem;
+      }
+      .error-crash__gag[hidden] { display: none; }
+      .error-crash__reload {
+        margin-top: 0.35rem;
+        border: 0;
+        border-radius: 4px;
+        padding: 0.7rem 1.6rem;
+        font-weight: 800;
+        font-size: 0.95rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #0a121c;
+        background: linear-gradient(180deg, #ffe566, #e8a020);
+        cursor: pointer;
+      }
+      .error-crash__details {
+        margin-top: 0.5rem;
+        width: 100%;
+        max-width: 26rem;
+        text-align: center;
+        font-size: 0.8rem;
+        color: #7a8799;
+      }
+    </style>
+    <script>
+      (function () {
+        try {
+          var q = new URLSearchParams(location.search);
+          if (q.get("previewCrash") === "1") {
+            document.documentElement.classList.add("preview-crash");
+            return;
+          }
+          if (q.get("skipIntro") === "1" || q.get("autostart") || q.get("onlineE2e") || q.get("garageAudit") === "1") return;
+          /** Domyślnie 3D kick; ?videoIntro=1 / ?cinematicIntro=1 → SM game cinematic mp4. */
+          var videoIntro = q.get("videoIntro") === "1" || q.get("cinematicIntro") === "1" || q.get("oldIntro") === "0";
+          if (!videoIntro) {
+            document.documentElement.classList.add("ignite-boot-cinematic");
+            document.addEventListener("DOMContentLoaded", function () {
+              var loading = document.getElementById("loading");
+              if (loading) loading.classList.add("boot-intro--cinematic");
+              var v = document.getElementById("boot-intro-video");
+              if (v) { v.removeAttribute("src"); v.removeAttribute("autoplay"); }
+            });
+            return;
+          }
+          document.addEventListener("DOMContentLoaded", function () {
+            var loading = document.getElementById("loading");
+            if (loading) loading.classList.add("boot-intro--cinematic-sm");
+            var v = document.getElementById("boot-intro-video");
+            if (v && !v.getAttribute("src")) {
+              v.src = "/assets/video/ignite_boot_cinematic.mp4?v=6";
+              v.loop = false;
+              v.preload = "auto";
+            }
+          });
+        } catch (_) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="loading">
+      <video
+        id="boot-intro-video"
+        class="boot-intro__video"
+        muted
+        loop
+        playsinline
+        preload="none"
+      ></video>
+      <div class="boot-intro__shade" aria-hidden="true"></div>
+      <div class="boot-intro__brand" aria-hidden="true">
+        <img
+          class="boot-intro__logo"
+          id="boot-intro-logo"
+          src="/assets/ui/menu/ignite_modern_logo.png"
+          alt=""
+          width="960"
+          height="421"
+          decoding="async"
+        />
+      </div>
+      <div class="boot-intro__ui">
+        <p data-i18n="loading.game">Ładowanie Ignite…</p>
+        <p id="loading-status"></p>
+        <div
+          class="boot-intro__bar"
+          role="progressbar"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+          aria-label="Postęp ładowania"
+        >
+          <div class="boot-intro__bar-track">
+            <div id="boot-intro-fill" class="boot-intro__bar-fill"></div>
+            <div class="boot-intro__bar-shine" aria-hidden="true"></div>
+          </div>
+          <span id="boot-intro-pct" class="boot-intro__pct">0%</span>
+        </div>
+      </div>
+    </div>
+    <script>
+      /* Natychmiast po #loading — zero painta boot logo na crash preview */
+      (function () {
+        if (!document.documentElement.classList.contains("preview-crash")) return;
+        var loading = document.getElementById("loading");
+        if (loading) loading.classList.add("hidden");
+        var logo = document.getElementById("boot-intro-logo");
+        if (logo) {
+          logo.removeAttribute("src");
+          logo.remove();
+        }
+      })();
+    </script>
+    <div id="error" role="alert" aria-live="assertive">
+      <div class="error-crash">
+        <img
+          class="error-crash__logo"
+          src="/assets/ui/menu/ignite_modern_logo.png"
+          alt="Ignite"
+          width="260"
+          height="111"
+          decoding="async"
+        />
+        <div class="error-crash__stage" aria-hidden="true">
+          <svg
+            class="error-crash__warn"
+            viewBox="0 0 120 110"
+            width="176"
+            height="161"
+            aria-hidden="true"
+          >
+            <defs>
+              <linearGradient id="error-warn-fill" x1="60" y1="4" x2="60" y2="108" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#fff3a0" />
+                <stop offset="38%" stop-color="#ffd400" />
+                <stop offset="100%" stop-color="#e07a00" />
+              </linearGradient>
+              <linearGradient id="error-warn-sheen" x1="30" y1="20" x2="90" y2="95" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55" />
+                <stop offset="42%" stop-color="#ffffff" stop-opacity="0.08" />
+                <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M60 8 L114 102 H6 Z"
+              fill="url(#error-warn-fill)"
+              stroke="#111111"
+              stroke-width="10"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M60 22 L98 94 H22 Z"
+              fill="url(#error-warn-sheen)"
+              opacity="0.85"
+            />
+            <text
+              x="60"
+              y="82"
+              text-anchor="middle"
+              font-family="Arial Black, Arial, sans-serif"
+              font-size="52"
+              font-weight="900"
+              fill="#111111"
+            >!</text>
+          </svg>
+          <img
+            class="error-crash__car"
+            src="/assets/ui/crash/car.png?v=4"
+            alt=""
+            width="420"
+            height="162"
+            decoding="async"
+          />
+        </div>
+        <p class="error-crash__title">Your car just crashed.</p>
+        <p class="error-crash__hint">Something went wrong in Ignite. Hit Reload — the pit crew is on it.</p>
+        <p class="error-crash__gag" id="error-gag" hidden></p>
+        <button type="button" id="error-reload" class="error-crash__reload">Reload</button>
+        <details class="error-crash__details">
+          <summary>Technical details</summary>
+          <pre id="error-msg"></pre>
+        </details>
+      </div>
+    </div>
+    <svg xmlns="http://www.w3.org/2000/svg" class="svg-sprite" aria-hidden="true" focusable="false"></svg>
+    <div id="goal-spectacle-flash" aria-hidden="true"></div>
+    <div id="goal-spectacle-vignette" aria-hidden="true"></div>
+    <div id="kickoff-impact-flash" aria-hidden="true"></div>
+    <div id="kickoff-impact-slam" aria-hidden="true"></div>
+    <div id="kickoff-impact-shock" aria-hidden="true"></div>
+    <div id="kickoff-impact-ring" aria-hidden="true"></div>
+    <div id="kickoff-impact-ring2" aria-hidden="true"></div>
+    <div id="supersonic-flash" aria-hidden="true"></div>
+    <div id="supersonic-banner" aria-hidden="true">SUPERSONIC</div>
+    <div id="power-shot-flash" aria-hidden="true"></div>
+    <div id="power-shot-banner" aria-hidden="true">POWER SHOT</div>
+    <div id="demolish-flash" aria-hidden="true"></div>
+    <div id="demolish-banner" aria-hidden="true">DEMOLISH!</div>
+    <div id="epic-save-flash" aria-hidden="true"></div>
+    <div id="epic-save-banner" aria-hidden="true">EPIC SAVE</div>
+    <div id="match-moment-flash" aria-hidden="true"></div>
+    <div id="match-moment-banner" aria-hidden="true"></div>
+    <div id="save-anticipation-flash" aria-hidden="true"></div>
+    <div id="post-hit-flash" aria-hidden="true"></div>
+    <div id="post-hit-banner" aria-hidden="true">POST!</div>
+    <div id="mp-lobby" class="hidden"></div>
+    <div id="mp-prematch" class="hidden" aria-live="polite">
+      <p class="mp-prematch__title" data-i18n="mp.prematch.title">Kickoff</p>
+      <div class="mp-prematch__count" id="mp-prematch-count">3</div>
+      <div class="mp-prematch__roster" id="mp-prematch-roster"></div>
+    </div>
+    <div id="cam-indicator" data-i18n="hud.ballCam" aria-live="polite">BALL CAM</div>
+    <div id="hud" class="hidden">
+      <div id="scoreboard-cluster">
+        <span class="scoreboard__flames scoreboard__flames--blue" aria-hidden="true">
+          <span class="scoreboard__flame scoreboard__flame--a"></span>
+          <span class="scoreboard__flame scoreboard__flame--b"></span>
+          <span class="scoreboard__flame scoreboard__flame--c"></span>
+          <span class="scoreboard__flame scoreboard__flame--d"></span>
+          <span class="scoreboard__flame scoreboard__flame--e"></span>
+          <span class="scoreboard__flame scoreboard__flame--wisp1"></span>
+          <span class="scoreboard__flame scoreboard__flame--wisp2"></span>
+        </span>
+        <span class="scoreboard__flames scoreboard__flames--orange" aria-hidden="true">
+          <span class="scoreboard__flame scoreboard__flame--a"></span>
+          <span class="scoreboard__flame scoreboard__flame--b"></span>
+          <span class="scoreboard__flame scoreboard__flame--c"></span>
+          <span class="scoreboard__flame scoreboard__flame--d"></span>
+          <span class="scoreboard__flame scoreboard__flame--e"></span>
+          <span class="scoreboard__flame scoreboard__flame--wisp1"></span>
+          <span class="scoreboard__flame scoreboard__flame--wisp2"></span>
+        </span>
+      <div id="scoreboard">
+        <span class="scoreboard__glow scoreboard__glow--blue" aria-hidden="true"></span>
+        <span class="scoreboard__glow scoreboard__glow--orange" aria-hidden="true"></span>
+        <span class="scoreboard__edge scoreboard__edge--blue" aria-hidden="true"></span>
+        <span class="scoreboard__edge scoreboard__edge--orange" aria-hidden="true"></span>
+        <div class="team-block blue">
+          <span class="team-block__accent" aria-hidden="true"></span>
+          <span class="team-block__wash" aria-hidden="true"></span>
+          <div class="team-block__plate">
+            <span class="team-label">BLUE</span>
+            <span class="team-score" id="score-blue">0</span>
+          </div>
+        </div>
+        <div id="score-center">
+          <span class="score-center__bracket" aria-hidden="true"></span>
+          <span class="score-center__chevron" aria-hidden="true"></span>
+          <span id="match-status"></span>
+        </div>
+        <div class="team-block orange">
+          <span class="team-block__accent" aria-hidden="true"></span>
+          <span class="team-block__wash" aria-hidden="true"></span>
+          <div class="team-block__plate">
+            <span class="team-label">ORANGE</span>
+            <span class="team-score" id="score-orange">0</span>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <div id="goal-banner" aria-live="polite"></div>
+      <div id="on-fire-badge" aria-live="polite">ON FIRE</div>
+      <div id="kickoff-banner" aria-live="polite"></div>
+      <div id="clip-rec-badge" class="clip-rec-badge hidden" aria-live="polite" hidden>REC</div>
+      <div id="match-end-banner" aria-live="polite"></div>
+      <div id="match-end-sub" class="match-end-sub" aria-live="polite"></div>
+      <button type="button" id="match-rematch" class="match-rematch hidden" data-i18n="hud.rematch">REWANŻ · R</button>
+      <p id="match-rematch-wait" class="match-rematch-wait hidden" aria-live="polite" data-i18n="hud.rematchWait">Oczekiwanie na rewanż…</p>
+      <div id="ignition-score-panel" class="hidden" aria-live="polite">
+        <div id="ignition-score-ring" aria-labelledby="ignition-score-label">
+          <svg class="ignition-score__svg" viewBox="0 0 100 100" width="136" height="136" aria-hidden="true">
+            <defs>
+              <linearGradient id="ignition-score-ring-gradient" x1="8%" y1="92%" x2="92%" y2="8%">
+                <stop offset="0%" stop-color="#2d8fff" />
+                <stop offset="45%" stop-color="#5ec8ff" />
+                <stop offset="100%" stop-color="#9efcff" />
+              </linearGradient>
+              <linearGradient id="ignition-score-track-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0.06)" />
+                <stop offset="50%" stop-color="rgba(255,255,255,0.16)" />
+                <stop offset="100%" stop-color="rgba(255,255,255,0.08)" />
+              </linearGradient>
+            </defs>
+            <circle class="ignition-score__track" cx="50" cy="50" r="40" />
+            <circle class="ignition-score__ring" cx="50" cy="50" r="40" />
+          </svg>
+          <div class="ignition-score__body">
+            <span id="ignition-score-label" data-i18n="hud.ffaYou">YOU</span>
+            <span id="ignition-score-number">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="power-up-panel" class="hidden" aria-live="polite">
+        <div id="power-up-ring" data-kind="charging">
+          <svg class="power-up-ring__svg" viewBox="0 0 100 100" width="136" height="136" aria-hidden="true">
+            <defs>
+              <linearGradient id="powerup-ring-gradient-magnet" x1="8%" y1="92%" x2="92%" y2="8%">
+                <stop offset="0%" stop-color="#9a6cff" />
+                <stop offset="50%" stop-color="#d4b0ff" />
+                <stop offset="100%" stop-color="#f0e0ff" />
+              </linearGradient>
+              <linearGradient id="powerup-ring-gradient-plunger" x1="8%" y1="92%" x2="92%" y2="8%">
+                <stop offset="0%" stop-color="#2ec8ff" />
+                <stop offset="50%" stop-color="#7ee8ff" />
+                <stop offset="100%" stop-color="#d8fbff" />
+              </linearGradient>
+              <linearGradient id="powerup-ring-gradient-haymaker" x1="8%" y1="92%" x2="92%" y2="8%">
+                <stop offset="0%" stop-color="#ff7a20" />
+                <stop offset="50%" stop-color="#ffb07a" />
+                <stop offset="100%" stop-color="#ffe8cc" />
+              </linearGradient>
+              <linearGradient id="powerup-ring-gradient-spikes" x1="8%" y1="92%" x2="92%" y2="8%">
+                <stop offset="0%" stop-color="#ff4466" />
+                <stop offset="50%" stop-color="#ff8a9a" />
+                <stop offset="100%" stop-color="#ffd0d8" />
+              </linearGradient>
+              <linearGradient id="powerup-ring-gradient-charging" x1="8%" y1="92%" x2="92%" y2="8%">
+                <stop offset="0%" stop-color="#3d8fff" />
+                <stop offset="50%" stop-color="#7ec8ff" />
+                <stop offset="100%" stop-color="#d8f2ff" />
+              </linearGradient>
+              <linearGradient id="powerup-ring-track-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0.06)" />
+                <stop offset="50%" stop-color="rgba(255,255,255,0.16)" />
+                <stop offset="100%" stop-color="rgba(255,255,255,0.08)" />
+              </linearGradient>
+            </defs>
+            <circle class="power-up-ring__track" cx="50" cy="50" r="40" />
+            <circle class="power-up-ring__fill" id="power-up-ring-fill" cx="50" cy="50" r="40" />
+          </svg>
+          <span id="power-up-center" class="power-up-ring__center">
+            <canvas id="power-up-icon-canvas" class="power-up-ring__icon-canvas" width="76" height="76" aria-hidden="true"></canvas>
+            <span id="power-up-timer" class="power-up-ring__timer hidden">
+              <span id="power-up-timer-value">0</span><span id="power-up-timer-unit">s</span>
+            </span>
+          </span>
+          <span id="power-up-hint" class="power-up-ring__hint" data-i18n="hud.powerUpUse">R — użyj</span>
+        </div>
+      </div>
+
+      <div id="speed-panel">
+        <span class="hud-slice" aria-hidden="true"></span>
+        <div class="speed-panel__body">
+          <span id="speed-val">0</span>
+          <span class="speed-unit">KM/H</span>
+          <span class="speed-tag">SUPERSONIC</span>
+        </div>
+      </div>
+
+      <div id="ball-offscreen" aria-hidden="true">
+        <div id="ball-offscreen-arrow"></div>
+      </div>
+
+      <div id="match-minimap-wrap">
+        <button
+          type="button"
+          id="minimap-toggle"
+          aria-pressed="false"
+          data-i18n="hud.minimapToggle"
+          data-i18n-title="hud.minimapToggleHint"
+          title="Mapa (M)"
+        >
+          Mapa
+        </button>
+        <canvas id="match-minimap" class="hidden" width="136" height="204" data-i18n-aria="hud.minimapAria" aria-label="Minimapa boiska"></canvas>
+      </div>
+
+      <div id="match-scoreboard" class="match-scoreboard" aria-hidden="true">
+        <div class="match-scoreboard__panel">
+          <span class="match-scoreboard__glow match-scoreboard__glow--blue" aria-hidden="true"></span>
+          <span class="match-scoreboard__glow match-scoreboard__glow--orange" aria-hidden="true"></span>
+          <span class="match-scoreboard__edge match-scoreboard__edge--blue" aria-hidden="true"></span>
+          <span class="match-scoreboard__edge match-scoreboard__edge--orange" aria-hidden="true"></span>
+          <h2 class="match-scoreboard__title" data-i18n="scoreboard.title">Statystyki meczu</h2>
+          <div class="match-scoreboard__teams">
+            <section class="match-scoreboard__team match-scoreboard__team--blue" aria-label="Niebiescy">
+              <header class="match-scoreboard__team-head">
+                <span class="match-scoreboard__team-badge" data-i18n="scoreboard.teamBlue">Niebiescy</span>
+                <span class="match-scoreboard__team-total">
+                  <span class="match-scoreboard__team-total-value" data-team-total="blue">0</span>
+                  <span class="match-scoreboard__team-total-label" data-i18n="scoreboard.score">Pkt</span>
+                </span>
+              </header>
+              <table class="match-scoreboard__table">
+                <thead>
+                  <tr>
+                    <th data-i18n="scoreboard.player">Gracz</th>
+                    <th data-i18n="scoreboard.score">Pkt</th>
+                    <th data-i18n="scoreboard.goals">G</th>
+                    <th data-i18n="scoreboard.assists">A</th>
+                    <th data-i18n="scoreboard.saves">S</th>
+                    <th data-i18n="scoreboard.centers">C</th>
+                    <th data-i18n="scoreboard.touches">T</th>
+                    <th data-i18n="scoreboard.shots">Sh</th>
+                  </tr>
+                </thead>
+                <tbody data-team-body="blue"></tbody>
+              </table>
+            </section>
+            <div class="match-scoreboard__rift" aria-hidden="true"></div>
+            <section class="match-scoreboard__team match-scoreboard__team--orange" aria-label="Pomarańczowi">
+              <header class="match-scoreboard__team-head">
+                <span class="match-scoreboard__team-badge" data-i18n="scoreboard.teamOrange">Pomarańczowi</span>
+                <span class="match-scoreboard__team-total">
+                  <span class="match-scoreboard__team-total-value" data-team-total="orange">0</span>
+                  <span class="match-scoreboard__team-total-label" data-i18n="scoreboard.score">Pkt</span>
+                </span>
+              </header>
+              <table class="match-scoreboard__table">
+                <thead>
+                  <tr>
+                    <th data-i18n="scoreboard.player">Gracz</th>
+                    <th data-i18n="scoreboard.score">Pkt</th>
+                    <th data-i18n="scoreboard.goals">G</th>
+                    <th data-i18n="scoreboard.assists">A</th>
+                    <th data-i18n="scoreboard.saves">S</th>
+                    <th data-i18n="scoreboard.centers">C</th>
+                    <th data-i18n="scoreboard.touches">T</th>
+                    <th data-i18n="scoreboard.shots">Sh</th>
+                  </tr>
+                </thead>
+                <tbody data-team-body="orange"></tbody>
+              </table>
+            </section>
+          </div>
+          <p class="match-scoreboard__hint" data-i18n="scoreboard.hint">Przytrzymaj Tab</p>
+        </div>
+      </div>
+
+      <div id="boost-panel" aria-label="Boost">
+        <div id="boost-ring">
+          <svg class="boost-ring__svg" viewBox="0 0 100 100" width="136" height="136" aria-hidden="true">
+            <defs>
+              <linearGradient id="boost-ring-gradient" x1="8%" y1="92%" x2="92%" y2="8%">
+                <stop offset="0%" stop-color="#4dfff2" />
+                <stop offset="28%" stop-color="#9efcff" />
+                <stop offset="52%" stop-color="#ffe566" />
+                <stop offset="78%" stop-color="#ffb020" />
+                <stop offset="100%" stop-color="#ff6a18" />
+              </linearGradient>
+              <linearGradient id="boost-ring-gradient-low" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#ff8866" />
+                <stop offset="55%" stop-color="#ff5533" />
+                <stop offset="100%" stop-color="#ff2200" />
+              </linearGradient>
+              <linearGradient id="boost-ring-track-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0.06)" />
+                <stop offset="50%" stop-color="rgba(255,255,255,0.16)" />
+                <stop offset="100%" stop-color="rgba(255,255,255,0.08)" />
+              </linearGradient>
+            </defs>
+            <circle class="boost-ring__track" cx="50" cy="50" r="40" />
+            <circle class="boost-ring__fill" id="boost-ring-fill" cx="50" cy="50" r="40" />
+          </svg>
+          <span id="boost-number">100</span>
+        </div>
+      </div>
+
+      <button type="button" id="credits-trigger" title="Credits (C)">©</button>
+    </div>
+
+    <div id="match-pause" class="hidden" role="dialog" aria-labelledby="match-pause-title" aria-modal="true">
+      <div class="match-pause__fx" aria-hidden="true">
+        <div class="match-pause__ring"></div>
+        <div class="match-pause__scanlines"></div>
+      </div>
+      <div class="match-pause__panel">
+        <h2 id="match-pause-title" data-i18n="pause.title">Pauza</h2>
+        <p class="match-pause__hint" data-i18n="pause.hint">Esc — kontynuuj</p>
+        <button type="button" id="match-pause-resume" class="match-pause__btn match-pause__btn--primary" data-i18n="pause.resume">
+          Kontynuuj
+        </button>
+        <button type="button" id="match-pause-menu" class="match-pause__btn match-pause__btn--secondary" data-i18n="pause.menu">
+          Menu główne
+        </button>
+        <button type="button" id="match-pause-settings" class="match-pause__btn match-pause__btn--secondary" data-i18n="pause.settings">
+          Ustawienia
+        </button>
+        <button type="button" id="match-pause-report" class="match-pause__btn match-pause__btn--secondary" data-i18n="pause.report">
+          Wyślij raport
+        </button>
+        <button type="button" id="match-pause-forfeit" class="match-pause__btn match-pause__btn--forfeit hidden" data-i18n="pause.forfeit">
+          Poddaj się
+        </button>
+      </div>
+    </div>
+
+    <div id="credits-panel" class="hidden" role="dialog" aria-labelledby="credits-title">
+      <div id="credits-card"></div>
+    </div>
+    <div id="webgl-stack">
+      <div id="game-container"></div>
+    </div>
+    <div id="main-menu"></div>
+    <script>
+      (function () {
+        function bindReload() {
+          var btn = document.getElementById("error-reload");
+          if (btn && !btn.dataset.bound) {
+            btn.dataset.bound = "1";
+            btn.addEventListener("click", function () { location.reload(); });
+          }
+        }
+        function showCrash(text) {
+          document.documentElement.classList.remove("ignite-boot-cinematic");
+          document.getElementById("ignite-boot-cinematic")?.remove();
+          var box = document.getElementById("error");
+          var msg = document.getElementById("error-msg");
+          var loading = document.getElementById("loading");
+          if (loading) loading.classList.add("hidden");
+          if (box && msg) {
+            box.style.display = "flex";
+            msg.textContent = text;
+            bindReload();
+          }
+        }
+        window.addEventListener("error", function (e) {
+          showCrash((e.error && e.error.stack) || e.message || "Unknown JS error");
+        });
+        window.addEventListener("unhandledrejection", function (e) {
+          var err = e.reason;
+          showCrash(err instanceof Error ? (err.stack || err.message) : String(err));
+        });
+        document.addEventListener("DOMContentLoaded", bindReload);
+        try {
+          if (new URLSearchParams(location.search).get("previewCrash") === "1") {
+            /* od razu — bez flasha boot logo */
+            if (document.readyState === "loading") {
+              document.addEventListener("DOMContentLoaded", function () {
+                showCrash("Preview — sample stack\n    at mountWheelGlb (cosmeticGlb.ts:197)\n    at async applyAllCarCosmetics");
+              });
+            } else {
+              showCrash("Preview — sample stack\n    at mountWheelGlb (cosmeticGlb.ts:197)\n    at async applyAllCarCosmetics");
+            }
+          }
+        } catch (_) {}
+      })();
+    </script>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

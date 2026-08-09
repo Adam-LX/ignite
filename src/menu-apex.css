@@ -1,0 +1,1742 @@
+/* ── APEX premium pass — layout bez zmian, warstwa designerska ─────────── */
+
+#main-menu.main-menu--apex {
+	--apex-cyan: #3dffe8;
+	--apex-blue: #4da8ff;
+	--apex-violet: #b06cff;
+	--apex-magenta: #ff5ec8;
+	--apex-gold: #ffc84d;
+	--apex-glass: rgba(6, 10, 22, 0.52);
+	--apex-glass-deep: rgba(4, 6, 14, 0.78);
+	--apex-stroke: rgba(255, 255, 255, 0.16);
+	--apex-stroke-hot: rgba(61, 255, 232, 0.55);
+	--apex-shadow-deep: 0 28px 90px rgba(0, 0, 0, 0.72);
+	--apex-shadow-glow: 0 0 48px rgba(61, 255, 232, 0.22);
+	--apex-shadow-violet: 0 0 56px rgba(176, 108, 255, 0.18);
+	--menu-type-scale: 1.08;
+	align-items: stretch;
+	justify-content: flex-start;
+}
+
+#main-menu.main-menu--apex .main-menu__layout--rl.main-menu__layout--cosmos {
+	display: grid;
+	width: 100%;
+	height: 100%;
+	max-width: none;
+	max-height: none;
+	margin: 0;
+	padding: clamp(0.65rem, 1.6vh, 1.1rem);
+	grid-template-columns: minmax(13rem, 16rem) minmax(0, 1fr);
+	grid-template-rows: auto minmax(0, 1fr) auto auto;
+	grid-template-areas:
+		"hud hud"
+		"rail stage"
+		"rail modes"
+		"rail dock";
+	gap: clamp(0.45rem, 1vh, 0.75rem);
+}
+
+@keyframes apex-aurora-drift {
+	0%,
+	100% {
+		transform: translate(-6%, -4%) rotate(0deg) scale(1);
+		opacity: 0.62;
+	}
+	33% {
+		transform: translate(4%, 2%) rotate(8deg) scale(1.05);
+		opacity: 0.78;
+	}
+	66% {
+		transform: translate(-2%, 6%) rotate(-5deg) scale(0.98);
+		opacity: 0.68;
+	}
+}
+
+@keyframes apex-mesh-pan {
+	from {
+		background-position:
+			0 0,
+			0 0,
+			0 0;
+	}
+	to {
+		background-position:
+			48px 48px,
+			-32px 32px,
+			0 120px;
+	}
+}
+
+@keyframes apex-prism-float {
+	0%,
+	100% {
+		transform: translateY(0) rotate(var(--prism-rot, 12deg));
+		opacity: 0.35;
+	}
+	50% {
+		transform: translateY(-18px) rotate(calc(var(--prism-rot, 12deg) + 6deg));
+		opacity: 0.72;
+	}
+}
+
+@keyframes apex-border-flow {
+	0% {
+		background-position: 0% 50%;
+	}
+	100% {
+		background-position: 200% 50%;
+	}
+}
+
+@keyframes apex-play-pulse {
+	0%,
+	100% {
+		box-shadow:
+			inset 0 2px 0 rgba(255, 255, 255, 0.55),
+			inset 0 -4px 12px rgba(0, 30, 50, 0.45),
+			0 0 0 1px rgba(255, 255, 255, 0.22),
+			0 0 0 3px rgba(61, 255, 232, 0.28),
+			0 0 40px rgba(61, 255, 232, 0.35),
+			0 18px 48px rgba(0, 0, 0, 0.55);
+	}
+	50% {
+		box-shadow:
+			inset 0 2px 0 rgba(255, 255, 255, 0.65),
+			inset 0 -4px 12px rgba(0, 30, 50, 0.45),
+			0 0 0 1px rgba(255, 255, 255, 0.32),
+			0 0 0 4px rgba(176, 108, 255, 0.38),
+			0 0 64px rgba(61, 255, 232, 0.55),
+			0 22px 56px rgba(0, 0, 0, 0.62);
+	}
+}
+
+@keyframes apex-card-shimmer {
+	0% {
+		transform: translateX(-130%) skewX(-18deg);
+	}
+	42% {
+		transform: translateX(230%) skewX(-18deg);
+	}
+	100% {
+		transform: translateX(230%) skewX(-18deg);
+	}
+}
+
+@keyframes apex-card-shimmer-spin {
+	0% {
+		transform: translateX(-155%) skewX(-16deg);
+		opacity: 0;
+	}
+	14% {
+		opacity: 0.75;
+	}
+	52% {
+		transform: translateX(265%) skewX(-16deg);
+		opacity: 1;
+	}
+	100% {
+		transform: translateX(285%) skewX(-16deg);
+		opacity: 0;
+	}
+}
+
+@keyframes apex-card-spin-outer {
+	0% {
+		transform: translateY(var(--card-lift)) scale(var(--card-scale))
+			rotateY(0deg) rotateX(0deg);
+		filter: brightness(1) saturate(1);
+	}
+	18% {
+		transform: translateY(calc(var(--card-lift) - 38px))
+			scale(calc(var(--card-scale) + 0.12)) rotateY(-72deg) rotateX(10deg);
+		filter: brightness(1.42) saturate(1.22);
+	}
+	42% {
+		transform: translateY(calc(var(--card-lift) - 22px))
+			scale(calc(var(--card-scale) + 0.08)) rotateY(48deg) rotateX(-8deg);
+		filter: brightness(1.28) saturate(1.12);
+	}
+	68% {
+		transform: translateY(calc(var(--card-lift) - 8px))
+			scale(calc(var(--card-scale) + 0.03)) rotateY(-12deg) rotateX(4deg);
+		filter: brightness(1.1);
+	}
+	100% {
+		transform: translateY(var(--card-lift)) scale(var(--card-scale))
+			rotateY(var(--card-tilt-y, 0deg)) rotateX(var(--card-tilt-x, 0deg));
+		filter: brightness(1.05) saturate(1.05);
+	}
+}
+
+@keyframes apex-card-pick-outer {
+	0% {
+		transform: translateY(var(--card-lift)) scale(var(--card-scale))
+			rotateY(0deg);
+		filter: brightness(1);
+	}
+	22% {
+		transform: translateY(calc(var(--card-lift) - 48px))
+			scale(calc(var(--card-scale) + 0.2)) rotateY(-12deg);
+		filter: brightness(1.48) saturate(1.28);
+	}
+	48% {
+		transform: translateY(calc(var(--card-lift) - 20px))
+			scale(calc(var(--card-scale) + 0.1)) rotateY(8deg);
+		filter: brightness(1.25);
+	}
+	72% {
+		transform: translateY(calc(var(--card-lift) - 6px))
+			scale(calc(var(--card-scale) + 0.04)) rotateY(-3deg);
+		filter: brightness(1.1);
+	}
+	100% {
+		transform: translateY(var(--card-lift)) scale(var(--card-scale))
+			rotateY(0deg);
+		filter: brightness(1.05);
+	}
+}
+
+@keyframes apex-card-pick-flash {
+	0%,
+	100% {
+		opacity: 0;
+		transform: scale(0.92);
+	}
+	28% {
+		opacity: 0.95;
+		transform: scale(1.22);
+	}
+	55% {
+		opacity: 0.45;
+		transform: scale(1.08);
+	}
+}
+
+@keyframes apex-card-glow-burst {
+	0% {
+		opacity: 0.55;
+		transform: scale(0.85);
+	}
+	35% {
+		opacity: 1;
+		transform: scale(1.35);
+	}
+	100% {
+		opacity: 0.78;
+		transform: scale(1);
+	}
+}
+
+@keyframes apex-card-select-lift {
+	0%,
+	100% {
+		transform: translateY(var(--card-lift)) scale(var(--card-scale))
+			rotateY(var(--card-tilt-y, 0deg)) rotateX(var(--card-tilt-x, 0deg));
+	}
+	42% {
+		transform: translateY(calc(var(--card-lift) - 8px))
+			scale(calc(var(--card-scale) + 0.04))
+			rotateY(calc(var(--card-tilt-y, 0deg) + 4deg))
+			rotateX(calc(var(--card-tilt-x, 0deg) - 3deg));
+	}
+}
+
+/* FX backdrop */
+#main-menu.main-menu--apex .main-menu__apex-backdrop {
+	position: absolute;
+	inset: 0;
+	background:
+		radial-gradient(
+			ellipse 120% 80% at 50% 110%,
+			rgba(61, 255, 232, 0.1) 0%,
+			transparent 55%
+		),
+		radial-gradient(
+			ellipse 70% 50% at 12% 18%,
+			rgba(77, 168, 255, 0.1) 0%,
+			transparent 58%
+		),
+		radial-gradient(
+			ellipse 55% 45% at 88% 22%,
+			rgba(61, 255, 232, 0.08) 0%,
+			transparent 52%
+		),
+		linear-gradient(180deg, rgba(4, 8, 18, 0.04) 0%, rgba(2, 4, 10, 0.18) 100%);
+}
+
+#main-menu.main-menu--apex .main-menu__vignette {
+	opacity: 0.04;
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .main-menu__rl-brief {
+	position: absolute;
+	top: clamp(0.35rem, 2vh, 0.75rem);
+	left: clamp(0.55rem, 1.2vw, 0.85rem);
+	right: auto;
+	z-index: 4;
+	max-width: min(30rem, 44vw);
+	margin: 0;
+}
+
+/* Stage — tylko auto + brief; kafelki w osobnym wierszu grida */
+#main-menu.main-menu--apex .main-menu__rl-stage {
+	position: relative;
+	min-height: 0;
+	overflow: hidden;
+	pointer-events: none;
+}
+
+#main-menu.main-menu--apex .main-menu__rl-modes {
+	grid-area: modes;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 0;
+	min-height: 0;
+	z-index: 6;
+	overflow: visible;
+	pointer-events: none;
+}
+
+#main-menu.main-menu--apex .main-menu__modes-block {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: 0.4rem;
+	width: max-content;
+	max-width: min(76rem, 100%);
+	pointer-events: none;
+}
+
+#main-menu.main-menu--apex .main-menu__modes-block .main-menu__rl-stage-head,
+#main-menu.main-menu--apex .main-menu__modes-block .main-menu__rl-carousel {
+	position: static;
+	margin: 0;
+	padding: 0;
+	pointer-events: auto;
+	width: 100%;
+	max-width: none;
+}
+
+#main-menu.main-menu--apex .main-menu__rl-modes .main-menu__rl-stage-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.85rem 1.25rem;
+	flex-wrap: nowrap;
+	padding: 0 0.15rem;
+	position: relative;
+	z-index: 8;
+	margin: 0;
+}
+
+#main-menu.main-menu--apex .main-menu__rl-modes .main-menu__rl-carousel {
+	width: 100%;
+	padding: 0.7rem 0 0.25rem;
+	margin: 0;
+	box-sizing: border-box;
+}
+
+#main-menu.main-menu--apex .main-menu__grain,
+#main-menu.main-menu--apex .main-menu__scanlines,
+#main-menu.main-menu--apex .main-menu__apex-noise {
+	display: none;
+}
+
+#main-menu.main-menu--apex .main-menu__apex-aurora {
+	position: absolute;
+	inset: -20%;
+	background: conic-gradient(
+		from 210deg at 30% 40%,
+		rgba(61, 255, 232, 0) 0deg,
+		rgba(61, 255, 232, 0.16) 70deg,
+		rgba(77, 168, 255, 0.14) 180deg,
+		rgba(61, 255, 232, 0.12) 280deg,
+		rgba(61, 255, 232, 0) 360deg
+	);
+	filter: blur(52px) saturate(105%);
+	mix-blend-mode: normal;
+	opacity: 0.55;
+	animation: apex-aurora-drift 18s ease-in-out infinite;
+}
+
+#main-menu.main-menu--apex .main-menu__apex-aurora--b {
+	animation-delay: -9s;
+	animation-duration: 22s;
+	opacity: 0.75;
+	transform: scale(1.15);
+}
+
+#main-menu.main-menu--apex .main-menu__apex-mesh {
+	position: absolute;
+	inset: 0;
+	opacity: 0.22;
+	background:
+		linear-gradient(rgba(61, 255, 232, 0.06) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(61, 255, 232, 0.06) 1px, transparent 1px),
+		repeating-linear-gradient(
+			-24deg,
+			transparent,
+			transparent 18px,
+			rgba(255, 255, 255, 0.025) 18px,
+			rgba(255, 255, 255, 0.025) 19px
+		);
+	background-size:
+		48px 48px,
+		48px 48px,
+		auto;
+	mask-image: radial-gradient(
+		ellipse 90% 75% at 50% 45%,
+		#000 20%,
+		transparent 78%
+	);
+	animation: apex-mesh-pan 24s linear infinite;
+}
+
+#main-menu.main-menu--apex .main-menu__apex-prisms {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+	pointer-events: none;
+}
+
+#main-menu.main-menu--apex .main-menu__apex-prisms span {
+	position: absolute;
+	width: clamp(3rem, 8vw, 6rem);
+	height: clamp(8rem, 18vh, 14rem);
+	background: linear-gradient(
+		180deg,
+		rgba(255, 255, 255, 0.02) 0%,
+		rgba(61, 255, 232, 0.12) 35%,
+		rgba(176, 108, 255, 0.08) 65%,
+		transparent 100%
+	);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+	filter: blur(0.2px);
+	animation: apex-prism-float 7s ease-in-out infinite;
+}
+
+#main-menu.main-menu--apex .main-menu__apex-prisms span:nth-child(1) {
+	left: 8%;
+	top: 12%;
+	--prism-rot: -18deg;
+	animation-delay: 0s;
+}
+#main-menu.main-menu--apex .main-menu__apex-prisms span:nth-child(2) {
+	right: 10%;
+	top: 8%;
+	--prism-rot: 14deg;
+	animation-delay: -2.4s;
+	width: clamp(2rem, 5vw, 4rem);
+	height: clamp(6rem, 12vh, 10rem);
+}
+#main-menu.main-menu--apex .main-menu__apex-prisms span:nth-child(3) {
+	left: 22%;
+	bottom: 18%;
+	--prism-rot: 8deg;
+	animation-delay: -4.8s;
+	opacity: 0.5;
+}
+#main-menu.main-menu--apex .main-menu__apex-prisms span:nth-child(4) {
+	right: 24%;
+	bottom: 22%;
+	--prism-rot: -10deg;
+	animation-delay: -1.2s;
+	opacity: 0.45;
+}
+
+#main-menu.main-menu--apex .main-menu__fx .main-menu__beams span {
+	opacity: 0.28;
+	filter: blur(1px);
+}
+
+#main-menu.main-menu--apex .main-menu__diag-stripes,
+#main-menu.main-menu--apex .main-menu__speed-streaks {
+	display: none;
+}
+
+#main-menu.main-menu--apex.main-menu--cosmos.main-menu--accent-pulse {
+	animation: none;
+	filter: none !important;
+}
+
+#main-menu.main-menu--apex .menu-corners::before,
+#main-menu.main-menu--apex .menu-corners::after {
+	display: none;
+}
+
+#main-menu.main-menu--apex .main-menu__layout--rl.main-menu__layout--cosmos {
+	pointer-events: auto;
+	overflow: visible;
+}
+
+/* HUD */
+#main-menu.main-menu--apex .main-menu__cosmos-brand {
+	font-size: clamp(1.55rem, 3.2vw, 2.35rem);
+	letter-spacing: 0.38em;
+	background: linear-gradient(
+		105deg,
+		#9efcff 0%,
+		#ffffff 38%,
+		#3dffe8 72%,
+		#4da8ff 100%
+	);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: #e8f8ff;
+	-webkit-text-fill-color: transparent;
+	animation: none;
+	filter: drop-shadow(0 0 22px rgba(61, 255, 232, 0.42));
+	text-shadow: none;
+	line-height: 1.05;
+	padding-bottom: 0.06em;
+}
+
+#main-menu.main-menu--apex .main-menu__cosmos-brand-block.apex-rail-tile--brand::after {
+	display: none;
+}
+
+#main-menu.main-menu--apex .main-menu__cosmos-tagline {
+	color: rgba(224, 236, 255, 0.62);
+	text-shadow: 0 0 18px rgba(77, 168, 255, 0.25);
+}
+
+#main-menu.main-menu--apex .main-menu__mode-index {
+	padding: 0.42rem 0.85rem;
+	border-radius: 999px;
+	border: 1px solid rgba(255, 255, 255, 0.18);
+	background: linear-gradient(
+		135deg,
+		rgba(61, 255, 232, 0.12) 0%,
+		rgba(176, 108, 255, 0.08) 100%
+	);
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.18),
+		var(--apex-shadow-glow);
+	font-weight: 900;
+	letter-spacing: 0.2em;
+}
+
+/* Rail — stos ściętych kafelków (futurystyczne prostokąty) */
+#main-menu.main-menu--apex {
+	--apex-tile-clip-a: polygon(
+		14px 0,
+		100% 0,
+		100% calc(100% - 14px),
+		calc(100% - 14px) 100%,
+		0 100%,
+		0 14px
+	);
+	--apex-tile-clip-b: polygon(
+		0 0,
+		calc(100% - 14px) 0,
+		100% 14px,
+		100% 100%,
+		14px 100%,
+		0 calc(100% - 14px)
+	);
+	--apex-tile-clip-c: polygon(
+		0 0,
+		calc(100% - 20px) 0,
+		100% 20px,
+		100% calc(100% - 10px),
+		calc(100% - 16px) 100%,
+		0 100%
+	);
+}
+
+#main-menu.main-menu--apex
+	.main-menu__cosmos-brand-block.apex-rail-tile--brand {
+	clip-path: var(--apex-tile-clip-a);
+	padding: clamp(0.65rem, 1.2vh, 0.9rem) clamp(0.85rem, 1.4vw, 1.15rem);
+	margin: 0;
+	pointer-events: auto;
+	filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.48));
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.22),
+		inset 3px 0 0 rgba(61, 255, 232, 0.55);
+}
+
+#main-menu.main-menu--apex .main-menu__cosmos-brand.cosmos-shimmer-text {
+	background: linear-gradient(
+		105deg,
+		#4da8ff 0%,
+		#9efcff 22%,
+		#ffffff 42%,
+		#3dffe8 62%,
+		#4da8ff 100%
+	);
+	background-size: 100% 100%;
+	animation: none;
+	-webkit-text-fill-color: transparent;
+	filter: drop-shadow(0 0 18px rgba(61, 255, 232, 0.45));
+}
+
+#main-menu.main-menu--apex .main-menu__cosmos-rail-kicker.apex-rail-tile--kicker {
+	display: none;
+}
+
+#main-menu.main-menu--apex .apex-rail-tile {
+	position: relative;
+	isolation: isolate;
+	overflow: visible;
+	border: none;
+	border-radius: 0;
+	clip-path: var(--apex-tile-clip, var(--apex-tile-clip-a));
+	background: linear-gradient(
+		168deg,
+		rgba(14, 20, 38, 0.96) 0%,
+		rgba(5, 8, 18, 0.94) 52%,
+		rgba(10, 14, 28, 0.9) 100%
+	);
+	filter: drop-shadow(0 0 0 1px rgba(255, 255, 255, 0.9))
+		drop-shadow(0 0 0 2px rgba(61, 255, 232, 0.58))
+		drop-shadow(0 10px 26px rgba(0, 0, 0, 0.46));
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.22),
+		inset 0 -1px 0 rgba(0, 0, 0, 0.42),
+		inset 3px 0 0 rgba(61, 255, 232, 0.42);
+}
+
+#main-menu.main-menu--apex .apex-rail-tile::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	z-index: 0;
+	background:
+		linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, transparent 30%),
+		linear-gradient(90deg, rgba(61, 255, 232, 0.1) 0%, transparent 42%);
+	clip-path: inherit;
+}
+
+#main-menu.main-menu--apex .main-menu__cosmos-rail.apex-monolith-rail {
+	display: flex;
+	flex-direction: column;
+	gap: clamp(0.42rem, 0.85vh, 0.62rem);
+	padding: 0;
+	border: none;
+	background: transparent;
+	clip-path: none;
+	box-shadow: none;
+	backdrop-filter: none;
+	-webkit-backdrop-filter: none;
+}
+
+#main-menu.main-menu--apex .main-menu__cosmos-rail.apex-monolith-rail::before,
+#main-menu.main-menu--apex .main-menu__cosmos-rail.apex-monolith-rail::after {
+	display: none;
+}
+
+#main-menu.main-menu--apex .apex-rail-chrome {
+	display: none;
+}
+
+#main-menu.main-menu--apex
+	.main-menu__cosmos-rail-kicker.apex-rail-tile--kicker {
+	z-index: 1;
+	margin: 0;
+	padding: 0.48rem 0.72rem 0.48rem 0.85rem;
+	font-size: 0.64rem;
+	font-weight: 900;
+	letter-spacing: 0.3em;
+	text-transform: uppercase;
+	clip-path: var(--apex-tile-clip-b);
+	color: rgba(200, 236, 255, 0.72);
+}
+
+#main-menu.main-menu--apex
+	.main-menu__cosmos-rail.apex-monolith-rail
+	> .main-menu__rl-rail-spacer {
+	flex: 1;
+	min-height: 0.35rem;
+}
+
+#main-menu.main-menu--apex .cosmos-nav-stagger {
+	animation-name: apex-nav-enter;
+}
+
+#main-menu.main-menu--apex
+	.apex-monolith-rail
+	.main-menu__rl-nav.apex-rail-tile {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.1rem;
+	width: 100%;
+	padding: clamp(0.72rem, 1.25vh, 0.95rem) clamp(2rem, 2.4vw, 2.35rem)
+		clamp(0.72rem, 1.25vh, 0.95rem) clamp(0.85rem, 1.2vw, 1.05rem);
+	font-size: clamp(0.84rem, 1.28vw, 1rem);
+	font-weight: 900;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: rgba(236, 244, 255, 0.9);
+	cursor: pointer;
+	transition:
+		transform 0.2s cubic-bezier(0.2, 1, 0.32, 1),
+		filter 0.2s ease,
+		box-shadow 0.2s ease,
+		background 0.2s ease,
+		color 0.2s ease;
+	animation: apex-nav-enter 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+	animation-delay: calc(0.08s + var(--nav-i, 0) * 0.07s);
+}
+
+#main-menu.main-menu--apex
+	.apex-monolith-rail
+	.main-menu__rl-nav.apex-rail-tile:nth-child(3) {
+	clip-path: var(--apex-tile-clip-c);
+}
+
+#main-menu.main-menu--apex
+	.apex-monolith-rail
+	.main-menu__rl-nav.apex-rail-tile:nth-child(4) {
+	clip-path: var(--apex-tile-clip-a);
+}
+
+#main-menu.main-menu--apex
+	.apex-monolith-rail
+	.main-menu__rl-nav.apex-rail-tile:nth-child(5) {
+	clip-path: var(--apex-tile-clip-b);
+}
+
+#main-menu.main-menu--apex
+	.apex-monolith-rail
+	.main-menu__rl-nav.apex-rail-tile:nth-child(7) {
+	clip-path: var(--apex-tile-clip-c);
+}
+
+#main-menu.main-menu--apex
+	.apex-monolith-rail
+	.main-menu__rl-nav.apex-rail-tile:nth-child(8) {
+	clip-path: var(--apex-tile-clip-a);
+}
+
+#main-menu.main-menu--apex
+	.apex-monolith-rail
+	.main-menu__rl-nav.apex-rail-tile
+	> * {
+	position: relative;
+	z-index: 1;
+}
+
+#main-menu.main-menu--apex
+	.apex-monolith-rail
+	.main-menu__rl-nav.apex-rail-tile::after {
+	content: "▸";
+	position: absolute;
+	right: 0.75rem;
+	top: 50%;
+	z-index: 1;
+	transform: translateY(-50%) translateX(-8px);
+	opacity: 0;
+	font-size: 1rem;
+	font-weight: 900;
+	color: var(--apex-cyan);
+	text-shadow: 0 0 14px rgba(61, 255, 232, 0.85);
+	transition:
+		opacity 0.16s ease,
+		transform 0.2s cubic-bezier(0.2, 1, 0.32, 1);
+}
+
+@keyframes apex-nav-enter {
+	from {
+		opacity: 0;
+		transform: translateX(-16px);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+#main-menu.main-menu--apex
+	.apex-monolith-rail
+	.main-menu__rl-nav.apex-rail-tile:hover {
+	transform: translateX(10px);
+	color: #fff;
+	background: linear-gradient(
+		90deg,
+		rgba(61, 255, 232, 0.3) 0%,
+		rgba(77, 168, 255, 0.12) 44%,
+		rgba(8, 12, 24, 0.92) 100%
+	);
+	filter: drop-shadow(0 0 0 1px rgba(255, 255, 255, 0.98))
+		drop-shadow(0 0 0 3px rgba(61, 255, 232, 0.88))
+		drop-shadow(0 0 24px rgba(61, 255, 232, 0.58))
+		drop-shadow(0 12px 28px rgba(0, 0, 0, 0.5));
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.38),
+		inset 0 0 26px rgba(61, 255, 232, 0.14),
+		inset 4px 0 0 rgba(61, 255, 232, 0.98);
+}
+
+#main-menu.main-menu--apex
+	.apex-monolith-rail
+	.main-menu__rl-nav.apex-rail-tile:hover::after {
+	opacity: 1;
+	transform: translateY(-50%) translateX(0);
+}
+
+#main-menu.main-menu--apex
+	.apex-monolith-rail
+	.main-menu__rl-nav.apex-rail-tile.main-menu__rl-nav--active {
+	color: #e8f4ff;
+	background: linear-gradient(
+		90deg,
+		rgba(61, 255, 232, 0.32) 0%,
+		rgba(61, 255, 232, 0.12) 42%,
+		rgba(6, 10, 22, 0.96) 100%
+	);
+	filter: drop-shadow(0 0 0 1px rgba(255, 255, 255, 0.85))
+		drop-shadow(0 0 0 2px rgba(61, 255, 232, 0.65))
+		drop-shadow(0 12px 28px rgba(0, 0, 0, 0.48));
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.32),
+		inset 0 0 22px rgba(61, 255, 232, 0.14),
+		inset 4px 0 0 rgba(61, 255, 232, 0.95);
+}
+
+#main-menu.main-menu--apex .main-menu__rl-nav .cosmos-shimmer-hover,
+#main-menu.main-menu--apex .main-menu__rl-nav.cosmos-shimmer-hover {
+	background: none;
+	background-size: unset;
+	-webkit-background-clip: unset;
+	background-clip: unset;
+	color: rgba(236, 244, 255, 0.96);
+	-webkit-text-fill-color: rgba(236, 244, 255, 0.96);
+	animation: none;
+	filter: none;
+	text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+}
+
+#main-menu.main-menu--apex
+	.main-menu__rl-nav.main-menu__rl-nav--active
+	.cosmos-shimmer-hover {
+	color: #fff;
+	-webkit-text-fill-color: #fff;
+	font-weight: 900;
+	text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
+}
+
+#main-menu.main-menu--apex
+	.apex-monolith-rail
+	.main-menu__rl-nav.apex-rail-tile.main-menu__rl-nav--active::after {
+	opacity: 1;
+	transform: translateY(-50%) translateX(2px);
+}
+
+#main-menu.main-menu--apex
+	.apex-monolith-rail
+	.main-menu__rl-nav.apex-rail-tile.main-menu__rl-nav--ghost {
+	opacity: 0.84;
+	filter: drop-shadow(0 0 0 1px rgba(255, 255, 255, 0.62))
+		drop-shadow(0 0 0 2px rgba(61, 255, 232, 0.38))
+		drop-shadow(0 8px 18px rgba(0, 0, 0, 0.4));
+}
+
+#main-menu.main-menu--apex
+	.apex-monolith-rail
+	.main-menu__rl-nav.apex-rail-tile.main-menu__rl-nav--ghost:hover {
+	opacity: 1;
+}
+
+#main-menu.main-menu--apex .apex-monolith-rail .main-menu__rl-nav-icon {
+	font-size: 0.82rem;
+	filter: drop-shadow(0 0 8px rgba(61, 255, 232, 0.55));
+}
+
+#main-menu.main-menu--apex .main-menu__rl-equipped--garage {
+	color: rgba(61, 255, 232, 0.85);
+	text-shadow: 0 0 12px rgba(61, 255, 232, 0.45);
+	font-weight: 800;
+}
+
+/* Stage chrome */
+#main-menu.main-menu--apex .main-menu__stage-chrome {
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	background:
+		linear-gradient(
+			180deg,
+			rgba(255, 255, 255, 0.05) 0%,
+			transparent 22%,
+			transparent 68%,
+			rgba(0, 0, 0, 0.35) 100%
+		),
+		radial-gradient(
+			ellipse 90% 65% at 50% 42%,
+			rgba(61, 255, 232, 0.06) 0%,
+			transparent 62%
+		);
+	box-shadow:
+		inset 0 0 0 1px rgba(61, 255, 232, 0.12),
+		inset 0 0 100px rgba(176, 108, 255, 0.06),
+		inset 0 -40px 80px rgba(0, 0, 0, 0.45);
+}
+
+#main-menu.main-menu--apex .main-menu__cosmos-void-ring {
+	border-width: 2px;
+	border-color: rgba(61, 255, 232, 0.45);
+	box-shadow:
+		0 0 60px rgba(61, 255, 232, 0.15),
+		inset 0 0 80px rgba(61, 255, 232, 0.08),
+		0 0 0 1px rgba(176, 108, 255, 0.25);
+}
+
+/* Brief panel */
+#main-menu.main-menu--apex .main-menu__rl-brief.monolith-glass {
+	border: 1px solid rgba(255, 255, 255, 0.16);
+	background: linear-gradient(
+		145deg,
+		rgba(16, 24, 42, 0.72) 0%,
+		rgba(8, 10, 20, 0.48) 55%,
+		rgba(20, 12, 32, 0.42) 100%
+	);
+	box-shadow:
+		var(--apex-shadow-deep),
+		var(--apex-shadow-violet),
+		inset 0 1px 0 rgba(255, 255, 255, 0.16),
+		inset 0 0 32px rgba(61, 255, 232, 0.06);
+	backdrop-filter: blur(24px) saturate(190%);
+	-webkit-backdrop-filter: blur(24px) saturate(190%);
+}
+
+#main-menu.main-menu--apex .main-menu__rl-brief-title {
+	font-size: clamp(1.05rem, 2vw, 1.35rem);
+	letter-spacing: 0.12em;
+	color: #eef6ff;
+	font-weight: 900;
+	text-shadow: 0 1px 4px rgba(0, 0, 0, 0.55);
+	animation: none;
+	background: none;
+	-webkit-text-fill-color: #eef6ff;
+}
+
+#main-menu.main-menu--apex .main-menu__rl-brief-desc {
+	color: rgba(224, 236, 255, 0.9);
+	line-height: 1.55;
+}
+
+#main-menu.main-menu--apex .main-menu__rl-kicker {
+	color: #ffffff;
+	-webkit-text-fill-color: #ffffff;
+	font-size: clamp(1.08rem, 2vw, 1.38rem);
+	letter-spacing: 0.2em;
+	font-weight: 900;
+}
+
+#main-menu.main-menu--apex .main-menu__rl-kicker.ignite-hero-type--on-dark {
+	filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.72));
+}
+
+#main-menu.main-menu--apex .main-menu__rl-modes,
+#main-menu.main-menu--apex .main-menu__rl-playlist {
+	overflow: visible;
+	pointer-events: auto;
+}
+
+#main-menu.main-menu--apex .main-menu__rl-carousel {
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
+	width: 100%;
+	overflow-x: auto;
+	overflow-y: hidden;
+	padding: 0.7rem 0 0.35rem;
+	margin: 0;
+	scrollbar-width: thin;
+	pointer-events: auto;
+}
+
+#main-menu.main-menu--apex .main-menu__rl-playlist {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: flex-start;
+	justify-content: center !important;
+	width: max-content;
+	max-width: 100%;
+	margin-inline: auto;
+	gap: clamp(0.75rem, 1.4vw, 1.1rem);
+	padding: 0.15rem 0 0.55rem;
+	overflow: visible;
+	scroll-snap-type: x proximity;
+	scroll-behavior: smooth;
+	mask-image: none;
+	-webkit-mask-image: none;
+	perspective: none;
+	box-sizing: border-box;
+}
+
+#main-menu.main-menu--apex .main-menu__modes-track {
+	display: flex;
+	justify-content: center;
+	width: 100%;
+	max-width: 100%;
+	padding-left: 0;
+}
+
+#main-menu.main-menu--apex .main-menu__deck-toggle {
+	font-size: clamp(0.95rem, 1.6vw, 1.18rem);
+	font-weight: 900;
+	letter-spacing: 0.14em;
+	padding: 0.78rem 1.6rem;
+	min-height: 3.05rem;
+}
+
+/* ── Poziomy rząd + animacja wyboru ─────────────────────────────────────── */
+
+@property --card-lift {
+	syntax: "<length>";
+	inherits: false;
+	initial-value: 6px;
+}
+
+@property --card-scale {
+	syntax: "<number>";
+	inherits: false;
+	initial-value: 0.94;
+}
+
+@property --card-opacity {
+	syntax: "<number>";
+	inherits: false;
+	initial-value: 0.82;
+}
+
+@property --card-tilt-y {
+	syntax: "<angle>";
+	inherits: false;
+	initial-value: 0deg;
+}
+
+@property --card-tilt-x {
+	syntax: "<angle>";
+	inherits: false;
+	initial-value: 0deg;
+}
+
+@keyframes apex-card-stagger-in {
+	from {
+		opacity: 0;
+		filter: blur(10px) brightness(1.4);
+		transform: translateY(44px) scale(0.7) rotateY(18deg);
+	}
+	68% {
+		opacity: 1;
+		filter: blur(0) brightness(1.08);
+		transform: translateY(-4px) scale(1.02) rotateY(-3deg);
+	}
+	to {
+		filter: none;
+		transform: translateY(6px) scale(0.94) rotateY(0deg);
+	}
+}
+
+@keyframes apex-card-active-glow {
+	0%,
+	100% {
+		border-color: rgba(255, 255, 255, 0.92);
+		box-shadow:
+			var(--ignite-shadow-contact),
+			var(--ignite-shadow-lift),
+			inset 0 0 0 1px rgba(255, 255, 255, 0.55),
+			inset 0 0 16px color-mix(in srgb, var(--wypas-art-glow) 12%, transparent),
+			0 0 22px color-mix(in srgb, var(--wypas-art-glow) 42%, transparent);
+	}
+	50% {
+		border-color: #fff;
+		box-shadow:
+			var(--ignite-shadow-contact),
+			var(--ignite-shadow-lift),
+			inset 0 0 0 2px rgba(255, 255, 255, 0.75),
+			inset 0 0 22px color-mix(in srgb, var(--wypas-art-glow) 18%, transparent),
+			0 0 34px color-mix(in srgb, var(--wypas-art-glow) 58%, transparent);
+	}
+}
+
+/* Stagger wejścia — tylko raz po show(); backwards = po animacji wraca var(--card-opacity) */
+#main-menu.main-menu--cards-intro.main-menu--apex .mode-card--wypas,
+#main-menu.main-menu--cards-intro.main-menu--apex.main-menu--wypas
+	.mode-card--wypas:not(.active),
+#main-menu.main-menu--deck-swap-in.main-menu--cards-intro.main-menu--apex
+	.mode-card--wypas {
+	animation: apex-card-stagger-in 0.68s cubic-bezier(0.22, 1, 0.36, 1) backwards !important;
+	transition: none !important;
+}
+
+#main-menu.main-menu--cards-intro.main-menu--apex .mode-card--wypas:nth-child(1) {
+	animation-delay: 0.06s !important;
+}
+#main-menu.main-menu--cards-intro.main-menu--apex .mode-card--wypas:nth-child(2) {
+	animation-delay: 0.13s !important;
+}
+#main-menu.main-menu--cards-intro.main-menu--apex .mode-card--wypas:nth-child(3) {
+	animation-delay: 0.2s !important;
+}
+#main-menu.main-menu--cards-intro.main-menu--apex .mode-card--wypas:nth-child(4) {
+	animation-delay: 0.27s !important;
+}
+#main-menu.main-menu--cards-intro.main-menu--apex .mode-card--wypas:nth-child(5) {
+	animation-delay: 0.34s !important;
+}
+#main-menu.main-menu--cards-intro.main-menu--apex .mode-card--wypas:nth-child(6) {
+	animation-delay: 0.41s !important;
+}
+
+/* menu.css ma cosmos-stagger-in na każdej karcie — wyłącz, intro tylko przez --cards-intro */
+#main-menu.main-menu--apex.main-menu--cosmos .mode-card--wypas {
+	animation: none;
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas {
+	position: relative;
+	z-index: 1;
+	flex: 0 0 clamp(10.5rem, 15.5vw, 13.5rem);
+	width: clamp(10.5rem, 15.5vw, 13.5rem);
+	height: clamp(12.5rem, 25vh, 16.5rem);
+	min-height: 12.5rem;
+	overflow: hidden;
+	clip-path: polygon(0 0, 100% 0, 100% 94%, 96% 100%, 0 100%);
+	isolation: isolate;
+	contain: paint;
+	transform-style: flat;
+	--card-spin-duration: 1.38s;
+	--card-lift: 0px;
+	--card-scale: 0.96;
+	--card-opacity: 0.88;
+	--card-tilt-y: 0deg;
+	--card-tilt-x: 0deg;
+	pointer-events: auto;
+	cursor: pointer;
+	border: 2px solid rgba(255, 255, 255, 0.5);
+	opacity: var(--card-opacity);
+	scroll-snap-align: center;
+	backdrop-filter: none;
+	-webkit-backdrop-filter: none;
+	box-shadow:
+		var(--ignite-shadow-contact),
+		var(--ignite-shadow-ambient),
+		inset 0 1px 0 rgba(255, 255, 255, 0.18);
+	transform: translateY(var(--card-lift)) scale(var(--card-scale));
+	transition:
+		--card-lift 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+		--card-scale 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+		--card-opacity 0.35s ease,
+		transform 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+		border-color 0.3s ease,
+		box-shadow 0.4s ease,
+		opacity 0.35s ease;
+	will-change: auto;
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas.mode-card--pick,
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas.mode-card--spin {
+	z-index: 40;
+	opacity: 1;
+	overflow: hidden;
+	clip-path: polygon(0 0, 100% 0, 100% 94%, 96% 100%, 0 100%);
+	animation: apex-card-pick-outer 1.35s cubic-bezier(0.12, 1, 0.22, 1) forwards;
+	transition:
+		border-color 0.35s ease,
+		box-shadow 0.45s ease,
+		opacity 0.3s ease;
+	box-shadow:
+		var(--ignite-shadow-contact),
+		var(--ignite-shadow-lift),
+		inset 0 0 0 2px color-mix(in srgb, var(--wypas-art-glow) 75%, white),
+		inset 0 0 28px color-mix(in srgb, var(--wypas-art-glow) 22%, transparent),
+		0 0 48px color-mix(in srgb, var(--wypas-art-glow) 55%, transparent);
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas.mode-card--spin {
+	animation: apex-card-spin-outer var(--card-spin-duration, 1.38s)
+		cubic-bezier(0.12, 1, 0.22, 1) forwards;
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas.mode-card--pick::before,
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas.mode-card--spin::before {
+	content: "";
+	position: absolute;
+	inset: -22%;
+	border-radius: inherit;
+	background: radial-gradient(
+		ellipse 80% 70% at 50% 50%,
+		color-mix(in srgb, var(--wypas-art-glow) 55%, white),
+		transparent 72%
+	);
+	opacity: 0;
+	pointer-events: none;
+	z-index: -1;
+	animation: apex-card-pick-flash 1.35s cubic-bezier(0.2, 1, 0.28, 1) forwards;
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas.mode-card--pick .mode-card__inner,
+#main-menu.main-menu--apex.main-menu--wypas
+	.mode-card--wypas.mode-card--pick
+	.mode-card__art,
+#main-menu.main-menu--apex.main-menu--wypas
+	.mode-card--wypas.mode-card--spin
+	.mode-card__inner,
+#main-menu.main-menu--apex.main-menu--wypas
+	.mode-card--wypas.mode-card--spin
+	.mode-card__art {
+	animation: none;
+	transition: none;
+	overflow: hidden;
+}
+
+#main-menu.main-menu--apex.main-menu--wypas
+	.mode-card--wypas.mode-card--pick
+	.mode-card__art-glow,
+#main-menu.main-menu--apex.main-menu--wypas
+	.mode-card--wypas.mode-card--spin
+	.mode-card__art-glow {
+	animation: apex-card-glow-burst 1.1s cubic-bezier(0.2, 1, 0.28, 1) forwards;
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card__inner {
+	position: relative;
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	justify-content: flex-end;
+	width: 100%;
+	height: 100%;
+	min-height: 0;
+	overflow: hidden;
+	border-radius: inherit;
+	transform-style: preserve-3d;
+	transform: translateZ(6px);
+	transition: transform 0.55s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas.active .mode-card__inner {
+	transform: translateZ(10px);
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card__shimmer {
+	position: absolute;
+	inset: 0;
+	z-index: 12;
+	overflow: hidden;
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 0.35s ease;
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas.active .mode-card__shimmer {
+	opacity: 0.42;
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas.mode-card--spin .mode-card__shimmer {
+	opacity: 1;
+	mix-blend-mode: screen;
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card__shimmer::after {
+	content: "";
+	position: absolute;
+	inset: -55% -75%;
+	background: linear-gradient(
+		105deg,
+		transparent 38%,
+		rgba(255, 255, 255, 0.06) 44%,
+		rgba(255, 255, 255, 0.34) 50%,
+		rgba(255, 255, 255, 0.06) 56%,
+		transparent 62%
+	);
+	transform: translateX(-130%) skewX(-18deg);
+	animation: apex-card-shimmer 4.8s ease-in-out infinite;
+}
+
+#main-menu.main-menu--apex.main-menu--wypas
+	.mode-card--wypas.active:not(.mode-card--spin)
+	.mode-card__shimmer::after {
+	opacity: 0.55;
+}
+
+#main-menu.main-menu--apex.main-menu--wypas
+	.mode-card--wypas.mode-card--spin
+	.mode-card__shimmer::after {
+	inset: -65% -90%;
+	background: linear-gradient(
+		105deg,
+		transparent 32%,
+		color-mix(in srgb, var(--wypas-art-glow) 35%, transparent) 38%,
+		rgba(255, 255, 255, 0.22) 44%,
+		rgba(255, 255, 255, 0.82) 50%,
+		rgba(255, 255, 255, 0.22) 56%,
+		color-mix(in srgb, var(--wypas-art-glow) 35%, transparent) 62%,
+		transparent 68%
+	);
+	filter: drop-shadow(0 0 22px rgba(255, 255, 255, 0.65));
+	animation: apex-card-shimmer-spin var(--card-spin-duration) linear both;
+}
+
+#main-menu.main-menu--cards-intro.main-menu--apex .mode-card--wypas {
+	transition:
+		--card-lift 0.55s cubic-bezier(0.23, 1, 0.32, 1),
+		--card-scale 0.55s cubic-bezier(0.23, 1, 0.32, 1),
+		border-color 0.4s ease,
+		box-shadow 0.5s ease;
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas:not(.active) {
+	/* bez filter — psuje clip/border przy aktywnej karcie */
+	opacity: 0.88;
+}
+
+#main-menu.main-menu--deck-swap-out.main-menu--apex.main-menu--wypas .mode-card--wypas,
+#main-menu.main-menu--deck-swap-out.main-menu--apex.main-menu--wypas
+	.mode-card--wypas:not(.active),
+#main-menu.main-menu--deck-swap-out.main-menu--apex.main-menu--wypas
+	.mode-card--wypas.active {
+	animation: apex-deck-card-out 0.58s cubic-bezier(0.4, 0, 0.55, 1) forwards !important;
+	pointer-events: none;
+	transition: none !important;
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas.active:not(.mode-card--spin) {
+	animation: apex-card-active-glow 3.4s ease-in-out infinite;
+}
+
+#main-menu.main-menu--cards-intro.main-menu--apex.main-menu--wypas
+	.mode-card--wypas.active:not(.mode-card--spin) {
+	animation:
+		apex-card-stagger-in 0.68s cubic-bezier(0.22, 1, 0.36, 1) backwards,
+		apex-card-active-glow 2.8s ease-in-out 0.68s infinite !important;
+	transition: none !important;
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas::after {
+	display: none;
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--duel {
+	--wypas-art-glow: #4da8ff;
+	background: linear-gradient(165deg, #1a3d72 0%, #0f2244 52%, #081525 100%);
+	border-color: rgba(77, 168, 255, 0.72);
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--team {
+	--wypas-art-glow: #3dffe8;
+	background: linear-gradient(165deg, #0e4a52 0%, #0a2838 52%, #061018 100%);
+	border-color: rgba(61, 255, 232, 0.68);
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--chaos {
+	--wypas-art-glow: #b06cff;
+	background: linear-gradient(165deg, #3a1868 0%, #1e0e38 52%, #0a0614 100%);
+	border-color: rgba(176, 108, 255, 0.72);
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--ignition,
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--featured,
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--ignition-test {
+	--wypas-art-glow: #ff9440;
+	background: linear-gradient(165deg, #6a3012 0%, #3a1808 48%, #140804 100%);
+	border-color: rgba(255, 148, 64, 0.72);
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--lab {
+	--wypas-art-glow: #50ffbe;
+	background: linear-gradient(165deg, #0c5a4a 0%, #0a3034 48%, #061018 100%);
+	border-color: rgba(80, 255, 190, 0.68);
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--duel .mode-card__art {
+	background: linear-gradient(
+		180deg,
+		rgba(77, 168, 255, 0.42) 0%,
+		rgba(26, 61, 114, 0.88) 100%
+	);
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--team .mode-card__art {
+	background: linear-gradient(
+		180deg,
+		rgba(61, 255, 232, 0.38) 0%,
+		rgba(14, 74, 82, 0.9) 100%
+	);
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--chaos .mode-card__art {
+	background: linear-gradient(
+		180deg,
+		rgba(176, 108, 255, 0.4) 0%,
+		rgba(58, 24, 104, 0.92) 100%
+	);
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--ignition .mode-card__art,
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--featured .mode-card__art,
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--ignition-test .mode-card__art {
+	background: linear-gradient(
+		180deg,
+		rgba(255, 150, 70, 0.48) 0%,
+		rgba(90, 40, 16, 0.92) 100%
+	);
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--lab .mode-card__art {
+	background: linear-gradient(
+		180deg,
+		rgba(80, 255, 190, 0.4) 0%,
+		rgba(12, 74, 66, 0.92) 100%
+	);
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas .mode-card__art-glow {
+	opacity: 1;
+	background: radial-gradient(
+		circle at 50% 78%,
+		color-mix(in srgb, var(--wypas-art-glow) 88%, white) 0%,
+		color-mix(in srgb, var(--wypas-art-glow) 45%, transparent) 45%,
+		transparent 72%
+	);
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas .mode-card__art-mesh {
+	opacity: 0.55;
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas .mode-card__art-label {
+	opacity: 1;
+	color: #fff;
+	text-shadow:
+		0 0 24px var(--wypas-art-glow),
+		0 0 48px color-mix(in srgb, var(--wypas-art-glow) 65%, transparent),
+		0 4px 14px rgba(0, 0, 0, 0.65);
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas .mode-card__foot {
+	background: linear-gradient(
+		180deg,
+		rgba(0, 0, 0, 0.08) 0%,
+		rgba(0, 0, 0, 0.72) 100%
+	);
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas .mode-card__title.cosmos-shimmer-hover {
+	background: none;
+	-webkit-background-clip: unset;
+	background-clip: unset;
+	color: #fff;
+	-webkit-text-fill-color: #fff;
+	animation: none;
+	filter: none;
+}
+
+#main-menu.main-menu--apex.main-menu--wypas
+	.mode-card--wypas.active
+	.mode-card__title.cosmos-shimmer-hover {
+	background: linear-gradient(
+		105deg,
+		color-mix(in srgb, var(--wypas-art-glow) 55%, #fff) 0%,
+		#ffffff 38%,
+		color-mix(in srgb, var(--wypas-art-glow) 70%, #fff) 58%,
+		#ffffff 78%,
+		color-mix(in srgb, var(--wypas-art-glow) 45%, #fff) 100%
+	);
+	background-size: 220% 100%;
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	-webkit-text-fill-color: transparent;
+	animation: cosmos-shimmer-sweep 2.4s linear infinite;
+	filter: drop-shadow(0 0 10px color-mix(in srgb, var(--wypas-art-glow) 55%, transparent));
+}
+
+#main-menu.main-menu--apex.main-menu--wypas
+	.mode-card--wypas.mode-card--spin
+	.mode-card__title.cosmos-shimmer-hover {
+	animation: cosmos-shimmer-sweep 1.05s linear infinite;
+	filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.75))
+		drop-shadow(0 0 28px color-mix(in srgb, var(--wypas-art-glow) 70%, transparent));
+}
+
+#main-menu.main-menu--apex.main-menu--wypas
+	.mode-card--wypas.active:not(.mode-card--spin)
+	.mode-card__title.cosmos-shimmer-hover {
+	animation: cosmos-shimmer-sweep 3.2s linear infinite;
+	filter: drop-shadow(0 0 8px color-mix(in srgb, var(--wypas-art-glow) 45%, transparent));
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas .mode-card__desc {
+	color: rgba(230, 240, 255, 0.88);
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas .mode-card__beam {
+	opacity: 1;
+	height: 3px;
+	left: 0;
+	right: 0;
+	width: auto;
+	max-width: 100%;
+	box-shadow: 0 0 12px var(--wypas-art-glow);
+	z-index: 4;
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas .mode-card__badge {
+	background: color-mix(in srgb, var(--wypas-art-glow) 32%, rgba(0, 0, 0, 0.65));
+	border: 1px solid color-mix(in srgb, var(--wypas-art-glow) 75%, white);
+	color: #fff;
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas:hover,
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas:focus-visible {
+	z-index: 10;
+	transform: translateY(calc(var(--card-lift) - 4px)) scale(calc(var(--card-scale) + 0.03));
+	border-color: #fff;
+	box-shadow:
+		var(--ignite-shadow-contact),
+		var(--ignite-shadow-lift),
+		inset 0 0 0 1px rgba(255, 255, 255, 0.65),
+		inset 0 1px 0 rgba(255, 255, 255, 0.32),
+		0 0 28px color-mix(in srgb, var(--wypas-art-glow) 70%, transparent);
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas:hover .mode-card__beam,
+#main-menu.main-menu--apex.main-menu--wypas
+	.mode-card--wypas:focus-visible
+	.mode-card__beam {
+	height: 4px;
+	box-shadow: 0 0 18px var(--wypas-art-glow);
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas.active {
+	z-index: 8;
+	filter: none;
+	border-color: #fff;
+	opacity: 1;
+	box-shadow:
+		var(--ignite-shadow-contact),
+		var(--ignite-shadow-lift),
+		inset 0 0 0 2px rgba(255, 255, 255, 0.72),
+		inset 0 0 18px color-mix(in srgb, var(--wypas-art-glow) 14%, transparent),
+		0 0 28px color-mix(in srgb, var(--wypas-art-glow) 55%, transparent);
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas.active.mode-card--spin {
+	animation: apex-card-select-lift var(--card-spin-duration)
+		cubic-bezier(0.18, 1, 0.22, 1) forwards;
+}
+
+#main-menu.main-menu--cards-intro.main-menu--apex.main-menu--wypas
+	.mode-card--wypas.active {
+	animation:
+		apex-card-stagger-in 0.68s cubic-bezier(0.22, 1, 0.36, 1) backwards,
+		apex-card-active-glow 2.8s ease-in-out 0.68s infinite !important;
+	transition: none !important;
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas.active:hover,
+#main-menu.main-menu--apex.main-menu--wypas
+	.mode-card--wypas.active:focus-visible {
+	z-index: 12;
+	transform: translateY(calc(var(--card-lift) - 4px)) scale(calc(var(--card-scale) + 0.03));
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas.active .mode-card__beam {
+	height: 5px;
+	box-shadow: 0 0 28px var(--wypas-art-glow);
+}
+
+#main-menu.main-menu--apex .mode-card--wypas.active::after {
+	display: none;
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--duel .mode-card__beam {
+	background: linear-gradient(90deg, #4da8ff, #9efcff);
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--team .mode-card__beam {
+	background: linear-gradient(90deg, #3dffe8, #9efcf0);
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--chaos .mode-card__beam {
+	background: linear-gradient(90deg, #b06cff, #ff5ec8);
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--ignition .mode-card__beam,
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--featured .mode-card__beam,
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--ignition-test .mode-card__beam {
+	background: linear-gradient(90deg, #ff8a3d, #ffc84d);
+}
+
+#main-menu.main-menu--apex.main-menu--wypas .mode-card--lab .mode-card__beam {
+	background: linear-gradient(90deg, #50ffbe, #9efcf0);
+}
+
+/* Play CTA */
+#main-menu.main-menu--apex .main-menu__rl-dock {
+	position: relative;
+	z-index: 8;
+	pointer-events: auto;
+}
+
+#main-menu.main-menu--apex .main-menu__rl-play {
+	position: relative;
+	z-index: 1;
+	min-width: clamp(14rem, 28vw, 20rem);
+	padding: clamp(0.85rem, 1.8vh, 1.15rem) clamp(1.5rem, 3vw, 2.25rem);
+	border: 2px solid rgba(61, 255, 232, 0.45);
+	border-radius: 14px;
+	background: linear-gradient(
+		145deg,
+		rgba(10, 18, 32, 0.96) 0%,
+		rgba(6, 12, 24, 0.98) 52%,
+		rgba(4, 8, 16, 1) 100%
+	);
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.08),
+		0 0 0 1px rgba(0, 0, 0, 0.45),
+		0 0 24px rgba(61, 255, 232, 0.2),
+		0 16px 42px rgba(0, 0, 0, 0.58);
+	cursor: pointer;
+	isolation: isolate;
+	transition:
+		transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+		filter 0.2s ease,
+		box-shadow 0.2s ease,
+		border-color 0.2s ease;
+}
+
+#main-menu.main-menu--apex .main-menu__rl-play.ignite-cta-ground::after {
+	bottom: -0.5rem;
+	height: 1.5rem;
+	filter: blur(8px);
+}
+
+#main-menu.main-menu--apex .main-menu__rl-play-shine {
+	opacity: 0.35;
+}
+
+#main-menu.main-menu--apex .main-menu__rl-play-label,
+#main-menu.main-menu--apex .main-menu__rl-play-label.cosmos-shimmer-text {
+	position: relative;
+	z-index: 2;
+	background: none;
+	background-size: unset;
+	-webkit-background-clip: unset;
+	background-clip: unset;
+	color: #f4f8ff;
+	-webkit-text-fill-color: #f4f8ff;
+	animation: none;
+	filter: none;
+	font-family: var(--font-display);
+	font-size: clamp(1.18rem, 2.35vw, 1.55rem);
+	font-weight: 900;
+	font-synthesis: none;
+	letter-spacing: 0.16em;
+	text-shadow:
+		0 1px 0 rgba(0, 0, 0, 0.35),
+		0 0 18px rgba(61, 255, 232, 0.22);
+}
+
+#main-menu.main-menu--apex .main-menu__launch-mode {
+	position: relative;
+	z-index: 2;
+	color: rgba(158, 252, 255, 0.78);
+	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
+}
+
+#main-menu.main-menu--apex .main-menu__rl-play:hover {
+	transform: translateY(-3px) scale(1.03);
+	filter: brightness(1.08);
+	border-color: rgba(61, 255, 232, 0.72);
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.12),
+		0 0 0 1px rgba(61, 255, 232, 0.35),
+		0 0 32px rgba(61, 255, 232, 0.32),
+		0 18px 46px rgba(0, 0, 0, 0.62);
+}
+
+#main-menu.main-menu--apex .main-menu__rl-play.cosmos-shimmer-surface::after,
+#main-menu.main-menu--apex .main-menu__rl-play::after {
+	display: none;
+}
+
+/* Corner brackets */
+#main-menu.main-menu--apex .menu-corners::before,
+#main-menu.main-menu--apex .menu-corners::after {
+	width: 14px;
+	height: 14px;
+	border-color: rgba(61, 255, 232, 0.55);
+	box-shadow: 0 0 12px rgba(61, 255, 232, 0.35);
+}
+
+/* Shimmer text boost */
+#main-menu.main-menu--apex .cosmos-shimmer-text {
+	filter: drop-shadow(0 0 20px rgba(61, 255, 232, 0.38));
+}
+
+@media (max-width: 820px) {
+	#main-menu.main-menu--apex .main-menu__apex-prisms span:nth-child(3),
+	#main-menu.main-menu--apex .main-menu__apex-prisms span:nth-child(4) {
+		display: none;
+	}
+
+	#main-menu.main-menu--apex .main-menu__rl-play {
+		width: 100%;
+	}
+
+	/* Apex: nie psuj layoutu w poziomie — zostaw pionowy rail do 640px */
+	#main-menu.main-menu--apex .main-menu__rl-rail.apex-monolith-rail {
+		flex-direction: column;
+		flex-wrap: nowrap;
+		align-items: stretch;
+	}
+}
+
+@media (max-width: 640px) {
+	#main-menu.main-menu--apex .main-menu__layout--rl.main-menu__layout--cosmos {
+		grid-template-columns: 1fr;
+		grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+		grid-template-areas:
+			"hud"
+			"rail"
+			"stage"
+			"modes"
+			"dock";
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#main-menu.main-menu--apex .main-menu__apex-aurora,
+	#main-menu.main-menu--apex .main-menu__apex-mesh,
+	#main-menu.main-menu--apex .main-menu__apex-prisms span,
+	#main-menu.main-menu--apex .mode-card--wypas::after,
+	#main-menu.main-menu--apex .mode-card--wypas.active,
+	#main-menu.main-menu--apex .mode-card__shimmer::after,
+	#main-menu.main-menu--apex
+		.mode-card--wypas.active
+		.mode-card__title.cosmos-shimmer-hover,
+	#main-menu.main-menu--apex .main-menu__rl-play {
+		animation: none;
+	}
+
+	#main-menu.main-menu--apex .mode-card--wypas.mode-card--pick,
+	#main-menu.main-menu--apex .mode-card--wypas.mode-card--spin,
+	#main-menu.main-menu--apex
+		.mode-card--wypas.mode-card--pick
+		.mode-card__inner,
+	#main-menu.main-menu--apex
+		.mode-card--wypas.mode-card--spin
+		.mode-card__inner {
+		animation-duration: 0.45s;
+	}
+
+	#main-menu.main-menu--cards-intro.main-menu--apex .mode-card--wypas {
+		animation: none;
+		opacity: var(--card-opacity);
+		filter: none;
+	}
+
+	#main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas.active .mode-card__shimmer {
+		opacity: 0.35;
+	}
+}

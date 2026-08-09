@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pl">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Pchełkowóz</title>
+		<meta name="description" content="Pchełkowóz — battle-car z Ignite." />
+		<meta property="og:title" content="Pchełkowóz" />
+		<meta property="og:image" content="media/pchelka-avatar.png?v=26" />
+		<meta name="theme-color" content="#1a120c" />
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+					"three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+				}
+			}
+		</script>
+		<style>
+			:root {
+				--bg: #140e0a;
+				--cyan: #4ec8ff;
+				--text: #fff6ec;
+				--mute: #cbb7a4;
+			}
+			* {
+				box-sizing: border-box;
+			}
+			html,
+			body {
+				margin: 0;
+				height: 100%;
+				background:
+					radial-gradient(ellipse at 70% 10%, rgba(78, 200, 255, 0.12), transparent 42%),
+					radial-gradient(ellipse at 50% 25%, #2a1a12 0%, var(--bg) 55%);
+				color: var(--text);
+				font-family: "Segoe UI", system-ui, sans-serif;
+				overflow: hidden;
+			}
+			.wrap {
+				height: 100%;
+				display: grid;
+				grid-template-rows: auto 1fr auto;
+			}
+			header {
+				padding: 0.85rem 1.1rem 0.25rem;
+				text-align: center;
+				z-index: 2;
+			}
+			.avatar {
+				width: min(120px, 28vw);
+				height: min(120px, 28vw);
+				margin: 0 auto 0.55rem;
+				border-radius: 50%;
+				object-fit: cover;
+				border: 2px solid color-mix(in srgb, var(--cyan) 45%, #fff);
+				box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45), 0 0 22px rgba(78, 200, 255, 0.22);
+			}
+			header h1 {
+				margin: 0;
+				font-size: clamp(1.35rem, 4vw, 1.9rem);
+				letter-spacing: 0.03em;
+			}
+			.tag {
+				display: inline-block;
+				margin-top: 0.45rem;
+				padding: 0.22rem 0.6rem;
+				border: 1px solid color-mix(in srgb, var(--cyan) 50%, transparent);
+				background: color-mix(in srgb, var(--cyan) 12%, transparent);
+				color: var(--cyan);
+				font-size: 0.72rem;
+				letter-spacing: 0.14em;
+				text-transform: uppercase;
+			}
+			#stage {
+				position: relative;
+				min-height: 0;
+			}
+			#stage canvas {
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+			.hint {
+				position: absolute;
+				left: 0;
+				right: 0;
+				bottom: 0.7rem;
+				text-align: center;
+				margin: 0;
+				opacity: 0.7;
+				font-size: 0.8rem;
+				color: var(--mute);
+				pointer-events: none;
+			}
+			footer {
+				padding: 0.55rem 1rem 0.9rem;
+				text-align: center;
+				color: var(--mute);
+				font-size: 0.84rem;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="wrap">
+			<header>
+				<img class="avatar" src="media/pchelka-avatar.png?v=26" alt="" width="120" height="120" />
+				<h1>Pchełkowóz</h1>
+				<span class="tag">Ignite</span>
+			</header>
+			<div id="stage">
+				<p class="hint">Przeciągnij — obracaj · scroll — zoom</p>
+			</div>
+			<footer>Ignite · Trellis 3D</footer>
+		</div>
+		<script type="module">
+			import * as THREE from "three";
+			import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+			import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+			import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+			const stage = document.getElementById("stage");
+			const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+			renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+			renderer.outputColorSpace = THREE.SRGBColorSpace;
+			renderer.toneMapping = THREE.ACESFilmicToneMapping;
+			renderer.toneMappingExposure = 1.12;
+			stage.appendChild(renderer.domElement);
+
+			const scene = new THREE.Scene();
+			const pmrem = new THREE.PMREMGenerator(renderer);
+			scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+			const camera = new THREE.PerspectiveCamera(40, 1, 0.05, 50);
+			const controls = new OrbitControls(camera, renderer.domElement);
+			controls.enableDamping = true;
+			controls.dampingFactor = 0.06;
+			controls.screenSpacePanning = false;
+			controls.enablePan = false;
+
+			scene.add(new THREE.HemisphereLight(0xffe2c8, 0x1a3038, 1.05));
+			const key = new THREE.DirectionalLight(0xffffff, 1.35);
+			key.position.set(2.5, 4, 2);
+			scene.add(key);
+			const fill = new THREE.DirectionalLight(0x7ad7ff, 0.45);
+			fill.position.set(-3, 1.5, -2);
+			scene.add(fill);
+
+			const ground = new THREE.Mesh(
+				new THREE.CircleGeometry(1.6, 64),
+				new THREE.MeshStandardMaterial({
+					color: 0x1a1410,
+					roughness: 0.95,
+					metalness: 0.05,
+				}),
+			);
+			ground.rotation.x = -Math.PI / 2;
+			scene.add(ground);
+
+			function resize() {
+				const w = stage.clientWidth;
+				const h = stage.clientHeight;
+				renderer.setSize(w, h, false);
+				camera.aspect = w / Math.max(1, h);
+				camera.updateProjectionMatrix();
+			}
+			resize();
+			window.addEventListener("resize", resize);
+
+			function scoreUndercarriageDown(root) {
+				let mesh = null;
+				const named = root.getObjectByName("body");
+				if (named?.isMesh) mesh = named;
+				root.traverse((o) => {
+					if (!mesh && o.isMesh) mesh = o;
+				});
+				if (!mesh?.geometry?.attributes?.position) return 0;
+				mesh.updateMatrixWorld(true);
+				const box = new THREE.Box3().setFromObject(mesh);
+				const h = box.max.y - box.min.y;
+				if (h < 1e-8) return 0;
+				const lowMax = box.min.y + h * 0.35;
+				const highMin = box.max.y - h * 0.35;
+				const pos = mesh.geometry.attributes.position;
+				const index = mesh.geometry.index;
+				const a = new THREE.Vector3();
+				const b = new THREE.Vector3();
+				const c = new THREE.Vector3();
+				const ab = new THREE.Vector3();
+				const ac = new THREE.Vector3();
+				const n = new THREE.Vector3();
+				let bottomDown = 0;
+				let topDown = 0;
+				const triCount = index ? index.count / 3 : pos.count / 3;
+				for (let t = 0; t < triCount; t++) {
+					const i0 = index ? index.getX(t * 3) : t * 3;
+					const i1 = index ? index.getX(t * 3 + 1) : t * 3 + 1;
+					const i2 = index ? index.getX(t * 3 + 2) : t * 3 + 2;
+					a.fromBufferAttribute(pos, i0).applyMatrix4(mesh.matrixWorld);
+					b.fromBufferAttribute(pos, i1).applyMatrix4(mesh.matrixWorld);
+					c.fromBufferAttribute(pos, i2).applyMatrix4(mesh.matrixWorld);
+					ab.subVectors(b, a);
+					ac.subVectors(c, a);
+					n.crossVectors(ab, ac);
+					const area = n.length() * 0.5;
+					if (area < 1e-12) continue;
+					n.normalize();
+					if (Math.abs(n.y) < 0.55) continue;
+					const cy = (a.y + b.y + c.y) / 3;
+					if (n.y < -0.55 && cy <= lowMax) bottomDown += area;
+					if (n.y < -0.55 && cy >= highMin) topDown += area;
+				}
+				return bottomDown - topDown * 1.35;
+			}
+
+			function ensureTrellisAxes(root) {
+				root.updateMatrixWorld(true);
+				const size = new THREE.Box3().setFromObject(root).getSize(new THREE.Vector3());
+				root.rotation.order = "XYZ";
+				if (size.y >= size.x && size.y >= size.z) {
+					root.rotation.x = -Math.PI / 2;
+					root.updateMatrixWorld(true);
+					const scoreNeg = scoreUndercarriageDown(root);
+					root.rotation.x = Math.PI / 2;
+					root.updateMatrixWorld(true);
+					const scorePos = scoreUndercarriageDown(root);
+					root.rotation.x = scorePos >= scoreNeg ? Math.PI / 2 : -Math.PI / 2;
+					root.updateMatrixWorld(true);
+				} else if (size.z >= size.x * 0.92 && size.z >= size.y * 0.92) {
+					const score = scoreUndercarriageDown(root);
+					root.rotation.x += Math.PI;
+					root.updateMatrixWorld(true);
+					if (scoreUndercarriageDown(root) < score) {
+						root.rotation.x -= Math.PI;
+						root.updateMatrixWorld(true);
+					}
+				}
+			}
+
+			function settleOnGround(obj) {
+				obj.updateMatrixWorld(true);
+				const box = new THREE.Box3().setFromObject(obj);
+				const center = box.getCenter(new THREE.Vector3());
+				obj.position.x += -center.x;
+				obj.position.y += -box.min.y;
+				obj.position.z += -center.z;
+				obj.updateMatrixWorld(true);
+				return new THREE.Box3().setFromObject(obj);
+			}
+
+			/** Pchełka na dachu — mały krążek, raycast w płaski dach. */
+			function stampFleaOnRoof(pivot) {
+				pivot.updateMatrixWorld(true);
+				const box = new THREE.Box3().setFromObject(pivot);
+				const size = box.getSize(new THREE.Vector3());
+				const targets = [];
+				pivot.traverse((o) => {
+					if (o.isMesh) targets.push(o);
+				});
+				const cx = 0;
+				const cz = -size.z * 0.085;
+				let hitY = box.max.y;
+				let hitZ = cz;
+				let bestY = -Infinity;
+				for (let dx = -2; dx <= 2; dx++) {
+					for (let dz = -2; dz <= 2; dz++) {
+						const hits = new THREE.Raycaster(
+							new THREE.Vector3(cx + dx * 0.02, box.max.y + 0.6, cz + dz * 0.02),
+							new THREE.Vector3(0, -1, 0),
+							0,
+							size.y * 1.6,
+						).intersectObjects(targets, true);
+						for (const h of hits) {
+							const n = h.face?.normal
+								? h.face.normal.clone().transformDirection(h.object.matrixWorld).normalize()
+								: null;
+							if (!n || n.y < 0.88) continue;
+							if (h.point.y > bestY) {
+								bestY = h.point.y;
+								hitY = h.point.y;
+								hitZ = h.point.z;
+							}
+						}
+					}
+				}
+				const r = Math.max(0.09, Math.min(size.x, size.z) * 0.2);
+				new THREE.TextureLoader().load("media/pchelka-avatar.png?v=26", (tex) => {
+					tex.colorSpace = THREE.SRGBColorSpace;
+					const ring = new THREE.Mesh(
+						new THREE.RingGeometry(r * 0.9, r * 1.02, 64),
+						new THREE.MeshBasicMaterial({
+							color: 0xffffff,
+							side: THREE.DoubleSide,
+							depthWrite: false,
+							polygonOffset: true,
+							polygonOffsetFactor: -4,
+							polygonOffsetUnits: -4,
+						}),
+					);
+					ring.rotation.x = -Math.PI / 2;
+					ring.position.set(0, hitY + 0.0004, hitZ);
+					ring.renderOrder = 2;
+					const disc = new THREE.Mesh(
+						new THREE.CircleGeometry(r * 0.91, 64),
+						new THREE.MeshBasicMaterial({
+							map: tex,
+							transparent: true,
+							alphaTest: 0.05,
+							side: THREE.DoubleSide,
+							depthWrite: false,
+							polygonOffset: true,
+							polygonOffsetFactor: -5,
+							polygonOffsetUnits: -5,
+						}),
+					);
+					disc.rotation.x = -Math.PI / 2;
+					disc.position.set(0, hitY + 0.0008, hitZ);
+					disc.renderOrder = 3;
+					pivot.add(ring);
+					pivot.add(disc);
+				});
+			}
+
+			new GLTFLoader().load(
+				"media/pchelka.glb?v=26",
+				(gltf) => {
+					const model = gltf.scene;
+					ensureTrellisAxes(model);
+					const pivot = new THREE.Group();
+					pivot.add(model);
+					const box = settleOnGround(pivot);
+					const size = box.getSize(new THREE.Vector3());
+					scene.add(pivot);
+					stampFleaOnRoof(pivot);
+
+					const len = Math.max(size.x, size.z, 0.8);
+					camera.position.set(len * 1.15, len * 0.55, len * 1.35);
+					controls.target.set(0, size.y * 0.35, 0);
+					controls.minDistance = len * 0.55;
+					controls.maxDistance = len * 3.5;
+					controls.minPolarAngle = 0.15;
+					controls.maxPolarAngle = Math.PI * 0.48;
+					controls.update();
+				},
+				undefined,
+				(err) => console.error(err),
+			);
+
+			function frame() {
+				controls.update();
+				renderer.render(scene, camera);
+				requestAnimationFrame(frame);
+			}
+			frame();
+		</script>
+	</body>
+</html>

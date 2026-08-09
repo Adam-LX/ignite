@@ -1,0 +1,133 @@
+{
+	"schemaVersion": 1,
+	"paints": [
+		{
+			"id": "black",
+			"nameKey": "paint.black",
+			"hex": "0x111111",
+			"accentHex": "0x000000",
+			"rarity": "common",
+			"finish": "standard"
+		},
+		{
+			"id": "white",
+			"nameKey": "paint.white",
+			"hex": "0xeeeeee",
+			"accentHex": "0xcccccc",
+			"rarity": "common",
+			"finish": "standard"
+		},
+		{
+			"id": "grey",
+			"nameKey": "paint.grey",
+			"hex": "0x888888",
+			"accentHex": "0x555555",
+			"rarity": "common",
+			"finish": "standard"
+		},
+		{
+			"id": "lime",
+			"nameKey": "paint.lime",
+			"hex": "0x88ee22",
+			"accentHex": "0x448811",
+			"rarity": "uncommon",
+			"finish": "standard"
+		},
+		{
+			"id": "saffron",
+			"nameKey": "paint.saffron",
+			"hex": "0xffaa22",
+			"accentHex": "0xcc7700",
+			"rarity": "uncommon",
+			"finish": "standard"
+		},
+		{
+			"id": "forest",
+			"nameKey": "paint.forest",
+			"hex": "0x228833",
+			"accentHex": "0x114422",
+			"rarity": "uncommon",
+			"finish": "standard"
+		},
+		{
+			"id": "cobalt",
+			"nameKey": "paint.cobalt",
+			"hex": "0x2244cc",
+			"accentHex": "0x112266",
+			"rarity": "uncommon",
+			"finish": "standard"
+		},
+		{
+			"id": "crimson",
+			"nameKey": "paint.crimson",
+			"hex": "0xcc1122",
+			"accentHex": "0x660811",
+			"rarity": "rare",
+			"finish": "standard"
+		},
+		{
+			"id": "pink",
+			"nameKey": "paint.pink",
+			"hex": "0xff66aa",
+			"accentHex": "0xcc3388",
+			"rarity": "rare",
+			"finish": "standard"
+		},
+		{
+			"id": "purple",
+			"nameKey": "paint.purple",
+			"hex": "0x8833cc",
+			"accentHex": "0x441166",
+			"rarity": "rare",
+			"finish": "standard"
+		},
+		{
+			"id": "sky",
+			"nameKey": "paint.sky",
+			"hex": "0x44ccff",
+			"accentHex": "0x2288aa",
+			"rarity": "rare",
+			"finish": "standard"
+		},
+		{
+			"id": "orange",
+			"nameKey": "paint.orange",
+			"hex": "0xff6622",
+			"accentHex": "0xcc4411",
+			"rarity": "veryRare",
+			"finish": "standard"
+		},
+		{
+			"id": "gold",
+			"nameKey": "paint.gold",
+			"hex": "0xffcc44",
+			"accentHex": "0xaa8822",
+			"rarity": "veryRare",
+			"finish": "standard"
+		},
+		{
+			"id": "turquoise",
+			"nameKey": "paint.turquoise",
+			"hex": "0x22ddcc",
+			"accentHex": "0x118877",
+			"rarity": "veryRare",
+			"finish": "standard"
+		},
+		{
+			"id": "ignite",
+			"nameKey": "paint.ignite",
+			"hex": "0xff8844",
+			"accentHex": "0x22ccff",
+			"rarity": "legendary",
+			"finish": "special"
+		},
+		{
+			"id": "void",
+			"nameKey": "paint.void",
+			"hex": "0x220044",
+			"accentHex": "0x110022",
+			"rarity": "legendary",
+			"finish": "special"
+		}
+	]
+}

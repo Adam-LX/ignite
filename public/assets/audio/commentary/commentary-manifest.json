@@ -1,0 +1,2226 @@
+{
+  "version": 2,
+  "locales": {
+    "en": {
+      "goal": {
+        "cooldown_sec": 3.2,
+        "clips": [
+          {
+            "id": "goal_00_what_a_strike_goal",
+            "text": "What a strike! Goal!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/goal/goal_00_what_a_strike_goal.ogg"
+          },
+          {
+            "id": "goal_01_they_find_the_net_goal",
+            "text": "They find the net! Goal!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/goal/goal_01_they_find_the_net_goal.ogg"
+          },
+          {
+            "id": "goal_02_unstoppable_that_s_a_goal",
+            "text": "Unstoppable! That's a goal!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/goal/goal_02_unstoppable_that_s_a_goal.ogg"
+          },
+          {
+            "id": "goal_03_ripples_the_net_goal",
+            "text": "Ripples the net! Goal!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/goal/goal_03_ripples_the_net_goal.ogg"
+          },
+          {
+            "id": "goal_04_put_a_bow_on_it_goal",
+            "text": "Put a bow on it! Goal!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/goal/goal_04_put_a_bow_on_it_goal.ogg"
+          },
+          {
+            "id": "goal_05_that_s_going_on_the_highlight_reel_goal",
+            "text": "That's going on the highlight reel! Goal!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/goal/goal_05_that_s_going_on_the_highlight_reel_goal.ogg"
+          }
+        ]
+      },
+      "epic_save": {
+        "cooldown_sec": 3.8,
+        "clips": [
+          {
+            "id": "epic_save_00_what_a_save",
+            "text": "What a save!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/epic_save/epic_save_00_what_a_save.ogg"
+          },
+          {
+            "id": "epic_save_01_denied_at_the_last_second",
+            "text": "Denied at the last second!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/epic_save/epic_save_01_denied_at_the_last_second.ogg"
+          },
+          {
+            "id": "epic_save_02_incredible_stop",
+            "text": "Incredible stop!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/epic_save/epic_save_02_incredible_stop.ogg"
+          },
+          {
+            "id": "epic_save_03_keeper_comes_up_huge",
+            "text": "Keeper comes up huge!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/epic_save/epic_save_03_keeper_comes_up_huge.ogg"
+          },
+          {
+            "id": "epic_save_04_not_today_what_a_denial",
+            "text": "Not today! What a denial!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/epic_save/epic_save_04_not_today_what_a_denial.ogg"
+          }
+        ]
+      },
+      "demolish": {
+        "cooldown_sec": 2.8,
+        "clips": [
+          {
+            "id": "demolish_00_demolished",
+            "text": "Demolished!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/demolish/demolish_00_demolished.ogg"
+          },
+          {
+            "id": "demolish_01_taken_out_of_the_play",
+            "text": "Taken out of the play!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/demolish/demolish_01_taken_out_of_the_play.ogg"
+          },
+          {
+            "id": "demolish_02_absolute_demolition",
+            "text": "Absolute demolition!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/demolish/demolish_02_absolute_demolition.ogg"
+          },
+          {
+            "id": "demolish_03_that_car_just_became_modern_art",
+            "text": "That car just became modern art!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/demolish/demolish_03_that_car_just_became_modern_art.ogg"
+          },
+          {
+            "id": "demolish_04_send_flowers_demolished",
+            "text": "Send flowers! Demolished!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/demolish/demolish_04_send_flowers_demolished.ogg"
+          }
+        ]
+      },
+      "kickoff": {
+        "cooldown_sec": 10.0,
+        "clips": [
+          {
+            "id": "kickoff_00_here_we_go",
+            "text": "Here we go!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/kickoff/kickoff_00_here_we_go.ogg"
+          },
+          {
+            "id": "kickoff_01_let_s_light_it_up",
+            "text": "Let's light it up!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/kickoff/kickoff_01_let_s_light_it_up.ogg"
+          },
+          {
+            "id": "kickoff_02_round_starts_now",
+            "text": "Round starts now!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/kickoff/kickoff_02_round_starts_now.ogg"
+          },
+          {
+            "id": "kickoff_03_engines_hot_let_s_dance",
+            "text": "Engines hot! Let's dance!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/kickoff/kickoff_03_engines_hot_let_s_dance.ogg"
+          }
+        ]
+      },
+      "countdown_10": {
+        "cooldown_sec": 0.35,
+        "clips": [
+          {
+            "id": "countdown_10_00_ten",
+            "text": "Ten!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/countdown_10/countdown_10_00_ten.ogg"
+          }
+        ]
+      },
+      "countdown_9": {
+        "cooldown_sec": 0.35,
+        "clips": [
+          {
+            "id": "countdown_9_00_nine",
+            "text": "Nine!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/countdown_9/countdown_9_00_nine.ogg"
+          }
+        ]
+      },
+      "countdown_8": {
+        "cooldown_sec": 0.35,
+        "clips": [
+          {
+            "id": "countdown_8_00_eight",
+            "text": "Eight!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/countdown_8/countdown_8_00_eight.ogg"
+          }
+        ]
+      },
+      "countdown_7": {
+        "cooldown_sec": 0.35,
+        "clips": [
+          {
+            "id": "countdown_7_00_seven",
+            "text": "Seven!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/countdown_7/countdown_7_00_seven.ogg"
+          }
+        ]
+      },
+      "countdown_6": {
+        "cooldown_sec": 0.35,
+        "clips": [
+          {
+            "id": "countdown_6_00_six",
+            "text": "Six!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/countdown_6/countdown_6_00_six.ogg"
+          }
+        ]
+      },
+      "countdown_5": {
+        "cooldown_sec": 0.35,
+        "clips": [
+          {
+            "id": "countdown_5_00_five",
+            "text": "Five!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/countdown_5/countdown_5_00_five.ogg"
+          }
+        ]
+      },
+      "countdown_4": {
+        "cooldown_sec": 0.35,
+        "clips": [
+          {
+            "id": "countdown_4_00_four",
+            "text": "Four!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/countdown_4/countdown_4_00_four.ogg"
+          }
+        ]
+      },
+      "countdown_3": {
+        "cooldown_sec": 0.35,
+        "clips": [
+          {
+            "id": "countdown_3_00_three",
+            "text": "Three!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/countdown_3/countdown_3_00_three.ogg"
+          }
+        ]
+      },
+      "countdown_2": {
+        "cooldown_sec": 0.35,
+        "clips": [
+          {
+            "id": "countdown_2_00_two",
+            "text": "Two!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/countdown_2/countdown_2_00_two.ogg"
+          }
+        ]
+      },
+      "countdown_1": {
+        "cooldown_sec": 0.35,
+        "clips": [
+          {
+            "id": "countdown_1_00_one",
+            "text": "One!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/countdown_1/countdown_1_00_one.ogg"
+          }
+        ]
+      },
+      "countdown_go": {
+        "cooldown_sec": 6.0,
+        "clips": [
+          {
+            "id": "countdown_go_00_go",
+            "text": "Go!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/countdown_go/countdown_go_00_go.ogg"
+          },
+          {
+            "id": "countdown_go_01_ignition",
+            "text": "Ignition!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/countdown_go/countdown_go_01_ignition.ogg"
+          }
+        ]
+      },
+      "clock_60": {
+        "cooldown_sec": 25.0,
+        "clips": [
+          {
+            "id": "clock_60_00_one_minute_remaining",
+            "text": "One minute remaining!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/clock_60/clock_60_00_one_minute_remaining.ogg"
+          },
+          {
+            "id": "clock_60_01_sixty_seconds_on_the_clock",
+            "text": "Sixty seconds on the clock!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/clock_60/clock_60_01_sixty_seconds_on_the_clock.ogg"
+          },
+          {
+            "id": "clock_60_02_final_minute_make_it_count",
+            "text": "Final minute! Make it count!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/clock_60/clock_60_02_final_minute_make_it_count.ogg"
+          }
+        ]
+      },
+      "clock_30": {
+        "cooldown_sec": 20.0,
+        "clips": [
+          {
+            "id": "clock_30_00_thirty_seconds_left",
+            "text": "Thirty seconds left!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/clock_30/clock_30_00_thirty_seconds_left.ogg"
+          },
+          {
+            "id": "clock_30_01_half_a_minute_push",
+            "text": "Half a minute! Push!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/clock_30/clock_30_01_half_a_minute_push.ogg"
+          },
+          {
+            "id": "clock_30_02_thirty_seconds_this_is_crunch_time",
+            "text": "Thirty seconds! This is crunch time!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/clock_30/clock_30_02_thirty_seconds_this_is_crunch_time.ogg"
+          }
+        ]
+      },
+      "power_shot": {
+        "cooldown_sec": 3.8,
+        "clips": [
+          {
+            "id": "power_shot_00_power_shot",
+            "text": "Power shot!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/power_shot/power_shot_00_power_shot.ogg"
+          },
+          {
+            "id": "power_shot_01_what_a_rocket",
+            "text": "What a rocket!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/power_shot/power_shot_01_what_a_rocket.ogg"
+          },
+          {
+            "id": "power_shot_02_cannon_fire",
+            "text": "Cannon fire!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/power_shot/power_shot_02_cannon_fire.ogg"
+          },
+          {
+            "id": "power_shot_03_that_ball_just_applied_for_citizenship_in_orbit",
+            "text": "That ball just applied for citizenship in orbit!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/power_shot/power_shot_03_that_ball_just_applied_for_citizenship_in_orbit.ogg"
+          }
+        ]
+      },
+      "flip_reset": {
+        "cooldown_sec": 4.5,
+        "clips": [
+          {
+            "id": "flip_reset_00_flip_reset",
+            "text": "Flip reset!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/flip_reset/flip_reset_00_flip_reset.ogg"
+          },
+          {
+            "id": "flip_reset_01_they_reset_mid_air",
+            "text": "They reset mid-air!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/flip_reset/flip_reset_01_they_reset_mid_air.ogg"
+          },
+          {
+            "id": "flip_reset_02_style_points_incoming",
+            "text": "Style points incoming!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/flip_reset/flip_reset_02_style_points_incoming.ogg"
+          }
+        ]
+      },
+      "aerial": {
+        "cooldown_sec": 4.2,
+        "clips": [
+          {
+            "id": "aerial_00_what_an_aerial",
+            "text": "What an aerial!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/aerial/aerial_00_what_an_aerial.ogg"
+          },
+          {
+            "id": "aerial_01_airborne_challenge",
+            "text": "Airborne challenge!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/aerial/aerial_01_airborne_challenge.ogg"
+          },
+          {
+            "id": "aerial_02_they_re_writing_poetry_up_there",
+            "text": "They're writing poetry up there!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/aerial/aerial_02_they_re_writing_poetry_up_there.ogg"
+          }
+        ]
+      },
+      "post_hit": {
+        "cooldown_sec": 3.8,
+        "clips": [
+          {
+            "id": "post_hit_00_off_the_post",
+            "text": "Off the post!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/post_hit/post_hit_00_off_the_post.ogg"
+          },
+          {
+            "id": "post_hit_01_rattles_the_woodwork",
+            "text": "Rattles the woodwork!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/post_hit/post_hit_01_rattles_the_woodwork.ogg"
+          },
+          {
+            "id": "post_hit_02_so_close_off_the_bar",
+            "text": "So close off the bar!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/post_hit/post_hit_02_so_close_off_the_bar.ogg"
+          },
+          {
+            "id": "post_hit_03_the_post_says_absolutely_not",
+            "text": "The post says absolutely not!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/post_hit/post_hit_03_the_post_says_absolutely_not.ogg"
+          }
+        ]
+      },
+      "near_miss": {
+        "cooldown_sec": 4.5,
+        "clips": [
+          {
+            "id": "near_miss_00_oh_so_close",
+            "text": "Oh, so close!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/near_miss/near_miss_00_oh_so_close.ogg"
+          },
+          {
+            "id": "near_miss_01_just_wide",
+            "text": "Just wide!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/near_miss/near_miss_01_just_wide.ogg"
+          },
+          {
+            "id": "near_miss_02_nearly",
+            "text": "Nearly!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/near_miss/near_miss_02_nearly.ogg"
+          },
+          {
+            "id": "near_miss_03_the_woodwork_says_no",
+            "text": "The woodwork says no!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/near_miss/near_miss_03_the_woodwork_says_no.ogg"
+          },
+          {
+            "id": "near_miss_04_that_was_a_postcard_away_from_glory",
+            "text": "That was a postcard away from glory!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/near_miss/near_miss_04_that_was_a_postcard_away_from_glory.ogg"
+          }
+        ]
+      },
+      "blue_ahead": {
+        "cooldown_sec": 7.5,
+        "clips": [
+          {
+            "id": "blue_ahead_00_blue_takes_the_lead",
+            "text": "Blue takes the lead!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/blue_ahead/blue_ahead_00_blue_takes_the_lead.ogg"
+          },
+          {
+            "id": "blue_ahead_01_blue_are_ahead",
+            "text": "Blue are ahead!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/blue_ahead/blue_ahead_01_blue_are_ahead.ogg"
+          },
+          {
+            "id": "blue_ahead_02_blue_hit_the_nitrous",
+            "text": "Blue hit the nitrous!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/blue_ahead/blue_ahead_02_blue_hit_the_nitrous.ogg"
+          }
+        ]
+      },
+      "orange_ahead": {
+        "cooldown_sec": 7.5,
+        "clips": [
+          {
+            "id": "orange_ahead_00_orange_takes_the_lead",
+            "text": "Orange takes the lead!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/orange_ahead/orange_ahead_00_orange_takes_the_lead.ogg"
+          },
+          {
+            "id": "orange_ahead_01_orange_are_ahead",
+            "text": "Orange are ahead!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/orange_ahead/orange_ahead_01_orange_are_ahead.ogg"
+          },
+          {
+            "id": "orange_ahead_02_orange_just_turned_up_the_heat",
+            "text": "Orange just turned up the heat!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/orange_ahead/orange_ahead_02_orange_just_turned_up_the_heat.ogg"
+          }
+        ]
+      },
+      "overtime": {
+        "cooldown_sec": 12.0,
+        "clips": [
+          {
+            "id": "overtime_00_overtime_next_goal_wins",
+            "text": "Overtime! Next goal wins!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/overtime/overtime_00_overtime_next_goal_wins.ogg"
+          },
+          {
+            "id": "overtime_01_sudden_death_who_wants_it_more",
+            "text": "Sudden death! Who wants it more?!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/overtime/overtime_01_sudden_death_who_wants_it_more.ogg"
+          },
+          {
+            "id": "overtime_02_extra_time_somebody_write_a_legend",
+            "text": "Extra time! Somebody write a legend!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/overtime/overtime_02_extra_time_somebody_write_a_legend.ogg"
+          }
+        ]
+      },
+      "match_end": {
+        "cooldown_sec": 15.0,
+        "clips": [
+          {
+            "id": "match_end_00_that_s_the_match",
+            "text": "That's the match!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/match_end/match_end_00_that_s_the_match.ogg"
+          },
+          {
+            "id": "match_end_01_final_whistle_what_a_game",
+            "text": "Final whistle! What a game!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/match_end/match_end_01_final_whistle_what_a_game.ogg"
+          },
+          {
+            "id": "match_end_02_match_over",
+            "text": "Match over!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/match_end/match_end_02_match_over.ogg"
+          },
+          {
+            "id": "match_end_03_book_it_what_a_show",
+            "text": "Book it! What a show!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/match_end/match_end_03_book_it_what_a_show.ogg"
+          }
+        ]
+      },
+      "scramble": {
+        "cooldown_sec": 9.0,
+        "clips": [
+          {
+            "id": "scramble_00_it_s_a_parking_lot_out_there",
+            "text": "It's a parking lot out there!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/scramble/scramble_00_it_s_a_parking_lot_out_there.ogg"
+          },
+          {
+            "id": "scramble_01_everybody_wants_the_ball",
+            "text": "Everybody wants the ball!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/scramble/scramble_01_everybody_wants_the_ball.ogg"
+          },
+          {
+            "id": "scramble_02_chaos_in_the_box",
+            "text": "Chaos in the box!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/scramble/scramble_02_chaos_in_the_box.ogg"
+          },
+          {
+            "id": "scramble_03_pinball_machine_activated",
+            "text": "Pinball machine activated!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/scramble/scramble_03_pinball_machine_activated.ogg"
+          },
+          {
+            "id": "scramble_04_someone_order_a_traffic_cone",
+            "text": "Someone order a traffic cone!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/scramble/scramble_04_someone_order_a_traffic_cone.ogg"
+          },
+          {
+            "id": "scramble_05_four_bumpers_one_ball_zero_manners",
+            "text": "Four bumpers, one ball, zero manners!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/scramble/scramble_05_four_bumpers_one_ball_zero_manners.ogg"
+          },
+          {
+            "id": "scramble_06_midfield_just_turned_into_a_mosh_pit",
+            "text": "Midfield just turned into a mosh pit!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/scramble/scramble_06_midfield_just_turned_into_a_mosh_pit.ogg"
+          }
+        ]
+      },
+      "turtle": {
+        "cooldown_sec": 8.0,
+        "clips": [
+          {
+            "id": "turtle_00_somebody_call_a_tow_truck",
+            "text": "Somebody call a tow truck!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/turtle/turtle_00_somebody_call_a_tow_truck.ogg"
+          },
+          {
+            "id": "turtle_01_that_s_one_way_to_take_a_nap",
+            "text": "That's one way to take a nap!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/turtle/turtle_01_that_s_one_way_to_take_a_nap.ogg"
+          },
+          {
+            "id": "turtle_02_belly_up_flip_it",
+            "text": "Belly up! Flip it!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/turtle/turtle_02_belly_up_flip_it.ogg"
+          },
+          {
+            "id": "turtle_03_gravity_wins_that_round",
+            "text": "Gravity wins that round!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/turtle/turtle_03_gravity_wins_that_round.ogg"
+          },
+          {
+            "id": "turtle_04_roof_inspection_complete",
+            "text": "Roof inspection complete!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/turtle/turtle_04_roof_inspection_complete.ogg"
+          },
+          {
+            "id": "turtle_05_they_are_reading_the_ceiling",
+            "text": "They are reading the ceiling!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/turtle/turtle_05_they_are_reading_the_ceiling.ogg"
+          }
+        ]
+      },
+      "fifty_fifty": {
+        "cooldown_sec": 7.5,
+        "clips": [
+          {
+            "id": "fifty_fifty_00_fifty_fifty_who_wants_it_more",
+            "text": "Fifty-fifty! Who wants it more?!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/fifty_fifty/fifty_fifty_00_fifty_fifty_who_wants_it_more.ogg"
+          },
+          {
+            "id": "fifty_fifty_01_two_cars_one_ball_zero_mercy",
+            "text": "Two cars, one ball, zero mercy!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/fifty_fifty/fifty_fifty_01_two_cars_one_ball_zero_mercy.ogg"
+          },
+          {
+            "id": "fifty_fifty_02_challenge_don_t_blink",
+            "text": "Challenge! Don't blink!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/fifty_fifty/fifty_fifty_02_challenge_don_t_blink.ogg"
+          },
+          {
+            "id": "fifty_fifty_03_hard_challenge_incoming",
+            "text": "Hard challenge incoming!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/fifty_fifty/fifty_fifty_03_hard_challenge_incoming.ogg"
+          },
+          {
+            "id": "fifty_fifty_04_brave_souls_collide",
+            "text": "Brave souls collide!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/fifty_fifty/fifty_fifty_04_brave_souls_collide.ogg"
+          },
+          {
+            "id": "fifty_fifty_05_this_contact_will_decide_the_play",
+            "text": "This contact will decide the play!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/fifty_fifty/fifty_fifty_05_this_contact_will_decide_the_play.ogg"
+          }
+        ]
+      },
+      "idle_ball": {
+        "cooldown_sec": 14.0,
+        "clips": [
+          {
+            "id": "idle_ball_00_anybody_gonna_touch_that",
+            "text": "Anybody gonna touch that?",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/idle_ball/idle_ball_00_anybody_gonna_touch_that.ogg"
+          },
+          {
+            "id": "idle_ball_01_the_ball_s_filing_for_unemployment",
+            "text": "The ball's filing for unemployment!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/idle_ball/idle_ball_01_the_ball_s_filing_for_unemployment.ogg"
+          },
+          {
+            "id": "idle_ball_02_free_real_estate_on_that_ball",
+            "text": "Free real estate on that ball!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/idle_ball/idle_ball_02_free_real_estate_on_that_ball.ogg"
+          },
+          {
+            "id": "idle_ball_03_it_s_lonely_in_midfield",
+            "text": "It's lonely in midfield!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/idle_ball/idle_ball_03_it_s_lonely_in_midfield.ogg"
+          },
+          {
+            "id": "idle_ball_04_that_ball_is_collecting_dust",
+            "text": "That ball is collecting dust!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/idle_ball/idle_ball_04_that_ball_is_collecting_dust.ogg"
+          },
+          {
+            "id": "idle_ball_05_someone_adopt_that_ball_please",
+            "text": "Someone adopt that ball, please!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/idle_ball/idle_ball_05_someone_adopt_that_ball_please.ogg"
+          }
+        ]
+      },
+      "big_boom": {
+        "cooldown_sec": 6.5,
+        "clips": [
+          {
+            "id": "big_boom_00_that_one_left_a_dent_in_spacetime",
+            "text": "That one left a dent in spacetime!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/big_boom/big_boom_00_that_one_left_a_dent_in_spacetime.ogg"
+          },
+          {
+            "id": "big_boom_01_physics_just_filed_a_complaint",
+            "text": "Physics just filed a complaint!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/big_boom/big_boom_01_physics_just_filed_a_complaint.ogg"
+          },
+          {
+            "id": "big_boom_02_absolute_thunderclap",
+            "text": "Absolute thunderclap!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/big_boom/big_boom_02_absolute_thunderclap.ogg"
+          },
+          {
+            "id": "big_boom_03_send_that_one_to_nasa",
+            "text": "Send that one to NASA!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/big_boom/big_boom_03_send_that_one_to_nasa.ogg"
+          },
+          {
+            "id": "big_boom_04_the_stadium_felt_that",
+            "text": "The stadium felt that!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/big_boom/big_boom_04_the_stadium_felt_that.ogg"
+          },
+          {
+            "id": "big_boom_05_microphone_just_peaked",
+            "text": "Microphone just peaked!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/big_boom/big_boom_05_microphone_just_peaked.ogg"
+          }
+        ]
+      },
+      "player_lazy": {
+        "cooldown_sec": 16.0,
+        "clips": [
+          {
+            "id": "player_lazy_00_wake_up_out_there_the_ball_isn_t_coming_to_you",
+            "text": "Wake up out there! The ball isn't coming to you!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/player_lazy/player_lazy_00_wake_up_out_there_the_ball_isn_t_coming_to_you.ogg"
+          },
+          {
+            "id": "player_lazy_01_sightseeing_tour_get_involved",
+            "text": "Sightseeing tour? Get involved!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/player_lazy/player_lazy_01_sightseeing_tour_get_involved.ogg"
+          },
+          {
+            "id": "player_lazy_02_they_re_watching_the_game_like_it_s_tv",
+            "text": "They're watching the game like it's TV!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_lazy/player_lazy_02_they_re_watching_the_game_like_it_s_tv.ogg"
+          },
+          {
+            "id": "player_lazy_03_somebody_check_if_that_car_still_has_a_driver",
+            "text": "Somebody check if that car still has a driver!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/player_lazy/player_lazy_03_somebody_check_if_that_car_still_has_a_driver.ogg"
+          },
+          {
+            "id": "player_lazy_04_initiative_never_heard_of_her",
+            "text": "Initiative? Never heard of her!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_lazy/player_lazy_04_initiative_never_heard_of_her.ogg"
+          },
+          {
+            "id": "player_lazy_05_that_s_a_lot_of_standing_around_for_a_car_soccer",
+            "text": "That's a lot of standing around for a car soccer match!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_lazy/player_lazy_05_that_s_a_lot_of_standing_around_for_a_car_soccer.ogg"
+          },
+          {
+            "id": "player_lazy_06_the_ball_is_over_there_hint_hint",
+            "text": "The ball is over THERE! Hint hint!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_lazy/player_lazy_06_the_ball_is_over_there_hint_hint.ogg"
+          },
+          {
+            "id": "player_lazy_07_passive_mode_engaged_not_a_compliment",
+            "text": "Passive mode engaged. Not a compliment!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_lazy/player_lazy_07_passive_mode_engaged_not_a_compliment.ogg"
+          },
+          {
+            "id": "player_lazy_08_did_they_park_because_nothing_is_happening",
+            "text": "Did they park? Because nothing is happening!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_lazy/player_lazy_08_did_they_park_because_nothing_is_happening.ogg"
+          },
+          {
+            "id": "player_lazy_09_hello_controllers_still_plugged_in",
+            "text": "Hello? Controllers still plugged in?",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_lazy/player_lazy_09_hello_controllers_still_plugged_in.ogg"
+          },
+          {
+            "id": "player_lazy_10_they_re_buffering_while_the_match_loads",
+            "text": "They're buffering while the match loads!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_lazy/player_lazy_10_they_re_buffering_while_the_match_loads.ogg"
+          },
+          {
+            "id": "player_lazy_11_statue_mode_very_avant_garde_very_useless",
+            "text": "Statue mode. Very avant-garde. Very useless!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_lazy/player_lazy_11_statue_mode_very_avant_garde_very_useless.ogg"
+          }
+        ]
+      },
+      "player_hot": {
+        "cooldown_sec": 12.0,
+        "clips": [
+          {
+            "id": "player_hot_00_they_re_everywhere_absolute_menace",
+            "text": "They're everywhere! Absolute menace!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/player_hot/player_hot_00_they_re_everywhere_absolute_menace.ogg"
+          },
+          {
+            "id": "player_hot_01_main_character_energy_owning_the_pitch",
+            "text": "Main character energy! Owning the pitch!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/player_hot/player_hot_01_main_character_energy_owning_the_pitch.ogg"
+          },
+          {
+            "id": "player_hot_02_this_player_is_cooking_with_gas",
+            "text": "This player is cooking with gas!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/player_hot/player_hot_02_this_player_is_cooking_with_gas.ogg"
+          },
+          {
+            "id": "player_hot_03_relentless_they_want_every_ball",
+            "text": "Relentless! They want every ball!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_hot/player_hot_03_relentless_they_want_every_ball.ogg"
+          },
+          {
+            "id": "player_hot_04_that_car_just_filed_for_overtime",
+            "text": "That car just filed for overtime!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_hot/player_hot_04_that_car_just_filed_for_overtime.ogg"
+          },
+          {
+            "id": "player_hot_05_initiative_through_the_roof",
+            "text": "Initiative through the roof!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_hot/player_hot_05_initiative_through_the_roof.ogg"
+          },
+          {
+            "id": "player_hot_06_they_re_writing_the_script_tonight",
+            "text": "They're writing the script tonight!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_hot/player_hot_06_they_re_writing_the_script_tonight.ogg"
+          },
+          {
+            "id": "player_hot_07_hungry_starving_devouring_plays",
+            "text": "Hungry! Starving! Devouring plays!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_hot/player_hot_07_hungry_starving_devouring_plays.ogg"
+          }
+        ]
+      },
+      "player_praise": {
+        "cooldown_sec": 9.0,
+        "clips": [
+          {
+            "id": "player_praise_00_beautiful_touch_that_s_how_you_do_it",
+            "text": "Beautiful touch! That's how you do it!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/player_praise/player_praise_00_beautiful_touch_that_s_how_you_do_it.ogg"
+          },
+          {
+            "id": "player_praise_01_clean_play_textbook",
+            "text": "Clean play! Textbook!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/player_praise/player_praise_01_clean_play_textbook.ogg"
+          },
+          {
+            "id": "player_praise_02_they_make_it_look_easy",
+            "text": "They make it look easy!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_praise/player_praise_02_they_make_it_look_easy.ogg"
+          },
+          {
+            "id": "player_praise_03_chef_s_kiss_on_that_contact",
+            "text": "Chef's kiss on that contact!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/player_praise/player_praise_03_chef_s_kiss_on_that_contact.ogg"
+          },
+          {
+            "id": "player_praise_04_that_s_the_stuff_highlight_reels_dream_of",
+            "text": "That's the stuff highlight reels dream of!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_praise/player_praise_04_that_s_the_stuff_highlight_reels_dream_of.ogg"
+          },
+          {
+            "id": "player_praise_05_composure_class_control",
+            "text": "Composure! Class! Control!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_praise/player_praise_05_composure_class_control.ogg"
+          },
+          {
+            "id": "player_praise_06_they_just_earned_a_standing_ovation",
+            "text": "They just earned a standing ovation!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_praise/player_praise_06_they_just_earned_a_standing_ovation.ogg"
+          },
+          {
+            "id": "player_praise_07_ice_cold_under_pressure",
+            "text": "Ice cold under pressure!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_praise/player_praise_07_ice_cold_under_pressure.ogg"
+          }
+        ]
+      },
+      "player_roast": {
+        "cooldown_sec": 10.0,
+        "clips": [
+          {
+            "id": "player_roast_00_oof_that_was_a_swing_and_a_miss",
+            "text": "Oof! That was a swing and a miss!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/player_roast/player_roast_00_oof_that_was_a_swing_and_a_miss.ogg"
+          },
+          {
+            "id": "player_roast_01_they_whiffed_harder_than_a_summer_breeze",
+            "text": "They whiffed harder than a summer breeze!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/player_roast/player_roast_01_they_whiffed_harder_than_a_summer_breeze.ogg"
+          },
+          {
+            "id": "player_roast_02_gps_says_the_ball_was_over_there",
+            "text": "GPS says the ball was over there!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_roast/player_roast_02_gps_says_the_ball_was_over_there.ogg"
+          },
+          {
+            "id": "player_roast_03_that_touch_needs_a_refund",
+            "text": "That touch needs a refund!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/player_roast/player_roast_03_that_touch_needs_a_refund.ogg"
+          },
+          {
+            "id": "player_roast_04_somebody_hide_the_replay",
+            "text": "Somebody hide the replay!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_roast/player_roast_04_somebody_hide_the_replay.ogg"
+          },
+          {
+            "id": "player_roast_05_bold_strategy_terrible_results",
+            "text": "Bold strategy. Terrible results!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_roast/player_roast_05_bold_strategy_terrible_results.ogg"
+          },
+          {
+            "id": "player_roast_06_the_ball_said_no_thank_you",
+            "text": "The ball said no thank you!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_roast/player_roast_06_the_ball_said_no_thank_you.ogg"
+          },
+          {
+            "id": "player_roast_07_that_s_going_on_the_blooper_reel",
+            "text": "That's going on the blooper reel!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_roast/player_roast_07_that_s_going_on_the_blooper_reel.ogg"
+          },
+          {
+            "id": "player_roast_08_my_grandmother_would_have_hit_that",
+            "text": "My grandmother would have hit that!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_roast/player_roast_08_my_grandmother_would_have_hit_that.ogg"
+          },
+          {
+            "id": "player_roast_09_they_just_invented_a_new_way_to_miss",
+            "text": "They just invented a new way to miss!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/player_roast/player_roast_09_they_just_invented_a_new_way_to_miss.ogg"
+          },
+          {
+            "id": "player_roast_10_close_by_the_standards_of_another_sport",
+            "text": "Close! By the standards of another sport!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_roast/player_roast_10_close_by_the_standards_of_another_sport.ogg"
+          },
+          {
+            "id": "player_roast_11_that_was_a_donation_to_the_other_team",
+            "text": "That was a donation to the other team!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_roast/player_roast_11_that_was_a_donation_to_the_other_team.ogg"
+          },
+          {
+            "id": "player_roast_12_skill_issue_detected_loudly",
+            "text": "Skill issue detected! Loudly!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_roast/player_roast_12_skill_issue_detected_loudly.ogg"
+          },
+          {
+            "id": "player_roast_13_they_whiffed_so_hard_the_ball_felt_awkward",
+            "text": "They whiffed so hard the ball felt awkward!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_roast/player_roast_13_they_whiffed_so_hard_the_ball_felt_awkward.ogg"
+          },
+          {
+            "id": "player_roast_14_yikes_that_one_stung_the_ego",
+            "text": "Yikes! That one stung the ego!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_roast/player_roast_14_yikes_that_one_stung_the_ego.ogg"
+          }
+        ]
+      },
+      "player_hustle": {
+        "cooldown_sec": 11.0,
+        "clips": [
+          {
+            "id": "player_hustle_00_look_at_that_hustle_closing_the_gap",
+            "text": "Look at that hustle! Closing the gap!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/player_hustle/player_hustle_00_look_at_that_hustle_closing_the_gap.ogg"
+          },
+          {
+            "id": "player_hustle_01_they_re_flying_across_the_pitch",
+            "text": "They're flying across the pitch!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/player_hustle/player_hustle_01_they_re_flying_across_the_pitch.ogg"
+          },
+          {
+            "id": "player_hustle_02_recovery_run_pure_work_rate",
+            "text": "Recovery run! Pure work rate!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_hustle/player_hustle_02_recovery_run_pure_work_rate.ogg"
+          },
+          {
+            "id": "player_hustle_03_boots_to_the_metal_love_to_see_it",
+            "text": "Boots to the metal! Love to see it!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_hustle/player_hustle_03_boots_to_the_metal_love_to_see_it.ogg"
+          },
+          {
+            "id": "player_hustle_04_that_chase_is_personal",
+            "text": "That chase is personal!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_hustle/player_hustle_04_that_chase_is_personal.ogg"
+          },
+          {
+            "id": "player_hustle_05_they_refuse_to_give_up_the_play",
+            "text": "They refuse to give up the play!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_hustle/player_hustle_05_they_refuse_to_give_up_the_play.ogg"
+          }
+        ]
+      },
+      "player_spectator": {
+        "cooldown_sec": 15.0,
+        "clips": [
+          {
+            "id": "player_spectator_00_great_view_from_the_cheap_seats",
+            "text": "Great view from the cheap seats!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/player_spectator/player_spectator_00_great_view_from_the_cheap_seats.ogg"
+          },
+          {
+            "id": "player_spectator_01_they_re_taking_notes_instead_of_touches",
+            "text": "They're taking notes instead of touches!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/player_spectator/player_spectator_01_they_re_taking_notes_instead_of_touches.ogg"
+          },
+          {
+            "id": "player_spectator_02_camera_operator_energy_from_that_car",
+            "text": "Camera operator energy from that car!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_spectator/player_spectator_02_camera_operator_energy_from_that_car.ogg"
+          },
+          {
+            "id": "player_spectator_03_the_action_is_happening_without_them",
+            "text": "The action is happening without them!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_spectator/player_spectator_03_the_action_is_happening_without_them.ogg"
+          },
+          {
+            "id": "player_spectator_04_someone_page_the_driver",
+            "text": "Someone page the driver!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_spectator/player_spectator_04_someone_page_the_driver.ogg"
+          },
+          {
+            "id": "player_spectator_05_participation_trophy_still_available",
+            "text": "Participation trophy still available!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_spectator/player_spectator_05_participation_trophy_still_available.ogg"
+          },
+          {
+            "id": "player_spectator_06_they_re_spectating_their_own_match",
+            "text": "They're spectating their own match!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_spectator/player_spectator_06_they_re_spectating_their_own_match.ogg"
+          },
+          {
+            "id": "player_spectator_07_front_row_seats_zero_involvement",
+            "text": "Front row seats, zero involvement!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_spectator/player_spectator_07_front_row_seats_zero_involvement.ogg"
+          },
+          {
+            "id": "player_spectator_08_is_that_car_afk_asking_for_a_friend",
+            "text": "Is that car AFK? Asking for a friend!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/player_spectator/player_spectator_08_is_that_car_afk_asking_for_a_friend.ogg"
+          }
+        ]
+      },
+      "blue_praise": {
+        "cooldown_sec": 11.0,
+        "clips": [
+          {
+            "id": "blue_praise_00_blue_looking_sharp_clockwork",
+            "text": "Blue looking sharp! Clockwork!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/blue_praise/blue_praise_00_blue_looking_sharp_clockwork.ogg"
+          },
+          {
+            "id": "blue_praise_01_blue_are_clicking_tonight",
+            "text": "Blue are clicking tonight!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/blue_praise/blue_praise_01_blue_are_clicking_tonight.ogg"
+          },
+          {
+            "id": "blue_praise_02_that_s_blue_chemistry_right_there",
+            "text": "That's Blue chemistry right there!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/blue_praise/blue_praise_02_that_s_blue_chemistry_right_there.ogg"
+          },
+          {
+            "id": "blue_praise_03_blue_mean_business",
+            "text": "Blue mean business!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/blue_praise/blue_praise_03_blue_mean_business.ogg"
+          },
+          {
+            "id": "blue_praise_04_blue_with_the_clinic",
+            "text": "Blue with the clinic!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/blue_praise/blue_praise_04_blue_with_the_clinic.ogg"
+          },
+          {
+            "id": "blue_praise_05_paint_it_blue_they_own_this_stretch",
+            "text": "Paint it blue! They own this stretch!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/blue_praise/blue_praise_05_paint_it_blue_they_own_this_stretch.ogg"
+          }
+        ]
+      },
+      "orange_praise": {
+        "cooldown_sec": 11.0,
+        "clips": [
+          {
+            "id": "orange_praise_00_orange_on_fire_keep_that_heat",
+            "text": "Orange on fire! Keep that heat!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/orange_praise/orange_praise_00_orange_on_fire_keep_that_heat.ogg"
+          },
+          {
+            "id": "orange_praise_01_orange_are_cooking",
+            "text": "Orange are cooking!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/orange_praise/orange_praise_01_orange_are_cooking.ogg"
+          },
+          {
+            "id": "orange_praise_02_that_s_orange_swagger",
+            "text": "That's Orange swagger!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/orange_praise/orange_praise_02_that_s_orange_swagger.ogg"
+          },
+          {
+            "id": "orange_praise_03_orange_with_the_answer",
+            "text": "Orange with the answer!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/orange_praise/orange_praise_03_orange_with_the_answer.ogg"
+          },
+          {
+            "id": "orange_praise_04_orange_turning_up_the_thermostat",
+            "text": "Orange turning up the thermostat!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/orange_praise/orange_praise_04_orange_turning_up_the_thermostat.ogg"
+          },
+          {
+            "id": "orange_praise_05_sunset_squad_looking_lethal",
+            "text": "Sunset squad looking lethal!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/orange_praise/orange_praise_05_sunset_squad_looking_lethal.ogg"
+          }
+        ]
+      },
+      "blue_roast": {
+        "cooldown_sec": 11.0,
+        "clips": [
+          {
+            "id": "blue_roast_00_blue_that_was_amateur_hour",
+            "text": "Blue, that was amateur hour!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/blue_roast/blue_roast_00_blue_that_was_amateur_hour.ogg"
+          },
+          {
+            "id": "blue_roast_01_blue_just_gifted_the_ball",
+            "text": "Blue just gifted the ball!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/blue_roast/blue_roast_01_blue_just_gifted_the_ball.ogg"
+          },
+          {
+            "id": "blue_roast_02_wake_up_blue_sleepwalking",
+            "text": "Wake up, Blue! Sleepwalking!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/blue_roast/blue_roast_02_wake_up_blue_sleepwalking.ogg"
+          },
+          {
+            "id": "blue_roast_03_blue_defending_with_a_welcome_mat",
+            "text": "Blue defending with a welcome mat!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/blue_roast/blue_roast_03_blue_defending_with_a_welcome_mat.ogg"
+          },
+          {
+            "id": "blue_roast_04_blue_my_grandmother_hits_harder",
+            "text": "Blue, my grandmother hits harder!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/blue_roast/blue_roast_04_blue_my_grandmother_hits_harder.ogg"
+          },
+          {
+            "id": "blue_roast_05_blue_looking_lost_in_their_own_half",
+            "text": "Blue looking lost in their own half!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/blue_roast/blue_roast_05_blue_looking_lost_in_their_own_half.ogg"
+          },
+          {
+            "id": "blue_roast_06_blue_that_turnover_was_criminal",
+            "text": "Blue, that turnover was criminal!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/blue_roast/blue_roast_06_blue_that_turnover_was_criminal.ogg"
+          },
+          {
+            "id": "blue_roast_07_blue_are_playing_hot_potato_with_the_ball",
+            "text": "Blue are playing hot potato with the ball!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/blue_roast/blue_roast_07_blue_are_playing_hot_potato_with_the_ball.ogg"
+          },
+          {
+            "id": "blue_roast_08_blue_defense_just_opened_a_gift_shop",
+            "text": "Blue defense just opened a gift shop!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/blue_roast/blue_roast_08_blue_defense_just_opened_a_gift_shop.ogg"
+          },
+          {
+            "id": "blue_roast_09_somebody_reboot_blue_s_firmware",
+            "text": "Somebody reboot Blue's firmware!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/blue_roast/blue_roast_09_somebody_reboot_blue_s_firmware.ogg"
+          },
+          {
+            "id": "blue_roast_10_blue_that_was_soft_marshmallow_soft",
+            "text": "Blue, that was soft. Marshmallow soft!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/blue_roast/blue_roast_10_blue_that_was_soft_marshmallow_soft.ogg"
+          }
+        ]
+      },
+      "orange_roast": {
+        "cooldown_sec": 11.0,
+        "clips": [
+          {
+            "id": "orange_roast_00_orange_that_was_a_soft_serve",
+            "text": "Orange, that was a soft serve!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/orange_roast/orange_roast_00_orange_that_was_a_soft_serve.ogg"
+          },
+          {
+            "id": "orange_roast_01_orange_just_mailed_it_in",
+            "text": "Orange just mailed it in!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/orange_roast/orange_roast_01_orange_just_mailed_it_in.ogg"
+          },
+          {
+            "id": "orange_roast_02_come_on_orange_tighten_up",
+            "text": "Come on, Orange! Tighten up!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/orange_roast/orange_roast_02_come_on_orange_tighten_up.ogg"
+          },
+          {
+            "id": "orange_roast_03_orange_defending_like_it_s_optional",
+            "text": "Orange defending like it's optional!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/orange_roast/orange_roast_03_orange_defending_like_it_s_optional.ogg"
+          },
+          {
+            "id": "orange_roast_04_orange_the_ball_is_not_a_hot_potato",
+            "text": "Orange, the ball is not a hot potato!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/orange_roast/orange_roast_04_orange_the_ball_is_not_a_hot_potato.ogg"
+          },
+          {
+            "id": "orange_roast_05_orange_looking_allergic_to_the_ball",
+            "text": "Orange looking allergic to the ball!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/orange_roast/orange_roast_05_orange_looking_allergic_to_the_ball.ogg"
+          },
+          {
+            "id": "orange_roast_06_orange_that_giveaway_was_generous",
+            "text": "Orange, that giveaway was generous!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/orange_roast/orange_roast_06_orange_that_giveaway_was_generous.ogg"
+          },
+          {
+            "id": "orange_roast_07_orange_just_donated_possession",
+            "text": "Orange just donated possession!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/orange_roast/orange_roast_07_orange_just_donated_possession.ogg"
+          },
+          {
+            "id": "orange_roast_08_orange_defense_went_on_vacation",
+            "text": "Orange defense went on vacation!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/orange_roast/orange_roast_08_orange_defense_went_on_vacation.ogg"
+          },
+          {
+            "id": "orange_roast_09_wake_up_call_for_orange_anyone_home",
+            "text": "Wake up call for Orange! Anyone home?",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/orange_roast/orange_roast_09_wake_up_call_for_orange_anyone_home.ogg"
+          },
+          {
+            "id": "orange_roast_10_orange_that_was_butter_fingers_on_wheels",
+            "text": "Orange, that was butter fingers on wheels!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/orange_roast/orange_roast_10_orange_that_was_butter_fingers_on_wheels.ogg"
+          }
+        ]
+      },
+      "score_taunt": {
+        "cooldown_sec": 14.0,
+        "clips": [
+          {
+            "id": "score_taunt_00_the_scoreboard_is_doing_the_talking",
+            "text": "The scoreboard is doing the talking!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/score_taunt/score_taunt_00_the_scoreboard_is_doing_the_talking.ogg"
+          },
+          {
+            "id": "score_taunt_01_one_team_is_writing_a_statement",
+            "text": "One team is writing a statement!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/score_taunt/score_taunt_01_one_team_is_writing_a_statement.ogg"
+          },
+          {
+            "id": "score_taunt_02_this_is_turning_into_a_clinic",
+            "text": "This is turning into a clinic!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/score_taunt/score_taunt_02_this_is_turning_into_a_clinic.ogg"
+          },
+          {
+            "id": "score_taunt_03_the_gap_is_getting_rude",
+            "text": "The gap is getting rude!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/score_taunt/score_taunt_03_the_gap_is_getting_rude.ogg"
+          },
+          {
+            "id": "score_taunt_04_somebody_call_a_comeback_quick",
+            "text": "Somebody call a comeback, quick!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/score_taunt/score_taunt_04_somebody_call_a_comeback_quick.ogg"
+          },
+          {
+            "id": "score_taunt_05_blowout_vibes_creeping_in",
+            "text": "Blowout vibes creeping in!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/score_taunt/score_taunt_05_blowout_vibes_creeping_in.ogg"
+          },
+          {
+            "id": "score_taunt_06_this_scoreline_is_getting_personal",
+            "text": "This scoreline is getting personal!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/score_taunt/score_taunt_06_this_scoreline_is_getting_personal.ogg"
+          },
+          {
+            "id": "score_taunt_07_mercy_rule_whispering_in_the_hallway",
+            "text": "Mercy rule whispering in the hallway!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/score_taunt/score_taunt_07_mercy_rule_whispering_in_the_hallway.ogg"
+          },
+          {
+            "id": "score_taunt_08_the_underdogs_need_a_miracle_and_a_snack",
+            "text": "The underdogs need a miracle and a snack!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/score_taunt/score_taunt_08_the_underdogs_need_a_miracle_and_a_snack.ogg"
+          }
+        ]
+      },
+      "crate_drop": {
+        "cooldown_sec": 0.5,
+        "clips": [
+          {
+            "id": "crate_drop_00_hold_up_is_that_a_loot_crate_falling_from_the_sk",
+            "text": "Hold up — is that a loot crate falling from the sky?",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_00_hold_up_is_that_a_loot_crate_falling_from_the_sk.ogg"
+          },
+          {
+            "id": "crate_drop_01_ladies_and_gentlemen_we_have_a_drop",
+            "text": "Ladies and gentlemen, we have a drop!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_01_ladies_and_gentlemen_we_have_a_drop.ogg"
+          },
+          {
+            "id": "crate_drop_02_something_shiny_just_crash_landed_on_the_pitch",
+            "text": "Something shiny just crash-landed on the pitch!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_02_something_shiny_just_crash_landed_on_the_pitch.ogg"
+          },
+          {
+            "id": "crate_drop_03_post_match_present_incoming_don_t_blink",
+            "text": "Post-match present incoming! Don't blink!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_03_post_match_present_incoming_don_t_blink.ogg"
+          },
+          {
+            "id": "crate_drop_04_lady_luck_just_mailed_us_a_mystery_box",
+            "text": "Lady Luck just mailed us a mystery box!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_04_lady_luck_just_mailed_us_a_mystery_box.ogg"
+          },
+          {
+            "id": "crate_drop_05_is_it_a_car_is_it_wheels_it_s_a_mystery_box",
+            "text": "Is it a car? Is it wheels? It's a mystery box!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_05_is_it_a_car_is_it_wheels_it_s_a_mystery_box.ogg"
+          },
+          {
+            "id": "crate_drop_06_someone_call_security_a_crate_just_trespassed",
+            "text": "Someone call security — a crate just trespassed!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_06_someone_call_security_a_crate_just_trespassed.ogg"
+          },
+          {
+            "id": "crate_drop_07_loot_drop_the_crowd_goes_mildly_unhinged",
+            "text": "Loot drop! The crowd goes mildly unhinged!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_07_loot_drop_the_crowd_goes_mildly_unhinged.ogg"
+          },
+          {
+            "id": "crate_drop_08_that_s_not_a_rebound_that_s_a_present",
+            "text": "That's not a rebound — that's a present!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_08_that_s_not_a_rebound_that_s_a_present.ogg"
+          },
+          {
+            "id": "crate_drop_09_special_delivery_from_the_rocket_gods_sign_here_",
+            "text": "Special delivery from the rocket gods! Sign here for chaos!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_09_special_delivery_from_the_rocket_gods_sign_here_.ogg"
+          },
+          {
+            "id": "crate_drop_10_box_from_the_heavens_popcorn_ready",
+            "text": "Box from the heavens! Popcorn ready!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_10_box_from_the_heavens_popcorn_ready.ogg"
+          },
+          {
+            "id": "crate_drop_11_oh_no_oh_yes_a_crate",
+            "text": "Oh no. Oh yes. A crate!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_11_oh_no_oh_yes_a_crate.ogg"
+          },
+          {
+            "id": "crate_drop_12_the_algorithm_felt_generous_today",
+            "text": "The algorithm felt generous today!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_12_the_algorithm_felt_generous_today.ogg"
+          },
+          {
+            "id": "crate_drop_13_treasure_chest_vibes_on_the_pitch",
+            "text": "Treasure chest vibes on the pitch!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_13_treasure_chest_vibes_on_the_pitch.ogg"
+          },
+          {
+            "id": "crate_drop_14_don_t_open_it_with_your_bumper_or_do",
+            "text": "Don't open it with your bumper. Or do!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_14_don_t_open_it_with_your_bumper_or_do.ogg"
+          },
+          {
+            "id": "crate_drop_15_a_wild_crate_appears",
+            "text": "A wild crate appears!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_15_a_wild_crate_appears.ogg"
+          },
+          {
+            "id": "crate_drop_16_post_game_care_package_contents_classified",
+            "text": "Post-game care package! Contents: classified!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_16_post_game_care_package_contents_classified.ogg"
+          },
+          {
+            "id": "crate_drop_17_that_thud_was_either_a_goal_post_or_free_cosmeti",
+            "text": "That thud was either a goal post or free cosmetics!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_17_that_thud_was_either_a_goal_post_or_free_cosmeti.ogg"
+          },
+          {
+            "id": "crate_drop_18_free_loot_in_this_economy_let_s_go",
+            "text": "Free loot? In this economy? Let's go!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_18_free_loot_in_this_economy_let_s_go.ogg"
+          },
+          {
+            "id": "crate_drop_19_the_sky_is_raining_boxes_and_i_am_here_for_it",
+            "text": "The sky is raining boxes and I am here for it!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_19_the_sky_is_raining_boxes_and_i_am_here_for_it.ogg"
+          },
+          {
+            "id": "crate_drop_20_it_s_raining_crates_and_loot",
+            "text": "It's raining crates and loot!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_20_it_s_raining_crates_and_loot.ogg"
+          },
+          {
+            "id": "crate_drop_21_somebody_ordered_chaos_and_it_arrived_in_a_crate",
+            "text": "Somebody ordered chaos and it arrived in a crate!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_21_somebody_ordered_chaos_and_it_arrived_in_a_crate.ogg"
+          },
+          {
+            "id": "crate_drop_22_if_this_is_empty_i_m_filing_a_complaint_with_the",
+            "text": "If this is empty I'm filing a complaint with the universe!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_22_if_this_is_empty_i_m_filing_a_complaint_with_the.ogg"
+          },
+          {
+            "id": "crate_drop_23_the_suspense_is_thicker_than_boost_smoke",
+            "text": "The suspense is thicker than boost smoke!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_23_the_suspense_is_thicker_than_boost_smoke.ogg"
+          },
+          {
+            "id": "crate_drop_24_please_be_wheels_please_be_wheels_okay_i_ll_take",
+            "text": "Please be wheels. Please be wheels. Okay I'll take anything!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_24_please_be_wheels_please_be_wheels_okay_i_ll_take.ogg"
+          },
+          {
+            "id": "crate_drop_25_that_box_is_vibrating_with_bad_decisions",
+            "text": "That box is vibrating with bad decisions!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_25_that_box_is_vibrating_with_bad_decisions.ogg"
+          },
+          {
+            "id": "crate_drop_26_i_can_smell_the_rarity_from_here_or_maybe_that_s",
+            "text": "I can smell the rarity from here. Or maybe that's the tires.",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_26_i_can_smell_the_rarity_from_here_or_maybe_that_s.ogg"
+          },
+          {
+            "id": "crate_drop_27_open_it_slow_or_smash_it_i_m_not_your_boss",
+            "text": "Open it slow. Or smash it. I'm not your boss!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_27_open_it_slow_or_smash_it_i_m_not_your_boss.ogg"
+          },
+          {
+            "id": "crate_drop_28_it_s_giving_main_character_energy_in_cardboard_f",
+            "text": "It's giving main-character energy in cardboard form!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_28_it_s_giving_main_character_energy_in_cardboard_f.ogg"
+          },
+          {
+            "id": "crate_drop_29_bonus_round_unlocked_stare_at_a_box",
+            "text": "Bonus round unlocked: stare at a box!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_29_bonus_round_unlocked_stare_at_a_box.ogg"
+          },
+          {
+            "id": "crate_drop_30_my_grandma_collects_stamps_we_collect_falling_cr",
+            "text": "My grandma collects stamps. We collect falling crates!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_30_my_grandma_collects_stamps_we_collect_falling_cr.ogg"
+          },
+          {
+            "id": "crate_drop_31_congratulations_you_played_yourself_into_free_st",
+            "text": "Congratulations, you played yourself into free stuff!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_31_congratulations_you_played_yourself_into_free_st.ogg"
+          },
+          {
+            "id": "crate_drop_32_is_this_legal_asking_for_a_friend_with_a_garage",
+            "text": "Is this legal? Asking for a friend with a garage!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_32_is_this_legal_asking_for_a_friend_with_a_garage.ogg"
+          },
+          {
+            "id": "crate_drop_33_the_crate_landed_harder_than_my_last_aerial",
+            "text": "The crate landed harder than my last aerial!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_33_the_crate_landed_harder_than_my_last_aerial.ogg"
+          },
+          {
+            "id": "crate_drop_34_plot_twist_the_real_match_was_the_loot_we_found_",
+            "text": "Plot twist: the real match was the loot we found along the way!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_34_plot_twist_the_real_match_was_the_loot_we_found_.ogg"
+          },
+          {
+            "id": "crate_drop_35_don_t_mind_me_i_m_emotionally_attached_to_this_b",
+            "text": "Don't mind me, I'm emotionally attached to this box already!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_35_don_t_mind_me_i_m_emotionally_attached_to_this_b.ogg"
+          },
+          {
+            "id": "crate_drop_36_shake_it_if_it_rattles_it_s_either_wheels_or_dis",
+            "text": "Shake it! If it rattles, it's either wheels or disappointment!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_36_shake_it_if_it_rattles_it_s_either_wheels_or_dis.ogg"
+          },
+          {
+            "id": "crate_drop_37_crate_check_ego_check_let_s_get_weird",
+            "text": "Crate check! Ego check! Let's get weird!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_37_crate_check_ego_check_let_s_get_weird.ogg"
+          },
+          {
+            "id": "crate_drop_38_this_is_the_part_where_we_all_pretend_we_deserve",
+            "text": "This is the part where we all pretend we deserved it!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_38_this_is_the_part_where_we_all_pretend_we_deserve.ogg"
+          },
+          {
+            "id": "crate_drop_39_i_would_trade_my_boost_for_a_peek_inside",
+            "text": "I would trade my boost for a peek inside!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_39_i_would_trade_my_boost_for_a_peek_inside.ogg"
+          },
+          {
+            "id": "crate_drop_40_and_the_crowd_whispers_ooh_shiny",
+            "text": "And the crowd whispers: ooh, shiny!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_40_and_the_crowd_whispers_ooh_shiny.ogg"
+          },
+          {
+            "id": "crate_drop_41_hmm_hmm_hmm_look_what_floated_down",
+            "text": "Hmm hmm hmm... look what floated down!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_41_hmm_hmm_hmm_look_what_floated_down.ogg"
+          },
+          {
+            "id": "crate_drop_42_doo_doo_doo_doo_surprise_in_a_box",
+            "text": "Doo doo doo doo — surprise in a box!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_42_doo_doo_doo_doo_surprise_in_a_box.ogg"
+          },
+          {
+            "id": "crate_drop_43_la_la_laa_crate_song_everybody",
+            "text": "La la laa — crate song, everybody!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_43_la_la_laa_crate_song_everybody.ogg"
+          },
+          {
+            "id": "crate_drop_44_bum_bum_buuum_loot_o_clock",
+            "text": "Bum bum buuum — loot o'clock!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_44_bum_bum_buuum_loot_o_clock.ogg"
+          },
+          {
+            "id": "crate_drop_45_naa_naa_naa_naa_naa_naa_open_the_crate",
+            "text": "Naa naa naa, naa naa naa — open the crate!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_45_naa_naa_naa_naa_naa_naa_open_the_crate.ogg"
+          },
+          {
+            "id": "crate_drop_46_i_m_humming_the_jackpot_tune_don_t_judge_me",
+            "text": "I'm humming the jackpot tune, don't judge me!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_46_i_m_humming_the_jackpot_tune_don_t_judge_me.ogg"
+          },
+          {
+            "id": "crate_drop_47_doobie_doo_something_rare_this_way_comes",
+            "text": "Doobie doo — something rare this way comes!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_47_doobie_doo_something_rare_this_way_comes.ogg"
+          },
+          {
+            "id": "crate_drop_48_hmm_mm_that_thud_had_melody",
+            "text": "Hmm-mm, that thud had melody!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_48_hmm_mm_that_thud_had_melody.ogg"
+          },
+          {
+            "id": "crate_drop_49_laa_dee_daa_free_cosmetics_falling_from_heaven",
+            "text": "Laa-dee-daa, free cosmetics falling from heaven!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_49_laa_dee_daa_free_cosmetics_falling_from_heaven.ogg"
+          },
+          {
+            "id": "crate_drop_50_doo_wop_doo_wop_crate_drop_harmony",
+            "text": "Doo-wop doo-wop — crate drop harmony!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_50_doo_wop_doo_wop_crate_drop_harmony.ogg"
+          },
+          {
+            "id": "crate_drop_51_the_bomb_has_been_planted_wait_wrong_game_it_s_a",
+            "text": "The bomb has been planted! Wait — wrong game. It's a crate!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_51_the_bomb_has_been_planted_wait_wrong_game_it_s_a.ogg"
+          },
+          {
+            "id": "crate_drop_52_case_opening_energy_somebody_call_the_trade_up_g",
+            "text": "Case opening energy! Somebody call the trade-up gods!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_52_case_opening_energy_somebody_call_the_trade_up_g.ogg"
+          },
+          {
+            "id": "crate_drop_53_field_tested_minimal_wear_this_crate_looks_facto",
+            "text": "Field-tested? Minimal wear? This crate looks factory new!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_53_field_tested_minimal_wear_this_crate_looks_facto.ogg"
+          },
+          {
+            "id": "crate_drop_54_don_t_overpay_for_stickers_just_open_the_box",
+            "text": "Don't overpay for stickers — just open the box!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_54_don_t_overpay_for_stickers_just_open_the_box.ogg"
+          },
+          {
+            "id": "crate_drop_55_one_tap_the_lid_crisp_as_a_dusty_mid_headshot",
+            "text": "One-tap the lid! Crisp as a dusty mid headshot!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_55_one_tap_the_lid_crisp_as_a_dusty_mid_headshot.ogg"
+          },
+          {
+            "id": "crate_drop_56_more_tension_than_overtime_on_dust_two",
+            "text": "More tension than overtime on Dust Two!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_56_more_tension_than_overtime_on_dust_two.ogg"
+          },
+          {
+            "id": "crate_drop_57_unbox_protocol_initiated_gloves_optional_vibes_m",
+            "text": "Unbox protocol initiated! Gloves optional, vibes mandatory!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_57_unbox_protocol_initiated_gloves_optional_vibes_m.ogg"
+          },
+          {
+            "id": "crate_drop_58_skin_market_who_we_rain_free_cosmetics_now",
+            "text": "Skin market who? We rain free cosmetics now!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_58_skin_market_who_we_rain_free_cosmetics_now.ogg"
+          },
+          {
+            "id": "crate_drop_59_hotter_than_a_crimson_web_and_twice_as_suspiciou",
+            "text": "Hotter than a crimson web and twice as suspicious!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_59_hotter_than_a_crimson_web_and_twice_as_suspiciou.ogg"
+          },
+          {
+            "id": "crate_drop_60_call_mid_call_b_call_the_crate",
+            "text": "Call mid! Call B! Call the crate!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_60_call_mid_call_b_call_the_crate.ogg"
+          },
+          {
+            "id": "crate_drop_61_this_drop_has_eco_round_desperation_and_full_buy",
+            "text": "This drop has Eco-round desperation and full-buy swagger!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_61_this_drop_has_eco_round_desperation_and_full_buy.ogg"
+          },
+          {
+            "id": "crate_drop_62_clutch_crate_save_it_for_the_highlight_reel",
+            "text": "Clutch crate! Save it for the highlight reel!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_62_clutch_crate_save_it_for_the_highlight_reel.ogg"
+          },
+          {
+            "id": "crate_drop_63_ace_energy_in_cardboard_form_open_it",
+            "text": "Ace energy in cardboard form — open it!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_63_ace_energy_in_cardboard_form_open_it.ogg"
+          },
+          {
+            "id": "crate_drop_64_that_s_not_a_decoy_that_s_premium_loot",
+            "text": "That's not a decoy — that's premium loot!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_64_that_s_not_a_decoy_that_s_premium_loot.ogg"
+          },
+          {
+            "id": "crate_drop_65_flashbang_the_suspense_i_m_peeking_the_box",
+            "text": "Flashbang the suspense! I'm peeking the box!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_65_flashbang_the_suspense_i_m_peeking_the_box.ogg"
+          },
+          {
+            "id": "crate_drop_66_it_s_dangerous_to_go_alone_take_this_crate",
+            "text": "It's dangerous to go alone — take this crate!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_66_it_s_dangerous_to_go_alone_take_this_crate.ogg"
+          },
+          {
+            "id": "crate_drop_67_it_s_a_me_mystery_box",
+            "text": "It's-a me! Mystery box!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_67_it_s_a_me_mystery_box.ogg"
+          },
+          {
+            "id": "crate_drop_68_hey_you_you_re_finally_awake_here_s_a_crate",
+            "text": "Hey you. You're finally awake. Here's a crate.",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_68_hey_you_you_re_finally_awake_here_s_a_crate.ogg"
+          },
+          {
+            "id": "crate_drop_69_hmm_a_crate_interesting",
+            "text": "Hmm. A crate. Interesting.",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_69_hmm_a_crate_interesting.ogg"
+          },
+          {
+            "id": "crate_drop_70_the_cake_is_a_crate",
+            "text": "The cake is a crate!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_70_the_cake_is_a_crate.ogg"
+          },
+          {
+            "id": "crate_drop_71_these_aren_t_the_crates_you_re_looking_for_oh_wa",
+            "text": "These aren't the crates you're looking for. Oh wait — they are!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_71_these_aren_t_the_crates_you_re_looking_for_oh_wa.ogg"
+          },
+          {
+            "id": "crate_drop_72_one_crate_to_rule_them_all",
+            "text": "One crate to rule them all!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_72_one_crate_to_rule_them_all.ogg"
+          },
+          {
+            "id": "crate_drop_73_there_is_no_crate_there_is_a_crate",
+            "text": "There is no crate... there is a crate!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_73_there_is_no_crate_there_is_a_crate.ogg"
+          },
+          {
+            "id": "crate_drop_74_it_belongs_in_a_museum_or_your_garage",
+            "text": "It belongs in a museum! Or your garage!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_74_it_belongs_in_a_museum_or_your_garage.ogg"
+          },
+          {
+            "id": "crate_drop_75_mission_passed_respect_plus_bonus_crate",
+            "text": "Mission passed! Respect plus bonus crate!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_75_mission_passed_respect_plus_bonus_crate.ogg"
+          },
+          {
+            "id": "crate_drop_76_ping_the_loot_apex_instincts_kicking_in",
+            "text": "Ping the loot! Apex instincts kicking in!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_76_ping_the_loot_apex_instincts_kicking_in.ogg"
+          },
+          {
+            "id": "crate_drop_77_engram_vibes_but_make_it_a_crate",
+            "text": "Engram vibes — but make it a crate!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_77_engram_vibes_but_make_it_a_crate.ogg"
+          },
+          {
+            "id": "crate_drop_78_victory_royale_energy_but_the_prize_is_a_box",
+            "text": "Victory Royale energy, but the prize is a box!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_78_victory_royale_energy_but_the_prize_is_a_box.ogg"
+          },
+          {
+            "id": "crate_drop_79_diamond_pickaxe_energy_in_cardboard_packaging",
+            "text": "Diamond pickaxe energy in cardboard packaging!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_79_diamond_pickaxe_energy_in_cardboard_packaging.ogg"
+          },
+          {
+            "id": "crate_drop_80_sus_crate_definitely_not_the_impostor_probably",
+            "text": "Sus crate. Definitely not the impostor. Probably.",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_80_sus_crate_definitely_not_the_impostor_probably.ogg"
+          },
+          {
+            "id": "crate_drop_81_high_noon_for_loot_draw_on_that_lid",
+            "text": "High noon for loot! Draw on that lid!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_81_high_noon_for_loot_draw_on_that_lid.ogg"
+          },
+          {
+            "id": "crate_drop_82_press_f_to_pay_respects_to_your_empty_inventory",
+            "text": "Press F to pay respects to your empty inventory!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_82_press_f_to_pay_respects_to_your_empty_inventory.ogg"
+          },
+          {
+            "id": "crate_drop_83_this_is_the_way_the_crate_way",
+            "text": "This is the way. The crate way.",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_83_this_is_the_way_the_crate_way.ogg"
+          },
+          {
+            "id": "crate_drop_84_i_am_inevitable_and_so_is_this_drop",
+            "text": "I am inevitable... and so is this drop!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_84_i_am_inevitable_and_so_is_this_drop.ogg"
+          },
+          {
+            "id": "crate_drop_85_winter_is_coming_and_so_is_free_cosmetics",
+            "text": "Winter is coming — and so is free cosmetics!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_85_winter_is_coming_and_so_is_free_cosmetics.ogg"
+          },
+          {
+            "id": "crate_drop_86_may_the_loot_be_with_you",
+            "text": "May the loot be with you!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_86_may_the_loot_be_with_you.ogg"
+          },
+          {
+            "id": "crate_drop_87_to_infinity_and_the_inventory",
+            "text": "To infinity... and the inventory!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_87_to_infinity_and_the_inventory.ogg"
+          },
+          {
+            "id": "crate_drop_88_say_hello_to_my_little_crate",
+            "text": "Say hello to my little crate!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_88_say_hello_to_my_little_crate.ogg"
+          },
+          {
+            "id": "crate_drop_89_i_ll_be_back_after_i_open_this",
+            "text": "I'll be back — after I open this!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_89_i_ll_be_back_after_i_open_this.ogg"
+          },
+          {
+            "id": "crate_drop_90_houston_we_have_a_drop",
+            "text": "Houston, we have a drop!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_90_houston_we_have_a_drop.ogg"
+          },
+          {
+            "id": "crate_drop_91_life_finds_a_way_into_your_loadout",
+            "text": "Life finds a way... into your loadout!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_91_life_finds_a_way_into_your_loadout.ogg"
+          },
+          {
+            "id": "crate_drop_92_why_so_serious_it_s_just_free_stuff",
+            "text": "Why so serious? It's just free stuff!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_92_why_so_serious_it_s_just_free_stuff.ogg"
+          },
+          {
+            "id": "crate_drop_93_you_shall_not_pass_unless_you_open_the_crate",
+            "text": "You shall not pass... unless you open the crate!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_93_you_shall_not_pass_unless_you_open_the_crate.ogg"
+          },
+          {
+            "id": "crate_drop_94_my_preciousss_crate",
+            "text": "My preciousss... crate!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_94_my_preciousss_crate.ogg"
+          },
+          {
+            "id": "crate_drop_95_bond_james_bond_and_this_is_my_crate",
+            "text": "Bond. James Bond. And this is my crate.",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_95_bond_james_bond_and_this_is_my_crate.ogg"
+          },
+          {
+            "id": "crate_drop_96_wakanda_has_garages_too_open_it",
+            "text": "Wakanda has garages too — open it!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_96_wakanda_has_garages_too_open_it.ogg"
+          },
+          {
+            "id": "crate_drop_97_avengers_assemble_around_the_box",
+            "text": "Avengers assemble... around the box!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_97_avengers_assemble_around_the_box.ogg"
+          },
+          {
+            "id": "crate_drop_98_this_is_fine_everything_is_fine_beautiful_crate",
+            "text": "This is fine. Everything is fine. Beautiful crate.",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_98_this_is_fine_everything_is_fine_beautiful_crate.ogg"
+          },
+          {
+            "id": "crate_drop_99_big_brain_play_receive_free_loot_after_the_match",
+            "text": "Big brain play: receive free loot after the match!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_99_big_brain_play_receive_free_loot_after_the_match.ogg"
+          },
+          {
+            "id": "crate_drop_100_touch_grass_nah_touch_crate",
+            "text": "Touch grass? Nah. Touch crate!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_100_touch_grass_nah_touch_crate.ogg"
+          },
+          {
+            "id": "crate_drop_101_sheeeesh_look_at_that_drop",
+            "text": "Sheeeesh — look at that drop!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_101_sheeeesh_look_at_that_drop.ogg"
+          },
+          {
+            "id": "crate_drop_102_no_cap_this_crate_is_fire",
+            "text": "No cap, this crate is fire!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_102_no_cap_this_crate_is_fire.ogg"
+          },
+          {
+            "id": "crate_drop_103_absolute_cinema_absolute_crate",
+            "text": "Absolute cinema. Absolute crate.",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_103_absolute_cinema_absolute_crate.ogg"
+          },
+          {
+            "id": "crate_drop_104_we_got_a_situation_a_shiny_situation",
+            "text": "We got a situation — a shiny situation!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_104_we_got_a_situation_a_shiny_situation.ogg"
+          },
+          {
+            "id": "crate_drop_105_boss_music_just_started_for_a_cardboard_box",
+            "text": "Boss music just started for a cardboard box!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_105_boss_music_just_started_for_a_cardboard_box.ogg"
+          },
+          {
+            "id": "crate_drop_106_final_boss_of_restraint_don_t_smash_open_yet",
+            "text": "Final boss of restraint: don't smash-open yet!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_106_final_boss_of_restraint_don_t_smash_open_yet.ogg"
+          },
+          {
+            "id": "crate_drop_107_speedrun_any_percent_open_the_crate",
+            "text": "Speedrun any percent: open the crate!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_107_speedrun_any_percent_open_the_crate.ogg"
+          },
+          {
+            "id": "crate_drop_108_new_side_quest_unlocked_stare_at_loot",
+            "text": "New side quest unlocked: stare at loot!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_108_new_side_quest_unlocked_stare_at_loot.ogg"
+          },
+          {
+            "id": "crate_drop_109_achievement_unlocked_emotionally_invested_in_car",
+            "text": "Achievement unlocked: emotionally invested in cardboard!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_109_achievement_unlocked_emotionally_invested_in_car.ogg"
+          },
+          {
+            "id": "crate_drop_110_loading_screen_tip_crates_contain_vibes_and_mayb",
+            "text": "Loading screen tip: crates contain vibes and maybe wheels!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_110_loading_screen_tip_crates_contain_vibes_and_mayb.ogg"
+          },
+          {
+            "id": "crate_drop_111_patch_notes_added_one_extremely_juicy_box",
+            "text": "Patch notes: added one extremely juicy box!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_111_patch_notes_added_one_extremely_juicy_box.ogg"
+          },
+          {
+            "id": "crate_drop_112_server_lag_no_just_your_heart_before_the_open",
+            "text": "Server lag? No — just your heart before the open!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_112_server_lag_no_just_your_heart_before_the_open.ogg"
+          },
+          {
+            "id": "crate_drop_113_that_thud_had_more_aura_than_the_whole_highlight",
+            "text": "That thud had more aura than the whole highlight reel!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_113_that_thud_had_more_aura_than_the_whole_highlight.ogg"
+          },
+          {
+            "id": "crate_drop_114_knowing_my_luck_this_dropped_a_blue_knife_wait_w",
+            "text": "Knowing my luck this dropped a blue knife... wait, wrong game!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_114_knowing_my_luck_this_dropped_a_blue_knife_wait_w.ogg"
+          },
+          {
+            "id": "crate_drop_115_please_be_a_knife_skin_oh_right_this_is_car_socc",
+            "text": "Please be a knife skin! Oh right — this is car soccer.",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_115_please_be_a_knife_skin_oh_right_this_is_car_socc.ogg"
+          },
+          {
+            "id": "crate_drop_116_somewhere_a_counter_strike_player_just_felt_a_di",
+            "text": "Somewhere a Counter-Strike player just felt a disturbance in the knife market!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_116_somewhere_a_counter_strike_player_just_felt_a_di.ogg"
+          },
+          {
+            "id": "crate_drop_117_if_this_were_a_weapon_case_i_d_already_be_checki",
+            "text": "If this were a weapon case I'd already be checking the float!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_117_if_this_were_a_weapon_case_i_d_already_be_checki.ogg"
+          },
+          {
+            "id": "crate_drop_118_butterfly_knife_dreams_die_here_welcome_to_wheel",
+            "text": "Butterfly knife dreams die here — welcome to wheels!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_118_butterfly_knife_dreams_die_here_welcome_to_wheel.ogg"
+          },
+          {
+            "id": "crate_drop_119_karambit_no_car_ambit_get_in_the_garage",
+            "text": "Karambit? No. Car-ambit. Get in the garage!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_119_karambit_no_car_ambit_get_in_the_garage.ogg"
+          },
+          {
+            "id": "crate_drop_120_stattrak_for_boost_pads_honestly_i_d_buy_that",
+            "text": "StatTrak for boost pads? Honestly I'd buy that.",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_120_stattrak_for_boost_pads_honestly_i_d_buy_that.ogg"
+          },
+          {
+            "id": "crate_drop_121_relax_it_s_not_another_battle_scarred_rifle_it_s",
+            "text": "Relax — it's not another battle-scarred rifle. It's a crate!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_121_relax_it_s_not_another_battle_scarred_rifle_it_s.ogg"
+          },
+          {
+            "id": "crate_drop_122_trade_up_for_a_knife_nah_trade_up_for_a_paint_jo",
+            "text": "Trade up for a knife? Nah. Trade up for a paint job!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_122_trade_up_for_a_knife_nah_trade_up_for_a_paint_jo.ogg"
+          },
+          {
+            "id": "crate_drop_123_gold_knife_energy_applied_to_cardboard_still_val",
+            "text": "Gold knife energy... applied to cardboard. Still valid!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_123_gold_knife_energy_applied_to_cardboard_still_val.ogg"
+          },
+          {
+            "id": "crate_drop_124_doppler_fade_sorry_buddy_this_crate_fades_into_c",
+            "text": "Doppler fade? Sorry buddy — this crate fades into cosmetics!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_124_doppler_fade_sorry_buddy_this_crate_fades_into_c.ogg"
+          },
+          {
+            "id": "crate_drop_125_don_t_sell_your_knife_yet_this_drop_might_be_whe",
+            "text": "Don't sell your knife yet — this drop might be wheels instead!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_125_don_t_sell_your_knife_yet_this_drop_might_be_whe.ogg"
+          },
+          {
+            "id": "crate_drop_126_case_hardened_heart_factory_new_hopes_car_soccer",
+            "text": "Case hardened heart, factory-new hopes, car-soccer reality!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_126_case_hardened_heart_factory_new_hopes_car_soccer.ogg"
+          },
+          {
+            "id": "crate_drop_127_i_opened_for_a_knife_and_got_emotional_damage_an",
+            "text": "I opened for a knife and got... emotional damage and a box!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_127_i_opened_for_a_knife_and_got_emotional_damage_an.ogg"
+          },
+          {
+            "id": "crate_drop_128_talon_knife_who_talon_wheels_when",
+            "text": "Talon knife who? Talon wheels when?",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_128_talon_knife_who_talon_wheels_when.ogg"
+          },
+          {
+            "id": "crate_drop_129_that_shimmer_looks_like_a_gamma_doppler_of_disap",
+            "text": "That shimmer looks like a gamma Doppler... of disappointment!",
+            "weight": 1,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_129_that_shimmer_looks_like_a_gamma_doppler_of_disap.ogg"
+          },
+          {
+            "id": "crate_drop_130_market_listing_rare_crate_low_float_zero_knives_",
+            "text": "Market listing: rare crate, low float, zero knives, all vibes!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_130_market_listing_rare_crate_low_float_zero_knives_.ogg"
+          },
+          {
+            "id": "crate_drop_131_unboxed_a_dream_packed_a_car_part_classic",
+            "text": "Unboxed a dream — packed a car part. Classic!",
+            "weight": 2,
+            "audio": "/assets/audio/commentary/en/crate_drop/crate_drop_131_unboxed_a_dream_packed_a_car_part_classic.ogg"
+          }
+        ]
+      }
+    }
+  }
+}

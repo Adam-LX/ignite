@@ -1,0 +1,8 @@
+docs/youtube/raw/
+docs/youtube/run-log/
+GOOGLE-ACCOUNT.local.md
+CHANNEL-LIVE.local.md
+*.mp4
+*.mov
+*.mkv
+*.webm

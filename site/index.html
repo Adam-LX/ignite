@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pl">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Ignite</title>
+		<meta name="description" content="Ignite — premium car soccer na Steamie." />
+		<meta property="og:title" content="Ignite" />
+		<meta property="og:image" content="media/hero-clean.jpg" />
+		<meta name="theme-color" content="#081018" />
+		<link rel="icon" href="media/logo.png" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Oxanium:wght@560;600;700&family=Manrope:wght@400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="styles.css?v=8" />
+	</head>
+	<body>
+		<header class="bar">
+			<a class="bar-brand" href="#top"
+				><img src="media/logo.png" alt="Ignite" width="132" height="58"
+			/></a>
+			<nav class="bar-nav">
+				<a href="#feel">Feel</a>
+				<a href="#gallery">Screeny</a>
+				<a class="bar-cta" href="https://discord.gg/Zw9jGrEG3z" target="_blank" rel="noopener"
+					>Discord</a
+				>
+			</nav>
+		</header>
+
+		<main id="top">
+			<!-- Jeden kadr: czysta arena bez UI gry -->
+			<section class="hero">
+				<img class="hero-img" src="media/hero-clean.jpg" alt="" fetchpriority="high" />
+				<div class="hero-dim"></div>
+				<div class="hero-inner">
+					<p class="eyebrow">Premium car soccer</p>
+					<h1>
+						<img src="media/logo-hero.png" alt="Ignite" class="mark" width="520" height="233" />
+					</h1>
+					<p class="lead">
+						Precyzyjny feel, friend-ready online i areny, które reagują gdy mecz się rozgrzewa.
+					</p>
+					<div class="row">
+						<a
+							class="btn primary"
+							href="https://discord.gg/Zw9jGrEG3z"
+							target="_blank"
+							rel="noopener"
+							>Dołącz na Discord</a
+						>
+						<a class="btn secondary" href="#gallery">Zobacz screeny</a>
+					</div>
+				</div>
+			</section>
+
+			<section class="band" id="feel">
+				<div class="band-copy">
+					<p class="eyebrow">The feel</p>
+					<h2>Kickoff. Wall ride. Boost fight.</h2>
+					<p>
+						Czyste 1v1/2v2 + Ignition Rush. Bez fillerów — feel najpierw, reszta później.
+					</p>
+				</div>
+				<ul class="stats">
+					<li><b>1v1 / 2v2</b><span>core</span></li>
+					<li><b>Rush</b><span>spektakl</span></li>
+					<li><b>$7.99–$9.99</b><span>cena start</span></li>
+				</ul>
+			</section>
+
+			<section class="gallery" id="gallery">
+				<div class="gallery-head">
+					<p class="eyebrow">Z boiska</p>
+					<h2>Same kadry. Bez HUD-u.</h2>
+				</div>
+				<div class="gallery-grid">
+					<figure>
+						<img src="media/shot-chase.jpg" alt="Pościg" loading="lazy" />
+					</figure>
+					<figure>
+						<img src="media/shot-field.jpg" alt="Boisko" loading="lazy" />
+					</figure>
+					<figure class="wide">
+						<img src="media/hero-clean.jpg" alt="Kickoff" loading="lazy" />
+					</figure>
+				</div>
+			</section>
+
+			<section class="join">
+				<img class="join-img" src="media/shot-field.jpg" alt="" />
+				<div class="join-dim"></div>
+				<div class="join-inner">
+					<p class="eyebrow">Discord</p>
+					<h2>Wbijaj na boisko.</h2>
+					<p>LFG, screeny, patch notes.</p>
+					<a
+						class="btn primary"
+						href="https://discord.gg/Zw9jGrEG3z"
+						target="_blank"
+						rel="noopener"
+						>discord.gg/Zw9jGrEG3z</a
+					>
+				</div>
+			</section>
+		</main>
+
+		<footer class="foot">
+			<img src="media/logo.png" alt="" width="96" height="42" />
+			<span>© <span id="y"></span> Ignite</span>
+		</footer>
+		<script src="app.js?v=8" type="module"></script>
+	</body>
+</html>

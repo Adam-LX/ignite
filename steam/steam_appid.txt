@@ -1,0 +1,7 @@
+# Steamworks local stub
+#
+# 480 = Spacewar (Valve test AppID) — tylko do lokalnego overlay / SDK smoke.
+# Po S4.1 zamień na prawdziwy AppID i ustaw STEAM_APP_ID w env uploadu.
+#
+# Plik kopiowany obok binarki w dev; nie commitować prawdziwego sekretu partnera.
+480

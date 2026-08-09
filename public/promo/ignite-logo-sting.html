@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Ignite — Logo Sting</title>
+	<style>
+		html, body { margin: 0; height: 100%; background: #000; overflow: hidden; cursor: none; }
+		canvas { display: block; width: 100vw; height: 100vh; }
+	</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+(() => {
+	const DURATION = 7.2;
+	const params = new URLSearchParams(location.search);
+	const LOOP = params.has("loop");
+	const EXPORT = params.has("export");
+	const LOGO_SRC = new URL("../assets/ui/menu/ignite_modern_logo.png", location.href).href;
+
+	const canvas = document.getElementById("c");
+	const ctx = canvas.getContext("2d", { alpha: false });
+	const W = 1920, H = 1080;
+	canvas.width = W;
+	canvas.height = H;
+
+	/** @type {HTMLImageElement | null} */
+	let logo = null;
+	/** Transparent-bg logo (black keyed out) */
+	/** @type {HTMLCanvasElement | null} */
+	let logoCut = null;
+	let logoReady = false;
+
+	function keyBlackLogo(img) {
+		const full = document.createElement("canvas");
+		full.width = img.naturalWidth;
+		full.height = img.naturalHeight;
+		const fx = full.getContext("2d");
+		fx.drawImage(img, 0, 0);
+		const id = fx.getImageData(0, 0, full.width, full.height);
+		const d = id.data;
+		const w = full.width;
+		const h = full.height;
+		/*
+		 * Strip the baked oval frame:
+		 * - bottom tire band
+		 * - cyan/blue energy ring that closes the "egg"
+		 * Keep chrome wordmark + orange fire paint.
+		 */
+		const tireCutY = Math.floor(h * 0.72);
+		for (let y = 0; y < h; y++) {
+			for (let x = 0; x < w; x++) {
+				const i = (y * w + x) * 4;
+				const r = d[i], g = d[i + 1], b = d[i + 2];
+				const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+				const chroma = Math.max(r, g, b) - Math.min(r, g, b);
+
+				if (y >= tireCutY) {
+					d[i + 3] = 0;
+					continue;
+				}
+				if (lum < 16) {
+					d[i + 3] = 0;
+					continue;
+				}
+				/* tire / dark metal orb under left letters */
+				if (lum < 95 && chroma < 38) {
+					d[i + 3] = 0;
+					continue;
+				}
+				if (y > h * 0.45 && x < w * 0.45 && lum < 110 && chroma < 45) {
+					d[i + 3] = 0;
+					continue;
+				}
+				/* cyan / blue energy arcs (egg bottom+right) */
+				const isCyan =
+					b > 90 &&
+					b > r * 1.15 &&
+					b >= g * 0.85 &&
+					(b - Math.min(r, g) > 35 || (b > 140 && r < 160));
+				if (isCyan) {
+					d[i + 3] = 0;
+					continue;
+				}
+				/* lower half: also kill leftover ring pixels that aren't hot fire or bright chrome */
+				if (y > h * 0.55) {
+					const isHotFire = r > 140 && g > 40 && r > b * 1.2;
+					const isChrome = lum > 140 && chroma < 55;
+					if (!isHotFire && !isChrome) {
+						d[i + 3] = 0;
+						continue;
+					}
+				}
+				if (lum < 40) {
+					d[i + 3] = Math.round(d[i + 3] * ((lum - 16) / 24));
+				}
+			}
+		}
+		fx.putImageData(id, 0, 0);
+		let minX = w, minY = h, maxX = 0, maxY = 0;
+		for (let y = 0; y < h; y++) {
+			for (let x = 0; x < w; x++) {
+				if (d[(y * w + x) * 4 + 3] > 10) {
+					if (x < minX) minX = x;
+					if (y < minY) minY = y;
+					if (x > maxX) maxX = x;
+					if (y > maxY) maxY = y;
+				}
+			}
+		}
+		const tw = Math.max(1, maxX - minX + 1);
+		const th = Math.max(1, maxY - minY + 1);
+		const out = document.createElement("canvas");
+		out.width = tw;
+		out.height = th;
+		out.getContext("2d").drawImage(full, minX, minY, tw, th, 0, 0, tw, th);
+		return out;
+	}
+
+	const logoImg = new Image();
+	logoImg.decoding = "async";
+	logoImg.onload = () => {
+		logo = logoImg;
+		logoCut = keyBlackLogo(logoImg);
+		logoReady = true;
+		if (EXPORT) document.documentElement.dataset.stingReady = "1";
+	};
+	logoImg.onerror = () => { document.documentElement.dataset.stingReady = "error"; };
+	logoImg.src = LOGO_SRC;
+
+	function clamp(x, a, b) { return Math.max(a, Math.min(b, x)); }
+	function smoothstep(e0, e1, x) {
+		const t = clamp((x - e0) / (e1 - e0), 0, 1);
+		return t * t * (3 - 2 * t);
+	}
+	function lerp(a, b, t) { return a + (b - a) * t; }
+	function easeOutBack(t) {
+		const c1 = 1.70158 * 1.4;
+		const c3 = c1 + 1;
+		return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+	}
+	function pulse(t, c, w) { return Math.exp(-(((t - c) / w) ** 2)); }
+	function mulberry32(a) {
+		return function () {
+			let t = (a += 0x6d2b79f5);
+			t = Math.imul(t ^ (t >>> 15), t | 1);
+			t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+			return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+		};
+	}
+	const rand = mulberry32(0x71a7e901);
+	const R = rand;
+
+	/**
+	 * Tall vertical fire columns + claw streaks — break the oval.
+	 * Emitters skewed UP and OUT, not around an ellipse.
+	 */
+	const columns = [
+		{ x: -340, y: 80, w: 90, h: 520, dens: 90, lean: -130 },
+		{ x: -250, y: 50, w: 110, h: 580, dens: 110, lean: -90 },
+		{ x: -150, y: 20, w: 120, h: 620, dens: 120, lean: -40 },
+		{ x: -40, y: -10, w: 100, h: 540, dens: 100, lean: 10 },
+		{ x: 70, y: -30, w: 90, h: 420, dens: 80, lean: 50 },
+		{ x: 180, y: -20, w: 70, h: 300, dens: 55, lean: 90 },
+		/* wild upper claws shooting out */
+		{ x: -200, y: -80, w: 60, h: 380, dens: 50, lean: -160 },
+		{ x: 40, y: -100, w: 50, h: 340, dens: 40, lean: 120 },
+	];
+
+	const parts = [];
+	for (let c = 0; c < columns.length; c++) {
+		const col = columns[c];
+		for (let i = 0; i < col.dens; i++) {
+			parts.push({
+				c,
+				sx: (R() - 0.5) * col.w,
+				life: 0.45 + R() * 0.85,
+				size: 8 + R() * 22,
+				phase: R() * Math.PI * 2,
+				spd: 0.9 + R() * 1.4,
+				seed: R(),
+			});
+		}
+	}
+
+	/** Sharp flame claws — elongated teardrops shooting outward */
+	const claws = Array.from({ length: 22 }, () => ({
+		ang: -2.5 + R() * 2.2,
+		len: 200 + R() * 380,
+		w: 16 + R() * 40,
+		phase: R() * 10,
+		delay: R() * 0.45,
+	}));
+
+	/** Under-word fire — chaotic licks, NOT a semicircle/egg base */
+	const underTongues = Array.from({ length: 11 }, () => ({
+		x: -220 + R() * 480,
+		h: 110 + R() * 200,
+		w: 18 + R() * 34,
+		phase: R() * Math.PI * 2,
+		spd: 9 + R() * 8,
+		lean: -0.55 + R() * 0.5,
+	}));
+
+	const embers = Array.from({ length: 160 }, () => ({
+		x: -500 + R() * 900,
+		y: 20 + R() * 140,
+		vx: -60 + R() * 140,
+		vy: -(100 + R() * 340),
+		size: 1.2 + R() * 4,
+		phase: R() * 14,
+		life: 0.6 + R() * 1.5,
+		born: R() * 1.4,
+		cyan: R() < 0.1,
+	}));
+
+	const sparks = Array.from({ length: 100 }, () => ({
+		a: -Math.PI * 0.95 + R() * Math.PI * 1.5,
+		sp: 260 + R() * 900,
+		size: 1.5 + R() * 4.5,
+		cyan: R() < 0.2,
+		delay: R() * 0.1,
+	}));
+
+	/** Cyan = kinetic SPEED LINES shooting right — never an under-arc egg */
+	const speedLines = Array.from({ length: 22 }, () => ({
+		y: -80 + R() * 220,
+		x0: -40 + R() * 200,
+		len: 280 + R() * 520,
+		thick: 1.5 + R() * 3.5,
+		phase: R() * 8,
+		delay: R() * 0.4,
+	}));
+
+	function fireColor(heat, a) {
+		if (heat > 0.78) return `rgba(255,255,245,${a})`;
+		if (heat > 0.55) return `rgba(255,225,100,${a})`;
+		if (heat > 0.32) return `rgba(255,125,20,${a})`;
+		if (heat > 0.15) return `rgba(255,40,0,${a * 0.85})`;
+		return `rgba(120,8,0,${a * 0.45})`;
+	}
+
+	function blob(x, y, size, heat, alpha) {
+		if (alpha < 0.02) return;
+		ctx.globalAlpha = alpha;
+		const g = ctx.createRadialGradient(x, y, 0, x, y, size);
+		g.addColorStop(0, fireColor(Math.min(1, heat + 0.15), 1));
+		g.addColorStop(0.4, fireColor(heat, 0.65));
+		g.addColorStop(1, "rgba(0,0,0,0)");
+		ctx.fillStyle = g;
+		ctx.beginPath();
+		ctx.arc(x, y, size, 0, Math.PI * 2);
+		ctx.fill();
+	}
+
+	function drawColumns(ox, oy, t, intensity) {
+		if (intensity < 0.02) return;
+		ctx.save();
+		ctx.globalCompositeOperation = "lighter";
+		for (const p of parts) {
+			const col = columns[p.c];
+			const cycle = (t * p.spd + p.seed * p.life) % p.life;
+			const u = cycle / p.life;
+			const rise = u * col.h * intensity;
+			const turb =
+				Math.sin(t * 6 + p.phase) * 28 +
+				Math.sin(t * 11 + p.seed * 30) * 16 +
+				Math.sin(u * 14) * 22;
+			const x = ox + col.x + p.sx + col.lean * u + turb;
+			const y = oy + col.y - rise;
+			const heat = 1 - u * 0.92;
+			const size = p.size * (1.2 - u * 0.5) * (0.65 + intensity * 0.5);
+			const alpha = Math.sin(u * Math.PI) * intensity * (0.5 + p.seed * 0.5);
+			blob(x, y, size, heat, alpha);
+		}
+		ctx.restore();
+	}
+
+	function drawClaws(ox, oy, t, intensity) {
+		if (intensity < 0.05) return;
+		ctx.save();
+		ctx.globalCompositeOperation = "lighter";
+		ctx.translate(ox, oy);
+		for (const cl of claws) {
+			const local = clamp((intensity - cl.delay * 0.5) / 0.7, 0, 1);
+			if (local < 0.05) continue;
+			const flick = 0.85 + Math.sin(t * 10 + cl.phase) * 0.15;
+			const len = cl.len * local * flick;
+			ctx.save();
+			ctx.rotate(cl.ang + Math.sin(t * 4 + cl.phase) * 0.08);
+			const g = ctx.createLinearGradient(0, 0, len, 0);
+			g.addColorStop(0, `rgba(255,240,180,${0.55 * local})`);
+			g.addColorStop(0.25, `rgba(255,140,20,${0.7 * local})`);
+			g.addColorStop(0.65, `rgba(255,40,0,${0.35 * local})`);
+			g.addColorStop(1, "rgba(0,0,0,0)");
+			ctx.fillStyle = g;
+			ctx.beginPath();
+			ctx.moveTo(0, 0);
+			ctx.quadraticCurveTo(len * 0.4, -cl.w * flick, len, 0);
+			ctx.quadraticCurveTo(len * 0.4, cl.w * 0.55 * flick, 0, 0);
+			ctx.fill();
+			ctx.fillStyle = `rgba(255,255,230,${0.35 * local})`;
+			ctx.beginPath();
+			ctx.moveTo(0, 0);
+			ctx.quadraticCurveTo(len * 0.35, -cl.w * 0.25, len * 0.7, 0);
+			ctx.quadraticCurveTo(len * 0.35, cl.w * 0.15, 0, 0);
+			ctx.fill();
+			ctx.restore();
+		}
+		ctx.restore();
+	}
+
+	/** Vertical flame tongues under the word — where the egg/tire was */
+	function drawUnderFire(ox, oy, t, intensity) {
+		if (intensity < 0.03) return;
+		ctx.save();
+		ctx.globalCompositeOperation = "lighter";
+		for (const tong of underTongues) {
+			const flick = Math.sin(t * tong.spd + tong.phase);
+			const flick2 = Math.sin(t * tong.spd * 1.6 + tong.phase * 1.4);
+			const h = tong.h * intensity * (0.85 + flick * 0.18);
+			const w = tong.w * intensity * (0.9 + flick2 * 0.12);
+			ctx.save();
+			ctx.translate(ox + tong.x, oy);
+			ctx.rotate(tong.lean + flick * 0.06);
+			const tipX = flick * w * 0.4;
+			const tipY = -h;
+			const midY = -h * 0.5;
+			let g = ctx.createLinearGradient(0, 0, tipX, tipY);
+			g.addColorStop(0, "rgba(180,20,0,0)");
+			g.addColorStop(0.2, `rgba(255,60,0,${0.55 * intensity})`);
+			g.addColorStop(0.55, `rgba(255,150,20,${0.75 * intensity})`);
+			g.addColorStop(0.85, `rgba(255,230,100,${0.55 * intensity})`);
+			g.addColorStop(1, "rgba(255,255,240,0)");
+			ctx.fillStyle = g;
+			ctx.beginPath();
+			ctx.moveTo(-w * 0.5, 8);
+			ctx.bezierCurveTo(-w * 0.85, midY * 0.35, tipX - w * 0.3, midY, tipX, tipY);
+			ctx.bezierCurveTo(tipX + w * 0.22, midY, w * 0.8, midY * 0.3, w * 0.45, 8);
+			ctx.closePath();
+			ctx.fill();
+			g = ctx.createLinearGradient(0, -h * 0.1, tipX * 0.5, tipY * 0.75);
+			g.addColorStop(0, "rgba(255,240,180,0)");
+			g.addColorStop(0.4, `rgba(255,250,210,${0.7 * intensity})`);
+			g.addColorStop(1, "rgba(255,255,255,0)");
+			ctx.fillStyle = g;
+			ctx.beginPath();
+			ctx.moveTo(-w * 0.12, -h * 0.05);
+			ctx.bezierCurveTo(-w * 0.1, midY * 0.7, tipX * 0.35, midY, tipX * 0.5, tipY * 0.7);
+			ctx.bezierCurveTo(tipX * 0.4, midY, w * 0.1, midY * 0.5, w * 0.1, -h * 0.05);
+			ctx.closePath();
+			ctx.fill();
+			ctx.restore();
+		}
+		ctx.restore();
+	}
+
+	function drawSpeedLines(ox, oy, t, reveal, intensity) {
+		if (reveal < 0.02) return;
+		ctx.save();
+		ctx.globalCompositeOperation = "lighter";
+		ctx.translate(ox, oy);
+		for (const s of speedLines) {
+			const local = clamp((reveal - s.delay) / 0.55, 0, 1);
+			if (local < 0.02) continue;
+			const x1 = s.x0;
+			const x2 = s.x0 + s.len * local;
+			const y = s.y + Math.sin(t * 5 + s.phase) * 6;
+			const g = ctx.createLinearGradient(x1, y, x2, y);
+			g.addColorStop(0, "rgba(0,220,255,0)");
+			g.addColorStop(0.2, `rgba(80,230,255,${0.55 * intensity * local})`);
+			g.addColorStop(0.7, `rgba(180,255,255,${0.35 * intensity * local})`);
+			g.addColorStop(1, "rgba(0,200,255,0)");
+			ctx.strokeStyle = g;
+			ctx.lineWidth = s.thick;
+			ctx.shadowColor = "#00e8ff";
+			ctx.shadowBlur = 10;
+			ctx.beginPath();
+			ctx.moveTo(x1, y);
+			ctx.lineTo(x2, y + (s.y > 80 ? 18 : -8) * local);
+			ctx.stroke();
+		}
+		ctx.restore();
+	}
+
+	function drawEmber(x, y, size, cyan, a) {
+		if (a < 0.02) return;
+		ctx.save();
+		ctx.globalCompositeOperation = "lighter";
+		ctx.globalAlpha = a;
+		const g = ctx.createRadialGradient(x, y, 0, x, y, size * 4);
+		if (cyan) {
+			g.addColorStop(0, "#f0ffff");
+			g.addColorStop(0.4, "rgba(0,220,255,0.7)");
+			g.addColorStop(1, "rgba(0,40,120,0)");
+		} else {
+			g.addColorStop(0, "#fff4c0");
+			g.addColorStop(0.35, "rgba(255,140,30,0.85)");
+			g.addColorStop(1, "rgba(60,0,0,0)");
+		}
+		ctx.fillStyle = g;
+		ctx.beginPath();
+		ctx.arc(x, y, size * 4, 0, Math.PI * 2);
+		ctx.fill();
+		ctx.restore();
+	}
+
+	function drawLogo(cx, cy, scale, opacity, glow, rgb) {
+		if (!logoCut || opacity < 0.01) return;
+		const maxW = 980;
+		const aspect = logoCut.height / logoCut.width;
+		const dw = maxW * scale;
+		const dh = dw * aspect;
+		ctx.save();
+		ctx.translate(cx, cy);
+		ctx.rotate(-0.06);
+		ctx.globalAlpha = opacity;
+		if (rgb > 0.5) {
+			ctx.globalCompositeOperation = "lighter";
+			ctx.globalAlpha = opacity * 0.4;
+			ctx.drawImage(logoCut, -dw / 2 - rgb, -dh / 2, dw, dh);
+			ctx.globalAlpha = opacity * 0.35;
+			ctx.drawImage(logoCut, -dw / 2 + rgb * 0.55, -dh / 2, dw, dh);
+			ctx.globalCompositeOperation = "source-over";
+			ctx.globalAlpha = opacity;
+		}
+		if (glow > 0) {
+			ctx.shadowColor = `rgba(255,100,15,${0.5 * glow})`;
+			ctx.shadowBlur = 20 + glow * 30;
+		}
+		ctx.drawImage(logoCut, -dw / 2, -dh / 2, dw, dh);
+		ctx.restore();
+	}
+
+	function render(time) {
+		const t = LOOP ? time % DURATION : clamp(time, 0, DURATION);
+		const cx0 = W * 0.5;
+		const cy0 = H * 0.48;
+
+		const slamHit = pulse(t, 2.55, 0.05) + pulse(t, 2.7, 0.04) * 0.5;
+		const shake = slamHit * 30;
+		const cx = cx0 + Math.sin(t * 90) * shake;
+		const cy = cy0 + Math.cos(t * 72) * shake * 0.65;
+
+		ctx.fillStyle = "#000";
+		ctx.fillRect(0, 0, W, H);
+
+		const fireIn = smoothstep(0.35, 1.5, t);
+		const fireRoar = fireIn * (1.1 - smoothstep(6.0, 7.2, t) * 0.22);
+		const clawIn = smoothstep(0.8, 1.8, t) * fireRoar;
+		const speedReveal = smoothstep(1.5, 2.35, t);
+		const speedInt = speedReveal * (0.85 + 0.15 * Math.sin(t * 5));
+		const logoOp = smoothstep(2.35, 2.7, t);
+		const slamT = easeOutBack(smoothstep(2.4, 2.85, t));
+		const breath = t > 3.0 ? 1 + Math.sin((t - 3) * 3.8) * 0.022 : 1;
+		const settle = 1 - smoothstep(5.9, 7.2, t) * 0.04;
+		const glow = smoothstep(2.5, 3.2, t) * (0.7 + 0.3 * Math.sin(t * 5.5));
+
+		/* Roaring columns behind */
+		drawColumns(cx, cy + 40, t, fireRoar);
+		drawClaws(cx - 40, cy - 20, t, clawIn);
+		/* Flames under the word — where the tire/egg used to sit */
+		drawUnderFire(cx + 20, cy + 95, t, fireRoar * 0.95);
+
+		for (const e of embers) {
+			const age = clamp((t - 0.3 - e.born) / e.life, 0, 1);
+			if (age <= 0 || age >= 1) continue;
+			drawEmber(
+				cx + e.x + e.vx * age + Math.sin(t * 4 + e.phase) * 22,
+				cy + e.y + e.vy * age,
+				e.size,
+				e.cyan,
+				Math.sin(age * Math.PI) * fireRoar * 0.9,
+			);
+		}
+
+		drawSpeedLines(cx + 60, cy + 40, t, speedReveal, speedInt);
+
+		const pre = lerp(1.55, 1.18, smoothstep(2.2, 2.45, t));
+		const logoScale = (t < 2.45 ? pre : lerp(1.18, 1.0, slamT)) * breath * settle;
+		drawLogo(cx, cy, logoScale, logoOp, glow + slamHit * 0.5, slamHit * 11);
+
+		/* Under-fire in front of logo bottom (replaces egg) */
+		drawUnderFire(cx + 20, cy + 100, t, fireRoar * (0.55 + 0.45 * logoOp));
+
+		/* Foreground fire over left/top only */
+		ctx.save();
+		ctx.beginPath();
+		ctx.rect(0, 0, cx - 60, H);
+		ctx.rect(0, 0, W, cy - 50);
+		ctx.clip();
+		drawColumns(cx + 40, cy + 20, t + 0.7, fireRoar * 0.7);
+		drawClaws(cx, cy - 40, t + 0.3, clawIn * 0.6);
+		ctx.restore();
+
+		const burst = clamp((t - 2.5) / 0.7, 0, 1);
+		if (burst > 0 && burst < 1) {
+			for (const s of sparks) {
+				const local = clamp((burst - s.delay) / 0.85, 0, 1);
+				if (local <= 0) continue;
+				drawEmber(
+					cx + Math.cos(s.a) * s.sp * local,
+					cy + Math.sin(s.a) * s.sp * local * 0.55 - local * 50,
+					s.size,
+					s.cyan,
+					(1 - local) * 0.9,
+				);
+			}
+		}
+
+		const flash = pulse(t, 2.55, 0.048) * 0.7 + pulse(t, 0.85, 0.05) * 0.25;
+		if (flash > 0.02) {
+			ctx.save();
+			ctx.globalCompositeOperation = "screen";
+			ctx.fillStyle = `rgba(255,220,170,${0.85 * flash})`;
+			ctx.fillRect(0, 0, W, H);
+			ctx.restore();
+		}
+
+		const vig = ctx.createRadialGradient(cx0, cy0, H * 0.2, cx0, cy0, H * 0.95);
+		vig.addColorStop(0, "rgba(0,0,0,0)");
+		vig.addColorStop(1, "rgba(0,0,0,0.55)");
+		ctx.fillStyle = vig;
+		ctx.fillRect(0, 0, W, H);
+	}
+
+	window.__STING__ = {
+		duration: DURATION,
+		ready: () => logoReady,
+		setTime(sec) { render(sec); },
+		drawFrame(sec) {
+			render(sec);
+			return canvas.toDataURL("image/png");
+		},
+	};
+
+	let start = performance.now();
+	function frame(now) {
+		if (EXPORT) return;
+		if (!logoReady) { requestAnimationFrame(frame); return; }
+		const elapsed = (now - start) / 1000;
+		render(elapsed);
+		if (LOOP || elapsed < DURATION) requestAnimationFrame(frame);
+	}
+	requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

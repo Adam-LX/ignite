@@ -1,0 +1,13 @@
+{
+	"name": "ignite-discord-musix",
+	"private": true,
+	"type": "module",
+	"version": "1.0.0",
+	"description": "Ignite Discord Musix queue bot (Admin-only)",
+	"dependencies": {
+		"@discordjs/voice": "^0.18.0",
+		"discord.js": "^14.16.3",
+		"libsodium-wrappers": "^0.7.15",
+		"opusscript": "^0.1.1"
+	}
+}

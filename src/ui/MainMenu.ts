@@ -1,0 +1,980 @@
+import { getArenaEntry } from "../arena/ArenaCatalog";
+import type { GameAudio } from "../audio/GameAudio";
+import {
+	type GameModeId,
+	getLocalizedModeSpec,
+	menuModeOrderForDeck,
+	modeMenuDeckForMode,
+	type ModeMenuDeck,
+	parseGameMode,
+} from "../game/modes";
+import { getModePolicy } from "../game/modePolicy";
+import { onLocaleChange, t } from "../i18n";
+import { applyStaticI18n } from "../i18n/staticDom";
+import { getCarEntry } from "../meta/CarCatalog";
+import { countNewCosmetics, getEquippedArenaId, getEquippedCarId } from "../meta/PlayerInventory";
+import { getWeeklyMutator } from "../modes/MutatorRegistry";
+import {
+	fetchOnlineStatus,
+	formatOnlineCount,
+	resolveMpServerAddress,
+} from "../net/serverStatus";
+import { GAME_VERSION } from "../util/gameVersion";
+import type { CreditsPanel } from "./CreditsPanel";
+import { MENU_BRAND_LOGO, MENU_PLAYLIST_ART } from "./menuAssets";
+import type { SettingsOverlay } from "./SettingsOverlay";
+
+const MODE_NAV_INTERVAL_MS = 340;
+const SPIN_COOLDOWN_MS = 780;
+const SPIN_COMMIT_DELAY_MS = 160;
+/** Out + stagger delay ostatniej karty (nth-child 6 ≈ 225ms). */
+const DECK_SWAP_OUT_MS = 720;
+
+type ModeSpinPolicy = "auto" | "always" | "never";
+
+const MODE_ACCENT: Record<GameModeId, string> = {
+	"1v1": "duel",
+	"2v2": "team",
+	"3v3": "team",
+	"4v4": "chaos",
+	ignitionRush2v2: "ignition",
+	meridian2v2: "duel",
+	ignition1v1: "ignition",
+	ignition: "ignition",
+	weeklyLab2v2: "lab",
+};
+
+const MODE_ACCENT_GLOW: Record<string, string> = {
+	duel: "rgba(77, 168, 255, 0.42)",
+	team: "rgba(61, 255, 232, 0.4)",
+	chaos: "rgba(176, 108, 255, 0.38)",
+	ignition: "rgba(255, 138, 61, 0.4)",
+	lab: "rgba(80, 255, 190, 0.45)",
+};
+
+export class MainMenu {
+	private readonly root: HTMLElement;
+	private readonly onStart: (mode: GameModeId) => void;
+	private readonly onOnline?: () => void;
+	private selected: GameModeId;
+	private modeDeck: ModeMenuDeck;
+	private startBtn!: HTMLButtonElement;
+	private modeIndexEl!: HTMLElement;
+	private onlineCountEl!: HTMLElement;
+	private deckToggleBtn!: HTMLButtonElement;
+	private modeGridEl!: HTMLElement;
+	private modeGridPrevBtn!: HTMLButtonElement;
+	private modeGridNextBtn!: HTMLButtonElement;
+	private modeGridNavObserver: ResizeObserver | null = null;
+	private keyHandler: ((e: KeyboardEvent) => void) | null = null;
+	private onlinePollTimer: number | null = null;
+	private cardsIntroTimer: number | null = null;
+	private spinCommitTimer: number | null = null;
+	private deckSwapTimer: number | null = null;
+	private blurSyncObserver: ResizeObserver | null = null;
+	private lastSpunMode: GameModeId | null = null;
+	private modeNavBlockedUntil = 0;
+	private lastSpinAt = 0;
+	private deckSwapBusy = false;
+
+	private launchModeEl!: HTMLElement;
+	private briefTitleEl!: HTMLElement;
+	private briefDescEl!: HTMLElement;
+	private garageChipEl!: HTMLElement;
+
+	constructor(
+		onStart: (mode: GameModeId) => void,
+		private readonly credits?: CreditsPanel,
+		onOnline?: () => void,
+		private readonly audio?: GameAudio,
+		private readonly settings?: SettingsOverlay,
+		private readonly onLoadout?: () => void,
+	) {
+		const el = document.getElementById("main-menu");
+		if (!el) throw new Error("Brak #main-menu");
+		this.root = el;
+		this.onStart = onStart;
+		this.onOnline = onOnline;
+
+		const params = new URLSearchParams(window.location.search);
+		this.selected = parseGameMode(params.get("mode"));
+		this.modeDeck = modeMenuDeckForMode(this.selected);
+
+		this.render();
+		this.bindKeyboard();
+		onLocaleChange(() => {
+			this.applyMenuLocale();
+		});
+	}
+
+	hide(): void {
+		this.root.classList.add("hidden");
+		this.stopOnlinePoll();
+		this.stopCardsIntro();
+		this.clearSpinCommit();
+		this.clearDeckSwap();
+		this.stopModesBlurSync();
+		this.modeGridNavObserver?.disconnect();
+		this.modeGridNavObserver = null;
+		this.lastSpunMode = null;
+		if (this.keyHandler) {
+			window.removeEventListener("keydown", this.keyHandler);
+			this.keyHandler = null;
+		}
+	}
+
+	show(): void {
+		this.root.classList.remove("hidden", "main-menu--exit");
+		if (!this.keyHandler) {
+			this.bindKeyboard();
+		}
+		this.audio?.ensureMenuMusic();
+		this.refreshEquippedChip();
+		void this.refreshOnlineCount();
+		this.startOnlinePoll();
+		this.syncModeCardVariables();
+		this.syncModesBlurPosition();
+		this.syncModeGridNav(true);
+		this.lastSpunMode = null;
+		this.playCardsIntro();
+	}
+
+	isVisible(): boolean {
+		return !this.root.classList.contains("hidden");
+	}
+
+	getSelectedMode(): GameModeId {
+		return this.selected;
+	}
+
+	getModeIndex(): number {
+		return this.deckOrder().indexOf(this.selected);
+	}
+
+	selectModeById(id: GameModeId): void {
+		const deck = modeMenuDeckForMode(id);
+		if (deck !== this.modeDeck) {
+			this.modeDeck = deck;
+			this.fillModeGrid();
+			this.syncDeckToggleLabel();
+		}
+		if (!this.deckOrder().includes(id)) return;
+		this.selectMode(id);
+	}
+
+	private deckOrder(): GameModeId[] {
+		return menuModeOrderForDeck(this.modeDeck);
+	}
+
+	private render(): void {
+		this.root.classList.add(
+			"main-menu--tiles",
+			"main-menu--rl",
+			"main-menu--wypas",
+			"main-menu--cosmos",
+			"main-menu--apex",
+			"main-menu--stadium-orbit",
+			"main-menu--esport",
+			"main-menu--rl-play",
+		);
+
+		this.root.innerHTML = `
+      <div class="main-menu__fx main-menu__fx--stadium-orbit" aria-hidden="true">
+        <div class="main-menu__vignette main-menu__vignette--soft"></div>
+        <div class="main-menu__vignette main-menu__vignette--ultrawide" aria-hidden="true"></div>
+      </div>
+
+      <div class="main-menu-overlay main-menu__layout main-menu__layout--esport main-menu__layout--rl-play">
+        <div class="ui-safe-zone ui-safe-zone--rl-play">
+          <header class="rl-topbar">
+            <div class="rl-brand">
+              <h1 class="logo-ignite">
+                <img
+                  class="logo-ignite__img"
+                  src="${MENU_BRAND_LOGO}"
+                  alt="Ignite"
+                  width="960"
+                  height="421"
+                  decoding="async"
+                />
+              </h1>
+              <div class="logo-meta">
+                <span class="main-menu__mode-index" id="mode-index">01/06</span>
+                <span class="main-menu__cosmos-version" id="main-menu-version">v${GAME_VERSION}</span>
+              </div>
+            </div>
+            <nav class="rl-topnav" aria-label="${t("menu.nav.aria")}">
+              <button type="button" id="main-menu-garage" class="rl-tab" data-nav="garage">
+                <span class="rl-tab__title" data-i18n="menu.nav.garage">${t("menu.nav.garage")}</span>
+                <span class="rl-tab__sub" id="main-menu-garage-chip">—</span>
+              </button>
+              <button type="button" id="main-menu-online" class="rl-tab" data-nav="online">
+                <span class="rl-tab__title" data-i18n="menu.online.label">${t("menu.online.label")}</span>
+                <span class="rl-tab__sub" id="main-menu-online-count">${t("menu.online.defaultStatus")}</span>
+              </button>
+              <button type="button" id="main-menu-settings" class="rl-tab" data-i18n-aria="menu.settings.aria" aria-label="${t("menu.settings.aria")}">
+                <span class="rl-tab__title" data-i18n="menu.settings">${t("menu.settings")}</span>
+              </button>
+              <button type="button" id="main-menu-credits" class="rl-tab">
+                <span class="rl-tab__title" data-i18n="menu.credits">${t("menu.credits")}</span>
+              </button>
+            </nav>
+          </header>
+
+          <div class="rl-bottom">
+            <section class="rl-dock" aria-label="${t("menu.zone.modes")}">
+              <header class="rl-dock__head">
+                <h2 data-i18n="menu.zone.modes">${t("menu.zone.modes")}</h2>
+                <button type="button" id="main-menu-deck-toggle" class="rl-deck-toggle" data-i18n-aria="menu.playlist.deckToggleAria" aria-label="${t("menu.playlist.deckToggleAria")}">
+                  <span class="main-menu__deck-toggle-label" data-i18n="menu.playlist.toExperimental">${t("menu.playlist.toExperimental")}</span>
+                </button>
+              </header>
+              <div class="rl-dock__body">
+                <div class="rl-playlists main-menu__modes-track">
+                  <div class="main-menu__modes-blur" aria-hidden="true"></div>
+                  <button type="button" class="rl-playlists__nav rl-playlists__nav--prev" id="mode-grid-prev" data-i18n-aria="menu.playlist.scrollPrev" aria-label="${t("menu.playlist.scrollPrev")}">&lt;</button>
+                  <div class="rl-playlists__grid modes-list__cards" id="mode-grid" role="list"></div>
+                  <button type="button" class="rl-playlists__nav rl-playlists__nav--next" id="mode-grid-next" data-i18n-aria="menu.playlist.scrollNext" aria-label="${t("menu.playlist.scrollNext")}">&gt;</button>
+                </div>
+                <button type="button" id="main-menu-start" class="rl-play btn-massive-play">
+                  <span class="rl-play__label" data-i18n="menu.launch.play">${t("menu.launch.play")}</span>
+                  <span class="rl-play__mode btn-sub" id="main-menu-launch-mode">—</span>
+                </button>
+              </div>
+            </section>
+            <div class="rl-ticker" role="status" aria-label="${t("menu.ticker.aria")}" data-i18n-aria="menu.ticker.aria">
+              <div class="rl-ticker__track" id="main-menu-ticker-track">
+                <span class="rl-ticker__seg" id="main-menu-ticker-a"></span>
+                <span class="rl-ticker__seg" id="main-menu-ticker-b" aria-hidden="true"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="main-menu__sr-only" aria-hidden="true">
+            <h2 id="main-menu-brief-title">—</h2>
+            <p id="main-menu-brief-desc">—</p>
+          </div>
+          <p class="main-menu__controls main-menu__controls--sr" data-i18n-html="menu.controls">${t("menu.controls")}</p>
+        </div>
+      </div>
+    `;
+
+		this.startBtn = this.req<HTMLButtonElement>("#main-menu-start");
+		this.launchModeEl = this.req("#main-menu-launch-mode");
+		this.briefTitleEl = this.req("#main-menu-brief-title");
+		this.briefDescEl = this.req("#main-menu-brief-desc");
+		this.garageChipEl = this.req("#main-menu-garage-chip");
+		this.modeIndexEl = this.req("#mode-index");
+		this.onlineCountEl = this.req("#main-menu-online-count");
+		this.deckToggleBtn = this.req<HTMLButtonElement>("#main-menu-deck-toggle");
+		this.modeGridEl = this.req("#mode-grid");
+		this.modeGridPrevBtn = this.req<HTMLButtonElement>("#mode-grid-prev");
+		this.modeGridNextBtn = this.req<HTMLButtonElement>("#mode-grid-next");
+
+		this.fillModeGrid();
+		this.syncDeckToggleLabel();
+		this.syncTicker();
+		this.bindModeGridNav();
+
+		this.startBtn.addEventListener("click", () => this.launch());
+		this.deckToggleBtn.addEventListener("click", () => {
+			void this.toggleModeDeck();
+		});
+		this.req<HTMLButtonElement>("#main-menu-credits").addEventListener(
+			"click",
+			() => {
+				this.credits?.show();
+			},
+		);
+		this.req<HTMLButtonElement>("#main-menu-settings").addEventListener(
+			"click",
+			() => {
+				this.settings?.show();
+			},
+		);
+		this.req<HTMLButtonElement>("#main-menu-garage").addEventListener(
+			"click",
+			() => {
+				this.onLoadout?.();
+			},
+		);
+		this.req<HTMLButtonElement>("#main-menu-online").addEventListener(
+			"click",
+			() => {
+				this.onOnline?.();
+			},
+		);
+
+		this.selectMode(this.selected, false, "never");
+		this.refreshEquippedChip();
+		this.bindMenuUiSounds();
+		this.bindModesBlurSync();
+	}
+
+	private fillModeGrid(): void {
+		this.modeGridEl.replaceChildren();
+		const order = this.deckOrder();
+		for (const id of order) {
+			this.modeGridEl.appendChild(this.createModeCard(id, order.indexOf(id)));
+		}
+		this.root.dataset.modeDeck = this.modeDeck;
+		this.root.style.removeProperty("--rl-card-w");
+		this.modeGridEl.scrollLeft = 0;
+		requestAnimationFrame(() => this.syncModeGridNav(true));
+	}
+
+	private bindModeGridNav(): void {
+		this.modeGridPrevBtn.addEventListener("click", () => {
+			this.scrollModeGrid(-1);
+			this.audio?.playMenuHover();
+		});
+		this.modeGridNextBtn.addEventListener("click", () => {
+			this.scrollModeGrid(1);
+			this.audio?.playMenuHover();
+		});
+		this.modeGridEl.addEventListener(
+			"scroll",
+			() => this.syncModeGridNav(false),
+			{ passive: true },
+		);
+		this.modeGridNavObserver?.disconnect();
+		if (typeof ResizeObserver !== "undefined") {
+			this.modeGridNavObserver = new ResizeObserver(() => {
+				this.syncModeGridNav(true);
+			});
+			this.modeGridNavObserver.observe(this.modeGridEl);
+		}
+	}
+
+	private modeGridGap(): number {
+		const styles = getComputedStyle(this.modeGridEl);
+		return Number.parseFloat(styles.columnGap || styles.gap || "0") || 14;
+	}
+
+	private modeGridStep(): number {
+		const card = this.modeGridEl.querySelector<HTMLElement>(".mode-card");
+		if (!card) return 200;
+		return card.offsetWidth + this.modeGridGap();
+	}
+
+	private modeGridMaxIndex(): number {
+		const cards = this.modeGridEl.querySelectorAll(".mode-card").length;
+		if (cards <= 0) return 0;
+		const step = this.modeGridStep();
+		const visible = Math.max(
+			1,
+			Math.floor((this.modeGridEl.clientWidth + 2) / step),
+		);
+		return Math.max(0, cards - visible);
+	}
+
+	private scrollModeGrid(dir: -1 | 1): void {
+		if (this.modeDeck !== "experimental") return;
+		const step = this.modeGridStep();
+		const maxIndex = this.modeGridMaxIndex();
+		const current = Math.round(this.modeGridEl.scrollLeft / step);
+		const target = Math.max(0, Math.min(maxIndex, current + dir));
+		this.modeGridEl.scrollTo({ left: target * step, behavior: "smooth" });
+		window.setTimeout(() => this.syncModeGridNav(true), 280);
+	}
+
+	private syncModeGridNav(snap = true): void {
+		const experimental = this.modeDeck === "experimental";
+		const maxIndex = this.modeGridMaxIndex();
+		const canScroll = experimental && maxIndex > 0;
+		this.modeGridPrevBtn.hidden = !canScroll;
+		this.modeGridNextBtn.hidden = !canScroll;
+		if (!canScroll) {
+			if (experimental && this.modeGridEl.scrollLeft !== 0) {
+				this.modeGridEl.scrollLeft = 0;
+			}
+			return;
+		}
+		const step = this.modeGridStep();
+		const snapped = Math.max(
+			0,
+			Math.min(maxIndex, Math.round(this.modeGridEl.scrollLeft / step)),
+		);
+		const targetLeft = snapped * step;
+		if (snap && Math.abs(this.modeGridEl.scrollLeft - targetLeft) > 2) {
+			this.modeGridEl.scrollLeft = targetLeft;
+		}
+		this.modeGridPrevBtn.disabled = snapped <= 0;
+		this.modeGridNextBtn.disabled = snapped >= maxIndex;
+	}
+
+	private syncDeckToggleLabel(): void {
+		const label = this.deckToggleBtn.querySelector(".main-menu__deck-toggle-label");
+		const key =
+			this.modeDeck === "core"
+				? "menu.playlist.toExperimental"
+				: "menu.playlist.toCore";
+		if (label) {
+			label.setAttribute("data-i18n", key);
+			label.textContent = t(key);
+		}
+		this.deckToggleBtn.classList.toggle(
+			"main-menu__deck-toggle--exp",
+			this.modeDeck === "experimental",
+		);
+	}
+
+	private syncTicker(): void {
+		const text = t("menu.ticker.text", { version: GAME_VERSION });
+		const a = this.root.querySelector<HTMLElement>("#main-menu-ticker-a");
+		const b = this.root.querySelector<HTMLElement>("#main-menu-ticker-b");
+		if (a) a.textContent = text;
+		if (b) b.textContent = text;
+	}
+
+	private async toggleModeDeck(): Promise<void> {
+		if (this.deckSwapBusy) return;
+		this.deckSwapBusy = true;
+		this.clearSpinCommit();
+		this.stopCardsIntro();
+		this.clearModeCardInlineVars();
+
+		const nextDeck: ModeMenuDeck =
+			this.modeDeck === "core" ? "experimental" : "core";
+		this.audio?.playMenuSpin(
+			nextDeck === "experimental" ? "ignition" : "team",
+		);
+
+		this.root.classList.remove("main-menu--deck-swap-in", "main-menu--cards-intro");
+		this.root.classList.add("main-menu--deck-swap-out");
+		void this.root.offsetWidth;
+
+		await new Promise<void>((resolve) => {
+			if (this.deckSwapTimer !== null) {
+				window.clearTimeout(this.deckSwapTimer);
+			}
+			this.deckSwapTimer = window.setTimeout(() => {
+				this.deckSwapTimer = null;
+				resolve();
+			}, DECK_SWAP_OUT_MS);
+		});
+
+		this.modeDeck = nextDeck;
+		const order = this.deckOrder();
+		if (!order.includes(this.selected)) {
+			this.selected = order[0]!;
+		}
+		this.fillModeGrid();
+		this.syncDeckToggleLabel();
+		this.root.classList.remove("main-menu--deck-swap-out");
+		void this.root.offsetWidth;
+		this.root.classList.add("main-menu--deck-swap-in");
+		this.selectMode(this.selected, true, "never", "auto");
+		this.playCardsIntro();
+
+		window.setTimeout(() => {
+			this.root.classList.remove("main-menu--deck-swap-in");
+			this.deckSwapBusy = false;
+			this.syncModeCardVariables();
+			this.syncModeGridNav();
+		}, 980);
+	}
+
+	private clearDeckSwap(): void {
+		if (this.deckSwapTimer !== null) {
+			window.clearTimeout(this.deckSwapTimer);
+			this.deckSwapTimer = null;
+		}
+		this.root.classList.remove("main-menu--deck-swap-out", "main-menu--deck-swap-in");
+	}
+
+	private bindMenuUiSounds(): void {
+		for (const btn of this.root.querySelectorAll<HTMLButtonElement>(
+			".nav-item, .main-menu__deck-toggle",
+		)) {
+			btn.addEventListener("pointerenter", () => this.audio?.playMenuHover());
+			btn.addEventListener("click", () => this.audio?.playMenuConfirm());
+		}
+		this.startBtn.addEventListener("pointerenter", () =>
+			this.audio?.playMenuHover("ignition"),
+		);
+	}
+
+	private startOnlinePoll(): void {
+		this.stopOnlinePoll();
+		this.onlinePollTimer = window.setInterval(() => {
+			void this.refreshOnlineCount();
+		}, 5000);
+	}
+
+	private stopOnlinePoll(): void {
+		if (this.onlinePollTimer !== null) {
+			window.clearInterval(this.onlinePollTimer);
+			this.onlinePollTimer = null;
+		}
+	}
+
+	private async refreshOnlineCount(): Promise<void> {
+		await resolveMpServerAddress();
+		const status = await fetchOnlineStatus();
+		this.onlineCountEl.textContent = formatOnlineCount(status);
+	}
+
+	private createModeCard(id: GameModeId, deckIndex: number): HTMLButtonElement {
+		const spec = getLocalizedModeSpec(id);
+		const policy = getModePolicy(id);
+		const accent = MODE_ACCENT[id];
+		const btn = document.createElement("button");
+		btn.type = "button";
+		const featuredClass =
+			id === "ignitionRush2v2" || id === "ignition"
+				? " mode-card--featured"
+				: "";
+		const testClass = id === "ignition1v1" ? " mode-card--ignition-test" : "";
+		btn.className = `mode-card mode-card--rl-play mode-card--wypas mode-card--${accent}${featuredClass}${testClass}`;
+		btn.dataset.mode = id;
+		btn.dataset.accent = accent;
+		btn.role = "listitem";
+
+		const badge = spec.isFFA
+			? `<span class="mode-card__badge mode-card__badge--ffa">FFA</span>`
+			: `<span class="mode-card__badge">${spec.teamSize}v${spec.teamSize}</span>`;
+		const playlistBadge = policy.experimentalBadge
+			? `<span class="mode-card__badge mode-card__badge--experimental">${t("menu.playlist.experimentalBadge")}</span>`
+			: "";
+
+		const weekly = policy.features.weeklyMutator
+			? getWeeklyMutator()
+			: null;
+		const mutatorLine = weekly
+			? `<span class="mode-card__mutator">${t("menu.playlist.weeklyMutatorLine", {
+					name: t(weekly.nameKey as never),
+				})}</span>`
+			: "";
+
+		const artSrc = MENU_PLAYLIST_ART[id];
+		btn.innerHTML = `
+      <span class="mode-card__art" aria-hidden="true">
+        <img class="mode-card__art-img" src="${artSrc}" alt="" loading="lazy" decoding="async" />
+        <span class="mode-card__art-shade"></span>
+        <span class="mode-card__shine"></span>
+      </span>
+      <span class="mode-card__bar" aria-hidden="true"></span>
+      <span class="mode-card__badges">${badge}${playlistBadge}</span>
+      <strong class="mode-card__title">${spec.label}</strong>
+      ${mutatorLine || `<span class="mode-card__desc">${spec.description}</span>`}
+      <span class="mode-card__index">${String(deckIndex + 1).padStart(2, "0")}</span>
+    `;
+
+		btn.addEventListener("click", () => this.selectMode(id, true, "always"));
+		btn.addEventListener("pointerenter", () => {
+			this.audio?.playMenuHover(accent);
+			if (this.canPlaySpin()) {
+				this.playCardSpin(btn);
+				this.lastSpinAt = performance.now();
+			}
+		});
+		btn.addEventListener("dblclick", () => {
+			this.selectMode(id, false);
+			this.launch();
+		});
+
+		return btn;
+	}
+
+	refreshEquippedChip(): void {
+		const car = getCarEntry(getEquippedCarId());
+		const arena = getArenaEntry(getEquippedArenaId());
+		const carName = car ? t(car.nameKey as never) : "—";
+		const arenaName = arena ? t(arena.nameKey as never) : "—";
+		const newCount = countNewCosmetics();
+		this.garageChipEl.textContent =
+			newCount > 0
+				? `${carName} · ${arenaName} · ${t("garage.newCount", { count: newCount })}`
+				: `${carName} · ${arenaName}`;
+	}
+
+	private selectMode(
+		id: GameModeId,
+		focusStart = true,
+		spinPolicy: ModeSpinPolicy = "auto",
+		scrollBehavior: ScrollBehavior = "smooth",
+	): void {
+		const order = this.deckOrder();
+		if (!order.includes(id)) return;
+
+		const isReselect = id === this.selected;
+		this.clearSpinCommit();
+		const spec = getLocalizedModeSpec(id);
+		const idx = order.indexOf(id);
+		this.selected = id;
+
+		let activeCard: HTMLButtonElement | null = null;
+		for (const card of this.root.querySelectorAll<HTMLButtonElement>(
+			".mode-card",
+		)) {
+			const isActive = card.dataset.mode === id;
+			card.classList.toggle("active", isActive);
+			card.classList.toggle("selected", isActive);
+			if (!isActive) card.classList.remove("mode-card--spin");
+			if (isActive) activeCard = card;
+		}
+		this.syncModeCardVariables();
+
+		const introPlaying = this.root.classList.contains(
+			"main-menu--cards-intro",
+		);
+		const canSpinNow =
+			!isReselect &&
+			(spinPolicy === "always" ||
+				(spinPolicy === "auto" &&
+					!introPlaying &&
+					this.lastSpunMode !== null &&
+					this.canPlaySpin()));
+
+		if (activeCard) {
+			this.ensureCardVisible(activeCard, scrollBehavior);
+			if (!isReselect || spinPolicy === "always") {
+				const accent = MODE_ACCENT[id];
+				activeCard.classList.add("mode-card--pick");
+				window.setTimeout(() => {
+					activeCard?.classList.remove("mode-card--pick");
+				}, 1350);
+				if (canSpinNow && this.lastSpunMode !== id) {
+					this.playCardSpin(activeCard);
+					this.lastSpinAt = performance.now();
+				} else if (spinPolicy !== "never" && !introPlaying && !isReselect) {
+					this.audio?.playMenuNav(accent, true);
+					this.scheduleSpinCommit(activeCard);
+				}
+				this.lastSpunMode = id;
+			}
+		}
+
+		this.modeIndexEl.textContent = `${String(idx + 1).padStart(2, "0")}/${String(order.length).padStart(2, "0")}`;
+		this.launchModeEl.textContent = spec.label;
+		this.briefTitleEl.textContent = spec.label;
+		this.briefDescEl.textContent = spec.description;
+
+		this.root.dataset.selectedAccent = MODE_ACCENT[id];
+		window.dispatchEvent(
+			new CustomEvent("ignite:menu-accent", {
+				detail: MODE_ACCENT[id],
+			}),
+		);
+
+		if (focusStart) {
+			this.startBtn.focus();
+		}
+		this.syncModesBlurPosition();
+	}
+
+	private canPlaySpin(): boolean {
+		return performance.now() - this.lastSpinAt >= SPIN_COOLDOWN_MS;
+	}
+
+	private scheduleSpinCommit(card: HTMLButtonElement): void {
+		this.clearSpinCommit();
+		this.spinCommitTimer = window.setTimeout(() => {
+			this.spinCommitTimer = null;
+			if (
+				card.dataset.mode !== this.selected ||
+				!card.classList.contains("active") ||
+				card.classList.contains("mode-card--spin")
+			) {
+				return;
+			}
+			this.playCardSpin(card);
+			this.lastSpinAt = performance.now();
+		}, SPIN_COMMIT_DELAY_MS);
+	}
+
+	private clearSpinCommit(): void {
+		if (this.spinCommitTimer !== null) {
+			window.clearTimeout(this.spinCommitTimer);
+			this.spinCommitTimer = null;
+		}
+	}
+
+	private navigateModeAdjacent(delta: 1 | -1): void {
+		const now = performance.now();
+		if (now < this.modeNavBlockedUntil) return;
+		this.modeNavBlockedUntil = now + MODE_NAV_INTERVAL_MS;
+
+		const order = this.deckOrder();
+		const idx = order.indexOf(this.selected);
+		const next = order[(idx + delta + order.length) % order.length]!;
+		const scrollBehavior = this.canPlaySpin() ? "smooth" : "auto";
+		this.selectMode(next, true, "auto", scrollBehavior);
+	}
+
+	private cardMotionLocked(): boolean {
+		return (
+			this.root.classList.contains("main-menu--cards-intro") ||
+			this.root.classList.contains("main-menu--deck-swap-out") ||
+			this.root.classList.contains("main-menu--deck-swap-in")
+		);
+	}
+
+	/** Inline --card-* zabijają keyframes deck-swap / stagger-in. */
+	private clearModeCardInlineVars(): void {
+		for (const card of this.root.querySelectorAll<HTMLButtonElement>(
+			".mode-card",
+		)) {
+			card.style.removeProperty("--card-lift");
+			card.style.removeProperty("--card-scale");
+			card.style.removeProperty("--card-opacity");
+			card.style.removeProperty("--card-tilt-y");
+			card.style.removeProperty("--card-tilt-x");
+		}
+	}
+
+	private syncModeCardVariables(): void {
+		if (this.cardMotionLocked()) {
+			this.syncModesBlurPosition();
+			return;
+		}
+		for (const card of this.root.querySelectorAll<HTMLButtonElement>(
+			".mode-card",
+		)) {
+			card.style.removeProperty("--card-lift");
+			card.style.removeProperty("--card-scale");
+			card.style.removeProperty("--card-opacity");
+			card.style.removeProperty("--card-tilt-y");
+			card.style.removeProperty("--card-tilt-x");
+		}
+		this.syncModesBlurPosition();
+	}
+
+	private bindModesBlurSync(): void {
+		this.stopModesBlurSync();
+		const track = this.root.querySelector<HTMLElement>(".main-menu__modes-track");
+		const grid = this.root.querySelector<HTMLElement>("#mode-grid");
+		if (!track || !grid || typeof ResizeObserver === "undefined") return;
+		this.blurSyncObserver = new ResizeObserver(() => {
+			this.syncModesBlurPosition();
+		});
+		this.blurSyncObserver.observe(track);
+		this.blurSyncObserver.observe(grid);
+		window.addEventListener("resize", this.onBlurLayoutChange);
+		grid.addEventListener("scroll", this.onBlurLayoutChange, { passive: true });
+		requestAnimationFrame(() => this.syncModesBlurPosition());
+	}
+
+	private stopModesBlurSync(): void {
+		this.blurSyncObserver?.disconnect();
+		this.blurSyncObserver = null;
+		window.removeEventListener("resize", this.onBlurLayoutChange);
+		this.root
+			.querySelector("#mode-grid")
+			?.removeEventListener("scroll", this.onBlurLayoutChange);
+	}
+
+	private readonly onBlurLayoutChange = (): void => {
+		this.syncModesBlurPosition();
+	};
+
+	/** Miękki cień pod kartami — glow śledzi aktywną kartę. */
+	private syncModesBlurPosition(): void {
+		const blur = this.root.querySelector<HTMLElement>(".main-menu__modes-blur");
+		const grid = this.root.querySelector<HTMLElement>("#mode-grid");
+		const track = this.root.querySelector<HTMLElement>(".main-menu__modes-track");
+		if (!blur || !grid || !track) return;
+
+		const accent = MODE_ACCENT[this.selected];
+		blur.style.setProperty(
+			"--blur-glow",
+			MODE_ACCENT_GLOW[accent] ?? MODE_ACCENT_GLOW.team!,
+		);
+
+		const active = grid.querySelector<HTMLElement>(".mode-card.active");
+		if (!active) {
+			blur.style.setProperty("--blur-accent-x", "50%");
+			blur.style.setProperty("--blur-accent-y", "58%");
+			return;
+		}
+
+		const tRect = track.getBoundingClientRect();
+		const aRect = active.getBoundingClientRect();
+		const cx = ((aRect.left + aRect.width * 0.5 - tRect.left) / tRect.width) * 100;
+		const cy = ((aRect.top + aRect.height * 0.55 - tRect.top) / tRect.height) * 100;
+		blur.style.setProperty("--blur-accent-x", `${cx}%`);
+		blur.style.setProperty("--blur-accent-y", `${cy}%`);
+	}
+
+	private playCardsIntro(): void {
+		this.stopCardsIntro();
+		this.clearModeCardInlineVars();
+		this.root.classList.remove("main-menu--cards-intro");
+		void this.root.offsetWidth;
+		this.root.classList.add("main-menu--cards-intro");
+		this.cardsIntroTimer = window.setTimeout(() => {
+			this.root.classList.remove("main-menu--cards-intro");
+			this.cardsIntroTimer = null;
+			this.syncModeCardVariables();
+			const activeCard = this.root.querySelector<HTMLButtonElement>(
+				".mode-card.active",
+			);
+			if (activeCard) {
+				this.playCardSpin(activeCard);
+				this.lastSpinAt = performance.now();
+				this.lastSpunMode = this.selected;
+			}
+		}, 780);
+	}
+
+	private playCardSpin(card: HTMLButtonElement): void {
+		if (card.classList.contains("mode-card--spin")) return;
+		this.clearSpinCommit();
+		const mode = card.dataset.mode as GameModeId | undefined;
+		this.audio?.playMenuSpin(mode ? MODE_ACCENT[mode] : undefined);
+		card.classList.remove("mode-card--spin");
+		void card.offsetWidth;
+		card.classList.add("mode-card--spin");
+		const onEnd = (event: Event) => {
+			const anim = event as AnimationEvent;
+			if (
+				anim.animationName !== "menu-plate-spin" &&
+				anim.animationName !== "apex-card-spin-outer"
+			) {
+				return;
+			}
+			card.classList.remove("mode-card--spin");
+			card.removeEventListener("animationend", onEnd);
+		};
+		card.addEventListener("animationend", onEnd);
+	}
+
+	private stopCardsIntro(): void {
+		if (this.cardsIntroTimer !== null) {
+			window.clearTimeout(this.cardsIntroTimer);
+			this.cardsIntroTimer = null;
+		}
+		this.root.classList.remove("main-menu--cards-intro");
+	}
+
+	private ensureCardVisible(
+		card: HTMLButtonElement,
+		behavior: ScrollBehavior = "smooth",
+	): void {
+		const scroller =
+			card.closest<HTMLElement>(".modes-list__cards") ??
+			card.closest<HTMLElement>("#mode-grid") ??
+			card.parentElement;
+		if (!scroller) return;
+
+		const scrollerRect = scroller.getBoundingClientRect();
+		const cardRect = card.getBoundingClientRect();
+		const margin = 20;
+		const outOfView =
+			cardRect.left < scrollerRect.left + margin ||
+			cardRect.right > scrollerRect.right - margin ||
+			cardRect.top < scrollerRect.top + margin ||
+			cardRect.bottom > scrollerRect.bottom - margin;
+		if (outOfView) {
+			card.scrollIntoView({
+				behavior,
+				block: "nearest",
+				inline: "nearest",
+			});
+		}
+	}
+
+	private applyMenuLocale(): void {
+		applyStaticI18n(this.root);
+		this.syncDeckToggleLabel();
+		this.syncTicker();
+		for (const id of this.deckOrder()) {
+			const card = this.root.querySelector<HTMLButtonElement>(
+				`[data-mode="${id}"]`,
+			);
+			if (!card) continue;
+			const spec = getLocalizedModeSpec(id);
+			const title = card.querySelector(".mode-card__title");
+			if (title) title.textContent = spec.label;
+			const desc = card.querySelector(".mode-card__desc, .mode-card__mutator");
+			if (desc) {
+				if (getModePolicy(id).features.weeklyMutator) {
+					const m = getWeeklyMutator();
+					desc.className = "mode-card__mutator";
+					desc.textContent = t("menu.playlist.weeklyMutatorLine", {
+						name: t(m.nameKey as never),
+					});
+				} else {
+					desc.className = "mode-card__desc";
+					desc.textContent = spec.description;
+				}
+			}
+			const expBadge = card.querySelector(".mode-card__badge--experimental");
+			if (expBadge) {
+				expBadge.textContent = t("menu.playlist.experimentalBadge");
+			}
+		}
+		this.selectMode(this.selected, false, "never");
+		this.syncModeCardVariables();
+		void this.refreshOnlineCount();
+	}
+
+	private launch(): void {
+		this.audio?.playMenuLaunch();
+		this.root.classList.add("main-menu--exit", "main-menu--launch-flash");
+		window.setTimeout(() => {
+			this.hide();
+			this.onStart(this.selected);
+		}, 520);
+	}
+
+	private bindKeyboard(): void {
+		this.keyHandler = (e: KeyboardEvent) => {
+			if (this.root.classList.contains("hidden")) return;
+			if (this.settings?.isVisible()) return;
+			if (e.key === "g" || e.key === "G") {
+				e.preventDefault();
+				this.onLoadout?.();
+				return;
+			}
+
+			const tag = (e.target as HTMLElement | null)?.tagName;
+			if (tag === "INPUT" || tag === "TEXTAREA") return;
+
+			if (e.key === "Enter") {
+				e.preventDefault();
+				this.launch();
+				return;
+			}
+
+			if (e.key === "s" || e.key === "S") {
+				e.preventDefault();
+				this.settings?.show();
+				return;
+			}
+
+			if (e.key === "o" || e.key === "O") {
+				e.preventDefault();
+				this.onOnline?.();
+				return;
+			}
+
+			if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+				e.preventDefault();
+				this.navigateModeAdjacent(1);
+				return;
+			}
+			if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+				e.preventDefault();
+				this.navigateModeAdjacent(-1);
+				return;
+			}
+
+			const order = this.deckOrder();
+			const num = Number(e.key);
+			if (num >= 1 && num <= order.length) {
+				e.preventDefault();
+				this.selectMode(order[num - 1]!, true, "always");
+			}
+		};
+
+		window.addEventListener("keydown", this.keyHandler);
+	}
+
+	private req<T extends HTMLElement = HTMLElement>(selector: string): T {
+		const el = this.root.querySelector<T>(selector);
+		if (!el) throw new Error(`MainMenu: brak ${selector}`);
+		return el;
+	}
+}

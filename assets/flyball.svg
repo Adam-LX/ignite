@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Ignite">
+  <defs>
+    <linearGradient id="field" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1a6b2e"/>
+      <stop offset="100%" stop-color="#0d3d1a"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5a6470"/>
+      <stop offset="55%" stop-color="#2a3038"/>
+      <stop offset="100%" stop-color="#12161c"/>
+    </linearGradient>
+    <linearGradient id="neon" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3dffe8"/>
+      <stop offset="100%" stop-color="#4da8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="24" fill="#0b1424"/>
+  <rect x="8" y="88" width="112" height="32" rx="6" fill="url(#field)"/>
+  <ellipse cx="64" cy="92" rx="28" ry="6" fill="#000" opacity="0.28"/>
+  <g transform="translate(64 58)">
+    <ellipse cx="0" cy="16" rx="34" ry="7" fill="#000" opacity="0.35"/>
+    <path d="M-38 10 L-28 4 L-8 2 L18 2 L34 6 L38 10 L34 14 L18 16 L-8 16 L-28 14 Z" fill="url(#body)" stroke="#1a222c" stroke-width="1.2"/>
+    <path d="M-6 2 L10 2 L14 6 L-2 6 Z" fill="#1e2630"/>
+    <rect x="-10" y="-6" width="22" height="8" rx="2" fill="#243040"/>
+    <path d="M-34 10 L-24 6 L-8 5 L18 5 L32 8" fill="none" stroke="url(#neon)" stroke-width="2.2" stroke-linecap="round"/>
+    <circle cx="-22" cy="14" r="7" fill="#101418" stroke="#2a3540" stroke-width="1.5"/>
+    <circle cx="-22" cy="14" r="4.5" fill="none" stroke="url(#neon)" stroke-width="1.8"/>
+    <circle cx="24" cy="14" r="7" fill="#101418" stroke="#2a3540" stroke-width="1.5"/>
+    <circle cx="24" cy="14" r="4.5" fill="none" stroke="url(#neon)" stroke-width="1.8"/>
+    <path d="M-4 -2 L8 -2 L10 2 L-2 2 Z" fill="rgba(61,255,232,0.35)"/>
+  </g>
+</svg>

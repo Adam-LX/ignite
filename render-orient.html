@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ignite — orient audit</title>
+    <style>
+      html, body { margin: 0; background: #102030; color: #e8f0ff; font: 14px sans-serif; }
+      #grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 8px; }
+      .card { background: #1a2838; border-radius: 8px; overflow: hidden; }
+      .card canvas { display: block; width: 100%; height: auto; background: #0b1424; }
+      .card .label { padding: 6px 8px; }
+      body[data-ready="1"] #status { color: #6dffb0; }
+    </style>
+  </head>
+  <body>
+    <div id="status">loading…</div>
+    <div id="grid"></div>
+    <script type="module" src="/src/tools/renderOrientEntry.ts"></script>
+  </body>
+</html>

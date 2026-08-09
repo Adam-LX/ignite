@@ -1,0 +1,23 @@
+{
+	"grassColor": "/assets/arenas/standard/textures/grass_color.jpg",
+	"grassNormal": "/assets/arenas/standard/textures/grass_normal.jpg",
+	"grassRoughness": "/assets/arenas/standard/textures/grass_roughness.jpg",
+	"wallPanel": "/assets/textures/meshy_arena_wall.png",
+	"bannerPanel": "/assets/arenas/standard/textures/banner_panel.png",
+	"ceilingPanel": "/assets/textures/meshy_arena_ceiling.png",
+	"carModel": "/assets/models/car.glb",
+	"carOrangeModel": "/assets/models/car_orange.glb",
+	"ballAlbedo": "/assets/textures/meshy_ball_albedo.jpg",
+	"ballModel": "/assets/models/ball_meshy.glb",
+	"updatedAt": "2026-08-06T08:00:14.000Z",
+	"bannerBlue": "/assets/arenas/standard/textures/banner_blue.png",
+	"bannerOrange": "/assets/arenas/standard/textures/banner_orange.png",
+	"soccarShell": true,
+	"goalVisual": "soccarShell-tubular",
+	"goalFrame": "/assets/arenas/standard/props/goalFrame.glb",
+	"prop_goalFrame": "/assets/arenas/standard/props/goalFrame.glb",
+	"goalConcept": "/assets/arenas/standard/concepts/goalFrame_front.png",
+	"lighting": "night-film-v2",
+	"goalFrameTrellisOptional": "/assets/arenas/standard/props/goalFrame.glb",
+	"goalNote": "Default: SoccarShell tubes. Trellis via ?trellisGoal=1"
+}
