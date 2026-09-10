@@ -14,7 +14,7 @@
     {
       "id": "flip_hit",
       "pass": true,
-      "detail": "maxHoriz=10.69 flipped=false (want solid shot ≥10)"
+      "detail": "maxHoriz=10.88 flipped=false (want solid shot ≥10)"
     },
     {
       "id": "ground_roll",

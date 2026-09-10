@@ -26,10 +26,10 @@ export const RL_CAR = {
 	/** Skala A/D na klawiaturze (±1 → analog); 1.0 = pełny yaw jak pad. */
 	keyboardYawScale: 1,
 	/** Obrót w miejscu przy niskiej prędkości (rad/s przy pełnym skręcie). */
-	groundTurnInPlace: 2.55,
+	groundTurnInPlace: 2.35,
 	/** Pivot / skręt — mocniejsza redukcja przy piłce (celowanie w hit). */
-	steerNearBallMul: 0.82,
-	steerNearBallRadius: 10,
+	steerNearBallMul: 0.72,
+	steerNearBallRadius: 14,
 	/** Boost tank — RL Soccar: start/respawn 33/100, brak passive regen. */
 	boostDrain: 0.33,
 	/** Spawn / reset kickoff (RL: 33). */
@@ -90,6 +90,8 @@ export const RL_CAR = {
 	 * (≈ rad/s² przy naszym modelu torque = accel * mass).
 	 */
 	yawAngAccel: 9.1,
+	/** Yaw na ziemi — niżej niż air; mniej „snap” przy celowaniu w power shot. */
+	groundYawAccel: 7.2,
 	/** Lekko niżej — KBM W w powietrzu mniej „plantuje” nos (klip Meridian). */
 	pitchAngAccel: 10.8,
 	rollAngAccel: 38.3,
@@ -103,7 +105,7 @@ export const RL_CAR = {
 	landingSpinRetain: 0.82,
 	airReverseAccel: 0.333_34,
 	/** Tarcie boczne — wyżej = mniej rwanej jazdy / nadsteru przy piłce. */
-	lateralGrip: 10.2,
+	lateralGrip: 11.4,
 	/** Powerslide — słabsze trzymanie boku */
 	driftGrip: 1.05,
 	/** Mnożnik yaw przy powerslide (jak w RL — ostry slide turn). */
@@ -190,16 +192,16 @@ export const RL_BALL = {
 	maxSpinRad: Math.PI * 2,
 	minHitSpeed: 0.25,
 	/** Soft dribble / rolling — rejestruj wolne kontakty (smish feel). */
-	minApproachSpeed: 0.55,
+	minApproachSpeed: 0.45,
 	/** Psyonix extra impulse — RocketSim / smish ball_simulation_3. */
 	psyonixVertScale: 0.35,
-	psyonixForwardRetain: 0.68,
+	psyonixForwardRetain: 0.72,
 	psyonixMaxRelSpeedUu: 4600,
-	extraForceScale: 1.0,
+	extraForceScale: 1.1,
 	/** Soft touch: poniżej tego |Δv| (uu/s) tłumi extraForce (dribble). */
-	softTouchSpeedUu: 900,
-	softTouchScaleMin: 0.45,
-	boostHitMul: 1.06,
+	softTouchSpeedUu: 1100,
+	softTouchScaleMin: 0.52,
+	boostHitMul: 1.1,
 	flipHitMul: 1.28,
 	/** Loft z geometrii: piłka poniżej środka auta (rząd „dół” hitboxa). */
 	groundLoftFromBelow: 0.34,

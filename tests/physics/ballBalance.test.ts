@@ -215,7 +215,7 @@ describe("Balans piłki", () => {
 
 		const v = ball.rapierRigidBody.linvel();
 		const horiz = Math.hypot(v.x, v.z);
-		expect(horiz).toBeGreaterThan(8);
+		expect(horiz).toBeGreaterThan(9);
 		expect(Math.abs(v.y)).toBeLessThan(8);
 		expect(horiz).toBeLessThan(RL_BALL.maxSpeed);
 	});

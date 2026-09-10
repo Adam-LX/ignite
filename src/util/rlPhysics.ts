@@ -109,11 +109,11 @@ export function rlAirThrottleAccelUu(throttle: number): number {
 
 /** Krzywa siły dodatkowego impulsu Psyonix (RocketSim / smish ball_simulation_3). */
 const BALL_CAR_EXTRA_IMPULSE_CURVE: ReadonlyArray<readonly [number, number]> = [
-	[0, 0.55],
-	[400, 0.58],
-	[750, 0.65],
-	[2300, 0.55],
-	[4600, 0.3],
+	[0, 0.58],
+	[400, 0.62],
+	[750, 0.7],
+	[2300, 0.58],
+	[4600, 0.32],
 ];
 
 export function rlPiecewiseLinear(

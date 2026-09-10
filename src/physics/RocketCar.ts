@@ -1520,7 +1520,7 @@ class RocketCar extends GameObject {
 			const target =
 				rlTargetYawRate(mpsToUu(speedFwd), this.lastYaw) * steerScale;
 			const maxDelta =
-				RL_CAR.yawAngAccel * dt * (1 + 0.35 * this.driftBlend);
+				RL_CAR.groundYawAccel * dt * (1 + 0.35 * this.driftBlend);
 			const newYaw =
 				surfaceYaw +
 				THREE.MathUtils.clamp(target - surfaceYaw, -maxDelta, maxDelta);

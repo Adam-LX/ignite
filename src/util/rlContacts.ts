@@ -379,7 +379,7 @@ export function applyCarBallHits(
 			factor *= THREE.MathUtils.lerp(RL_BALL.softTouchScaleMin, 1, t);
 		}
 		/** Domknij skalę do closing — unikaj „rakiety” przy lekkim tapnięciu. */
-		factor *= THREE.MathUtils.clamp(closing / 5.5, 0.35, 1);
+		factor *= THREE.MathUtils.clamp(closing / 6.0, 0.42, 1);
 		if (isMeridianArenaActive()) factor *= 1.95;
 		if (player.isBoosting()) factor *= RL_BALL.boostHitMul;
 		if (player.isFlipping()) factor *= RL_BALL.flipHitMul;
@@ -420,7 +420,7 @@ export function applyCarBallHits(
 		clampLinvel(player.rapierRigidBody, MAX_CAR_SPEED);
 
 		if (addedSpeed > 6) {
-			const push = Math.min(0.12, addedSpeed * 0.01);
+			const push = Math.min(0.15, addedSpeed * 0.012);
 			ballBody.setTranslation(
 				{
 					x: ballPos.x + _hitDir.x * push,
