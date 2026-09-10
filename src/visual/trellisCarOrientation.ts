@@ -107,38 +107,133 @@ export function scoreUndercarriageDown(root: THREE.Object3D): number {
 	return bottomDown - topDown * 1.35;
 }
 
+const _noseSample = new THREE.Vector3();
+const PITCH_UPRIGHT_CANDIDATES = [-Math.PI / 2, Math.PI / 2] as const;
+const YAW_UPRIGHT_CANDIDATES = [0, Math.PI / 2, Math.PI, (3 * Math.PI) / 2] as const;
+
+/**
+ * Tył auta = wyższy maxY / więcej masy w górnym paśmie (kabina, spoiler).
+ * Ocena końca karoserii wzdłuż osi X lub Z.
+ */
+export function meshyRearEndScore(
+	root: THREE.Object3D,
+	axis: "x" | "z",
+	sign: 1 | -1,
+): number {
+	const body = root.getObjectByName("body");
+	if (!(body instanceof THREE.Mesh) || !body.geometry?.attributes.position) {
+		return 0;
+	}
+	body.updateMatrixWorld(true);
+	root.updateMatrixWorld(true);
+	const box = new THREE.Box3().setFromObject(body);
+	const len =
+		axis === "z" ? box.max.z - box.min.z : box.max.x - box.min.x;
+	const h = box.max.y - box.min.y;
+	if (len < 1e-4 || h < 1e-4) return 0;
+
+	const center =
+		axis === "z"
+			? (box.min.z + box.max.z) * 0.5
+			: (box.min.x + box.max.x) * 0.5;
+	const band = len * 0.2;
+	const yHigh = box.min.y + h * 0.62;
+	const pos = body.geometry.attributes.position;
+
+	const target = center + sign * len * 0.4;
+	let n = 0;
+	let maxY = -Infinity;
+	let highN = 0;
+	for (let i = 0; i < pos.count; i++) {
+		_noseSample.fromBufferAttribute(pos, i).applyMatrix4(body.matrixWorld);
+		const coord = axis === "z" ? _noseSample.z : _noseSample.x;
+		if (Math.abs(coord - target) > band) continue;
+		n += 1;
+		maxY = Math.max(maxY, _noseSample.y);
+		if (_noseSample.y >= yHigh) highN += 1;
+	}
+	if (n < 24) return 0;
+	return maxY + (highN / n) * h * 0.85;
+}
+
+/** Ocena układu płaskiego: długość na Z, tył na −Z (nie ±X). */
+function gradeShowcaseFlatOrientation(
+	root: THREE.Object3D,
+	invertUndercarriage: boolean,
+): number {
+	const body = root.getObjectByName("body");
+	if (!(body instanceof THREE.Mesh)) return -Infinity;
+	const size = new THREE.Box3().setFromObject(body).getSize(new THREE.Vector3());
+	const h = size.y;
+	let grade = 0;
+
+	const under = scoreUndercarriageDown(root);
+	grade += (invertUndercarriage ? -under : under) * 0.08;
+
+	if (size.z > size.x * 1.05) grade += 50;
+	else if (size.x > size.z * 1.05) grade -= 35;
+
+	const zBest = Math.max(
+		meshyRearEndScore(root, "z", 1),
+		meshyRearEndScore(root, "z", -1),
+	);
+	const xBest = Math.max(
+		meshyRearEndScore(root, "x", 1),
+		meshyRearEndScore(root, "x", -1),
+	);
+	if (zBest > xBest + h * 0.006) grade += 40;
+	else if (xBest > zBest + h * 0.006) grade -= 45;
+
+	const zNeg = meshyRearEndScore(root, "z", -1);
+	const zPos = meshyRearEndScore(root, "z", 1);
+	if (zNeg > zPos + h * 0.004) grade += 15;
+
+	return grade;
+}
+
+/** pitch [rad] + dodatkowy yaw [rad] na bazie gałęzi Y-pitch. */
+const FORCE_PITCH_YAW: Record<string, { pitch: number; yaw: number }> = {};
+
 function pickPitchUpright(
 	root: THREE.Object3D,
-	/** Gdy heurystyka myli dach z podłogą — bierz niższy score. */
+	/** Gdy heurystyka myli dach z podłogą — bierz niższy score podwozia. */
 	invertScore = false,
+	carId?: string | null,
 ): void {
+	if (carId && FORCE_PITCH_YAW[carId]) {
+		const { pitch, yaw } = FORCE_PITCH_YAW[carId]!;
+		root.rotation.order = "XYZ";
+		root.rotation.x = pitch;
+		root.rotation.y = root.rotation.y + yaw;
+		root.updateMatrixWorld(true);
+		return;
+	}
 	root.rotation.order = "XYZ";
+	const baseY = root.rotation.y;
+	const baseZ = root.rotation.z;
 
-	root.rotation.x = -Math.PI / 2;
-	root.updateMatrixWorld(true);
-	const scoreNeg = scoreUndercarriageDown(root);
-	const hubsNeg = averageHubRelativeY(root);
-	const densNeg = countMeshVerticesInYBands(root);
+	let bestGrade = -Infinity;
+	let bestPitch = -Math.PI / 2;
+	let bestYawOff = 0;
 
-	root.rotation.x = Math.PI / 2;
-	root.updateMatrixWorld(true);
-	const scorePos = scoreUndercarriageDown(root);
-	const hubsPos = averageHubRelativeY(root);
-	const densPos = countMeshVerticesInYBands(root);
-
-	let pickPos = invertScore ? scorePos < scoreNeg : scorePos > scoreNeg;
-	if (Math.abs(scorePos - scoreNeg) < 1e-5) {
-		if (densPos.lower !== densNeg.lower) {
-			/** Domyślnie gęstszy dół = podwozie; invert = gęstszy góra (kabina). */
-			pickPos = invertScore
-				? densPos.lower < densNeg.lower
-				: densPos.lower > densNeg.lower;
-		} else if (hubsPos != null && hubsNeg != null) {
-			pickPos = invertScore ? hubsPos < hubsNeg : hubsPos > hubsNeg;
+	for (const pitch of PITCH_UPRIGHT_CANDIDATES) {
+		for (const yawOff of YAW_UPRIGHT_CANDIDATES) {
+			root.rotation.x = pitch;
+			root.rotation.y = baseY + yawOff;
+			root.rotation.z = baseZ;
+			root.updateMatrixWorld(true);
+			const grade = gradeShowcaseFlatOrientation(root, invertScore);
+			if (grade > bestGrade) {
+				bestGrade = grade;
+				bestPitch = pitch;
+				bestYawOff = yawOff;
+			}
 		}
 	}
 
-	root.rotation.x = pickPos ? Math.PI / 2 : -Math.PI / 2;
+	root.rotation.x = bestPitch;
+	root.rotation.y = baseY + bestYawOff;
+	root.rotation.z = baseZ;
 	root.updateMatrixWorld(true);
 }
 
@@ -151,8 +246,8 @@ const INVERT_UNDERCARRIAGE_SCORE = new Set([
 	"buggy",
 ]);
 
-/** blade/phantom: po auto +180° X. */
-const FORCE_FLIP_AFTER_AXES = new Set(["blade", "phantom"]);
+/** blade: po auto +180° X (phantom — pickPitch+yaw wystarcza). */
+const FORCE_FLIP_AFTER_AXES = new Set(["blade"]);
 
 const FORCE_PITCH: Record<string, number> = {};
 const FORCE_ROLL: Record<string, number> = {};
@@ -177,7 +272,7 @@ export function ensureMeshyGltfAxes(
 			root.updateMatrixWorld(true);
 		}
 	} else if (size.y >= size.x && size.y >= size.z) {
-		pickPitchUpright(root, invert);
+		pickPitchUpright(root, invert, carId);
 		if (carId && FORCE_ROLL[carId] != null) {
 			root.rotation.z += FORCE_ROLL[carId]!;
 			root.updateMatrixWorld(true);
@@ -186,7 +281,7 @@ export function ensureMeshyGltfAxes(
 		root.rotation.order = "XYZ";
 		root.rotation.y += Math.PI / 2;
 		root.updateMatrixWorld(true);
-		pickPitchUpright(root, invert);
+		pickPitchUpright(root, invert, carId);
 	}
 
 	/** Twarde override’y — po WSZYSTKICH gałęziach (flat też). */
@@ -304,8 +399,6 @@ export function ensureBodyNormalsOutward(root: THREE.Object3D): void {
 	}
 }
 
-const _noseSample = new THREE.Vector3();
-
 /**
  * Tył auta = wyższy maxY / więcej masy w górnym paśmie (kabina, spoiler).
  * Zwraca true gdy ten tył leży od strony +Z (trzeba obrócić yaw o 180°).
@@ -316,36 +409,13 @@ export function meshyRearTowardPlusZ(root: THREE.Object3D): boolean {
 		return false;
 	}
 	body.updateMatrixWorld(true);
-	root.updateMatrixWorld(true);
 	const box = new THREE.Box3().setFromObject(body);
-	const len = box.max.z - box.min.z;
 	const h = box.max.y - box.min.y;
-	if (len < 1e-4 || h < 1e-4) return false;
+	if (h < 1e-4) return false;
 
-	const cz = (box.min.z + box.max.z) * 0.5;
-	const band = len * 0.2;
-	const yHigh = box.min.y + h * 0.62;
-	const pos = body.geometry.attributes.position;
-
-	const score = (sign: 1 | -1): number => {
-		const zTarget = cz + sign * len * 0.4;
-		let n = 0;
-		let maxY = -Infinity;
-		let highN = 0;
-		for (let i = 0; i < pos.count; i++) {
-			_noseSample
-				.fromBufferAttribute(pos, i)
-				.applyMatrix4(body.matrixWorld);
-			if (Math.abs(_noseSample.z - zTarget) > band) continue;
-			n += 1;
-			maxY = Math.max(maxY, _noseSample.y);
-			if (_noseSample.y >= yHigh) highN += 1;
-		}
-		if (n < 24) return 0;
-		return maxY + (highN / n) * h * 0.85;
-	};
-
-	return score(1) > score(-1) + h * 0.02;
+	const scorePos = meshyRearEndScore(root, "z", 1);
+	const scoreNeg = meshyRearEndScore(root, "z", -1);
+	return scorePos > scoreNeg + h * 0.02;
 }
 
 /**

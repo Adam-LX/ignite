@@ -5,7 +5,9 @@ import {
 	averageHubRelativeY,
 	bodyMassSkewInverted,
 	ensureMeshyGltfAxes,
+	ensureMeshyCarNosePlusZ,
 	ensureTrellisCarUpright,
+	meshyRearEndScore,
 	meshyRearTowardPlusZ,
 	scoreUndercarriageDown,
 } from "../../src/visual/trellisCarOrientation";
@@ -117,6 +119,19 @@ describe("trellisCarOrientation", () => {
 		expect(worldBox.min.y).toBeCloseTo(afterPitch.min.y, 3);
 		expect(worldBox.max.y).toBeCloseTo(afterPitch.max.y, 3);
 		void averageHubRelativeY;
+	});
+
+	it("ensureMeshyGltfAxes kładzie Y-long Trellis z tyłem na Z (nie ±X)", () => {
+		const car = makeTrellisLikeCar();
+		ensureMeshyGltfAxes(car, "bruiser");
+		ensureMeshyCarNosePlusZ(car);
+		car.updateMatrixWorld(true);
+		const body = car.getObjectByName("body")!;
+		const size = new THREE.Box3().setFromObject(body).getSize(new THREE.Vector3());
+		expect(size.z).toBeGreaterThan(size.x * 1.05);
+		expect(meshyRearEndScore(car, "z", -1)).toBeGreaterThan(
+			meshyRearEndScore(car, "x", 1) - 0.05,
+		);
 	});
 
 	it("meshyRearTowardPlusZ wykrywa wyższy tył na +Z", () => {
