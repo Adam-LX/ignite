@@ -6,7 +6,6 @@ const TIP_KEYS: I18nKey[] = [
 	"tip.field.overcharge",
 	"tip.field.lab",
 	"tip.camera.ballCam",
-	"tip.replay.skip",
 	"tip.body.traits",
 ];
 

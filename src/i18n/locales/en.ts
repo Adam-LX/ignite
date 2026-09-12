@@ -34,7 +34,7 @@ export const en: Record<keyof typeof pl, string> = {
 	"hud.goalBlue": "GOAL — BLUE!",
 	"hud.goalOrange": "GOAL — ORANGE!",
 	"hud.goalPlayer": "GOAL — {name}!",
-	"hud.replay": "REPLAY · RMB skip",
+	"hud.replay": "REPLAY",
 	"hud.overtime": "OVERTIME",
 	"hud.rematch": "REMATCH · R",
 	"hud.rematchWait": "Waiting for rematch…",
@@ -668,14 +668,13 @@ export const en: Record<keyof typeof pl, string> = {
 		"After 3…2…1…GO drive diagonally to the ball. First touch wins the race.",
 	"tutorial.replay.title": "Goal replay",
 	"tutorial.replay.body":
-		"After a goal you get a replay. Hold jump to skip and get back to the match.",
+		"After a goal, watch a short replay of the shot before play resumes.",
 
 	"tip.field.rush": "Field Energy: Rush every ~90s — ball and boost speed up.",
 	"tip.field.zones": "Drive into a zone — Low Grav or Magnet changes the feel for a few seconds.",
 	"tip.field.overcharge": "Saves, dribbles, and demos charge team Overcharge.",
 	"tip.field.lab": "Weekly Lab = Field Energy + this week's mutator. Check the menu card.",
 	"tip.camera.ballCam": "Space (pad: B) — Ball Cam ↔ Free Cam. Ball Cam keeps the ball framed.",
-	"tip.replay.skip": "After a goal: hold jump to skip the replay.",
 	"tip.body.traits": "In Field Energy modes, body style (wide/low/hatch/tall) changes the feel.",
 	"garage.bodyTrait": "Style: {style} — affects feel in Field Energy",
 };

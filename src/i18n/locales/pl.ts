@@ -32,7 +32,7 @@ export const pl = {
 	"hud.goalBlue": "GOAL — BLUE!",
 	"hud.goalOrange": "GOAL — ORANGE!",
 	"hud.goalPlayer": "GOAL — {name}!",
-	"hud.replay": "REPLAY · PPM pomija",
+	"hud.replay": "REPLAY",
 	"hud.overtime": "DOGRYWKA",
 	"hud.rematch": "REWANŻ · R",
 	"hud.rematchWait": "Oczekiwanie na rewanż…",
@@ -666,14 +666,13 @@ export const pl = {
 		"Po 3…2…1…GO jedź po skosie do piłki. Pierwszy kontakt wygrywa wyścig.",
 	"tutorial.replay.title": "Replay gola",
 	"tutorial.replay.body":
-		"Po golu leci replay. Przytrzymaj skok, by pominąć i wrócić do meczu.",
+		"Po golu obejrzyj krótki replay strzału, zanim gra wróci do akcji.",
 
 	"tip.field.rush": "Field Energy: co ~90 s Rush — piłka i boost przyspieszają.",
 	"tip.field.zones": "Wjedź w strefę — Low Grav lub Magnet zmieniają feel na kilka sekund.",
 	"tip.field.overcharge": "Save, dribble i demo ładują Overcharge drużyny.",
 	"tip.field.lab": "Weekly Lab = Field Energy + mutator tygodnia. Sprawdź kartę w menu.",
 	"tip.camera.ballCam": "Spacja (pad: B) — Ball Cam ↔ Free Cam. Ball Cam trzyma piłkę w kadrze.",
-	"tip.replay.skip": "Po golu: przytrzymaj skok, by pominąć replay.",
 	"tip.body.traits": "W trybach Field Energy styl karoserii (wide/low/hatch/tall) wpływa na feel.",
 	"garage.bodyTrait": "Styl: {style} — wpływa na feel w Field Energy",
 } as const;
