@@ -1,0 +1,3372 @@
+import RAPIER from "@dimforge/rapier3d-compat";
+import * as THREE from "three";
+import {
+	HOVER_DEBUG_RAYS,
+	HOVER_FORCE_MAX,
+	HOVER_SAFE_MODE,
+	HOVER_TELEMETRY_EVERY_STEPS,
+} from "../debug/config";
+import GameObject from "../GameObject";
+import type Scene from "../Scene";
+import type { RigidBodyData } from "../types";
+import type { ControlInput } from "../util/ControlInput";
+import { RL_BALL, RL_CAR, RL_HOVER, WORLD_GRAVITY } from "../util/rlConstants";
+import {
+	carHorizontalForwardFromQuat,
+	carHorizontalRightFromForward,
+	clampSpeedMps,
+	mpsToUu,
+	rlAirBoostAccelUu,
+	rlAirThrottleAccelUu,
+	rlDodgeDirection,
+	rlDodgeImpulseComponentsMps,
+	rlFlipCancelPitchScale,
+	rlGroundDriveAccelUu,
+	rlTargetYawRate,
+	uuAccelToMps2,
+} from "../util/rlPhysics";
+import {
+	SimulatedControlInput,
+	type SimulatedInput,
+} from "../util/SimulatedInput";
+import {
+	getTraitsForBodyStyle,
+	type CarBodyTraits,
+	pivotDodgeDeadzone,
+} from "../meta/carBodyTraits";
+import {
+	getMeridianSphere,
+	isMeridianArenaActive,
+	meridianSurfaceNormalAt,
+} from "../visual/meridianArena";
+import { PLAYFIELD_SURFACE_Y, RL_ARENA } from "../visual/arenaConstants";
+import { hoverRayColliderPredicate } from "./hoverRayFilter";
+import {
+	type SuspensionRayDebug,
+	SuspensionVisualizer,
+} from "./SuspensionVisualizer";
+
+/** Opróżnia kolejkę edge’ów skoku (GameInput / Mock) — po liftoff bez bounce→flip. */
+function drainJumpEdges(input: ControlInput): void {
+	const clear = (input as { clearJumpEdges?: () => void }).clearJumpEdges;
+	if (typeof clear === "function") clear.call(input);
+}
+
+const _rayDebugScratch: SuspensionRayDebug[] = [
+	{ origin: new THREE.Vector3(), end: new THREE.Vector3(), hit: false },
+	{ origin: new THREE.Vector3(), end: new THREE.Vector3(), hit: false },
+	{ origin: new THREE.Vector3(), end: new THREE.Vector3(), hit: false },
+	{ origin: new THREE.Vector3(), end: new THREE.Vector3(), hit: false },
+];
+
+type WheelHit = {
+	hit: boolean;
+	/** Koło w zasięgu raycasta (do podglądu / telemetrii). */
+	inRange: boolean;
+	/** Sprężyna faktycznie ściśnięta — prawdziwy kontakt z podłożem. */
+	compressing: boolean;
+	distance: number;
+	normal: THREE.Vector3;
+	point: THREE.Vector3;
+};
+
+/** Max prędkość zbliżania do podłoża (m/s) — powyżej = jeszcze w locie (nie „na ziemi”). */
+const GROUND_APPROACH_MAX_MPS = 1.75;
+
+const CORNER_LOCAL = [
+	new THREE.Vector3(RL_CAR.hitboxHalfX * 0.92, 0, RL_CAR.hitboxHalfZ * 0.92),
+	new THREE.Vector3(-RL_CAR.hitboxHalfX * 0.92, 0, RL_CAR.hitboxHalfZ * 0.92),
+	new THREE.Vector3(RL_CAR.hitboxHalfX * 0.92, 0, -RL_CAR.hitboxHalfZ * 0.92),
+	new THREE.Vector3(-RL_CAR.hitboxHalfX * 0.92, 0, -RL_CAR.hitboxHalfZ * 0.92),
+];
+
+/**
+ * Rocket League–style raycast hovercar: jeden box + 4 sprężyny raycast.
+ * Zastępuje stary Player (Wheel/Collider drive).
+ */
+class RocketCar extends GameObject {
+	boostFuel: number = RL_CAR.boostSpawn;
+	/** Rush / Overcharge — mnożniki ustawiane z GameSession. */
+	boostRegenMul = 1;
+	boostForceMul = 1;
+	/** Ignition Zone Low Grav — 1 = normalna grawitacja. */
+	gravityScale = 1;
+	/** Experimental bodyStyle hooks (v0.8) — wyłączone w Core. */
+	bodyTraitsEnabled = false;
+	bodyTraits: CarBodyTraits = getTraitsForBodyStyle("standard");
+
+	readonly visualRoot: THREE.Object3D;
+	readonly recoveryPos = new THREE.Vector3();
+
+	private isGrounded = false;
+	private wheelsGrounded = 0;
+	private wheelsCompressing = 0;
+	private canSecondJump = true;
+	private jumpCount = 0;
+	private jumpHoldLeft = 0;
+	/** Czas trwania hold od startu skoku (RocketSim jumpTime). */
+	private jumpHoldElapsed = 0;
+	/** Odliczanie okna dodge — startuje po zakończeniu jump hold (RL: 1.25–1.45 s). */
+	private dodgeWindowAge = 0;
+	/** RL: 2. skok dopiero po puszczeniu PPM — anty bounce-flip (klip 00-33). */
+	private airJumpArmed = false;
+	private flipActive = false;
+	private flipTimer = 0;
+	private flipElapsed = 0;
+	/** Skumulowany kąt spinu dodge (rad) — RL dokręca ~2π, nie half-flip. */
+	private flipAngleAccum = 0;
+	private flipGravityOffLeft = 0;
+	private flipPitchRateMul = 1;
+	private flipPitchLockLeft = 0;
+	private neutralJumpLockLeft = 0;
+	private jumpStickyLeft = 0;
+	private wasGroundedLastFrame = false;
+	private groundedReleaseLeft = 0;
+	private landingPulse = 0;
+	/** Jednorazowy impuls SFX po liftoff (1. skok). */
+	private jumpSfxPulse = 0;
+	/** 1 = dodge/flip, 2 = double jump — SFX po 2. skoku. */
+	private aerialSfxPulse = 0;
+	private jumpCooldown = 0;
+	private disableSuspensionTimer = 0;
+	private recoveryCooldown = 0;
+	/** Czas w „stójce na zderzaku” na płaskim — auto-odklejenie (klip F9). */
+	private verticalStandTimer = 0;
+	private turtleStandTimer = 0;
+	private wallContactLeft = 0;
+	private wallProbeActive = false;
+	private wasOnWallLastFrame = false;
+	/** Po skoku ze ściany — bez stick/sep-damp, żeby jump działał. */
+	private wallJumpDetachLeft = 0;
+	private flipImpulseTicksLeft = 0;
+	private flipImpulseFwdPerTick = 0;
+	private flipImpulseSidePerTick = 0;
+	/** Zamrożone osie świata na starcie dodge (car-local → world). */
+	private readonly _flipAxisPitch = new THREE.Vector3();
+	private readonly _flipAxisRoll = new THREE.Vector3();
+	/**
+	 * Ostatni stabilny poziom „przód” (|fwd.y| mały) —
+	 * yaw z quata odwraca się po |pitch|>90° (wolny 2×PPM+W).
+	 */
+	private readonly _stableFlatFwd = new THREE.Vector3(0, 0, 1);
+	/** Kinematyczna orientacja dodge — Rapier kontakty nie mogą skosić salta. */
+	private readonly _flipQuat = new THREE.Quaternion();
+	/** RocketSim flipRelTorque (x=roll, y=pitch) przed skalą FLIP_TORQUE_*. */
+	private flipRelX = 0;
+	private flipRelY = 0;
+	/** Flip reset — dwell kontaktu kół z piłką. */
+	private flipResetDwell = 0;
+	private flipResetCooldown = 0;
+	private flipResetPulse = false;
+	/** Scratch: wektor car→ball przy flip reset. */
+	private readonly _ballRel = new THREE.Vector3();
+	/** Demolish: czas do respawnu; >0 = poza grą. */
+	private demolishLeft = 0;
+	/** Po respawnie — krótka niewrażliwość. */
+	private demolishSpawnInvulnLeft = 0;
+
+	private boosting = false;
+	private readonly surfaceNormal = new THREE.Vector3(0, 1, 0);
+
+	private lastThrottle = 0;
+	private lastYaw = 0;
+	private lastRoll = 0;
+	private lastBoosting = false;
+	private lastDrifting = false;
+	/** Wiek od świeżego wciśnięcia throttle/yaw (aerial vs dodge). */
+	private throttleFreshAge = 999;
+	private yawFreshAge = 999;
+	private prevThrottleAbs = 0;
+	private prevYawAbs = 0;
+	/** 0 = pełny grip, 1 = pełny powerslide — soft exit po puszczeniu Shift. */
+	private driftBlend = 0;
+	private ballSteerMul = 1;
+
+	private readonly _wheelHits: WheelHit[] = CORNER_LOCAL.map(() => ({
+		hit: false,
+		inRange: false,
+		compressing: false,
+		distance: RL_HOVER.suspensionMaxLength,
+		normal: new THREE.Vector3(0, 1, 0),
+		point: new THREE.Vector3(),
+	}));
+	private readonly _cornerWorld = new THREE.Vector3();
+	private readonly _rayDir = new THREE.Vector3();
+	private readonly _flipImpulseFwdDir = new THREE.Vector3();
+	private readonly _flipImpulseSideDir = new THREE.Vector3();
+	private readonly _force = new THREE.Vector3();
+	private readonly _vel = new THREE.Vector3();
+	private readonly _velAt = new THREE.Vector3();
+	private readonly _fwd = new THREE.Vector3();
+	private readonly _right = new THREE.Vector3();
+	private readonly _up = new THREE.Vector3();
+	private readonly _tmp = new THREE.Vector3();
+	private readonly _quat = new THREE.Quaternion();
+	private readonly _tmpQ = new THREE.Quaternion();
+	private readonly _alignMat = new THREE.Matrix4();
+	private readonly _carUp = new THREE.Vector3();
+
+	private suspensionViz: SuspensionVisualizer | null = null;
+	private physicsStepCounter = 0;
+	private lastSuspensionForceMag = 0;
+	private groundDriveLinvel: { x: number; y: number; z: number } | null = null;
+	private frameDriveDtAcc = 0;
+
+	constructor(scene: Scene, mesh: THREE.Mesh) {
+		const correctedMesh = new THREE.Object3D();
+		correctedMesh.add(mesh);
+
+		const colliderData: RigidBodyData = {
+			colliderDesc: RAPIER.ColliderDesc.cuboid(
+				RL_CAR.hitboxHalfX,
+				RL_CAR.hitboxHalfY,
+				RL_CAR.hitboxHalfZ,
+			)
+				.setMass(RL_CAR.mass)
+				/** Blisko CARWORLD; pełne 0.3 bounce psuje lądowanie / flip przy murawie. */
+				.setFriction(0.3)
+				.setRestitution(0.1)
+				.setActiveEvents(RAPIER.ActiveEvents.CONTACT_FORCE_EVENTS)
+				.setContactForceEventThreshold(8),
+			rigidBodyDesc: RAPIER.RigidBodyDesc.dynamic()
+				.setLinearDamping(RL_CAR.linearDamp)
+				.setAngularDamping(RL_CAR.angularDamp)
+				.setCcdEnabled(true),
+		};
+
+		super(scene, correctedMesh as THREE.Mesh, colliderData);
+		this.visualRoot = mesh;
+		if (HOVER_DEBUG_RAYS) {
+			this.suspensionViz = new SuspensionVisualizer(scene.threeJSScene);
+		}
+		this.threeJSGroup.frustumCulled = false;
+		this.threeJSGroup.traverse((obj) => {
+			obj.frustumCulled = false;
+			obj.visible = true;
+			if (obj instanceof THREE.Mesh) {
+				obj.castShadow = true;
+				obj.receiveShadow = true;
+				obj.geometry?.computeBoundingSphere();
+			}
+		});
+	}
+
+	/** Włącz / wyłącz body traits z `modePolicy.features.bodyTraits`. */
+	setBodyTraits(traits: CarBodyTraits, enabled: boolean): void {
+		this.bodyTraits = traits;
+		this.bodyTraitsEnabled = enabled;
+	}
+
+	control(input: ControlInput, dt: number): void {
+		if (this.demolishLeft > 0) return;
+		this.lastThrottle = input.forward();
+		this.lastYaw = input.yaw();
+		this.lastRoll = HOVER_SAFE_MODE ? 0 : input.roll();
+		this.lastBoosting = HOVER_SAFE_MODE
+			? false
+			: input.isBoosting() && this.boostFuel > 0;
+		this.lastDrifting = HOVER_SAFE_MODE ? false : input.isShiftDown();
+		this.boosting = this.lastBoosting;
+
+		const thrAbs = Math.abs(this.lastThrottle);
+		const yawAbs = Math.abs(this.lastYaw);
+		if (thrAbs >= 0.2 && this.prevThrottleAbs < 0.2) this.throttleFreshAge = 0;
+		else this.throttleFreshAge += dt;
+		if (yawAbs >= 0.2 && this.prevYawAbs < 0.2) this.yawFreshAge = 0;
+		else this.yawFreshAge += dt;
+		this.prevThrottleAbs = thrAbs;
+		this.prevYawAbs = yawAbs;
+
+		/** Wejście w slide: natychmiast. Wyjście: soft blend (anty-tank snap). */
+		if (this.lastDrifting) {
+			this.driftBlend = 1;
+		} else if (this.driftBlend > 0) {
+			const exitSec = Math.max(1e-3, RL_CAR.gripExitBlendSec);
+			this.driftBlend = THREE.MathUtils.damp(
+				this.driftBlend,
+				0,
+				1 / exitSec,
+				dt,
+			);
+			if (this.driftBlend < 0.02) this.driftBlend = 0;
+		}
+
+		this.jumpCooldown = Math.max(0, this.jumpCooldown - dt);
+		this.wallJumpDetachLeft = Math.max(0, this.wallJumpDetachLeft - dt);
+		this.flipPitchLockLeft = Math.max(0, this.flipPitchLockLeft - dt);
+		this.neutralJumpLockLeft = Math.max(0, this.neutralJumpLockLeft - dt);
+
+		this.recoveryCooldown = Math.max(0, this.recoveryCooldown - dt);
+
+		/** Max 1 edge / klatkę — inaczej bounce PPM + W = jump i flip w dwóch klatkach. */
+		if (input.consumeJump()) {
+			this.processJumpPress(input);
+		}
+
+		if (!HOVER_SAFE_MODE) {
+			if (!this.isGrounded && this.jumpCount === 1) {
+				/** Okno flipa liczy się od lift-off — jump hold nie może blokować dodge (klip 17-09). */
+				this.dodgeWindowAge += dt;
+				if (!input.isJumpHeld()) this.airJumpArmed = true;
+				if (input.isJumpHeld()) {
+					this.applyJumpHold(true, dt);
+					/**
+					 * RL: trzymany jump ≠ 2. skok. W/S przy PPM = air pitch,
+					 * Q/E = air roll. Dodge tylko po nowym edge PPM.
+					 */
+				} else if (this.jumpHoldLeft > 0) {
+					this.jumpHoldLeft = Math.max(0, this.jumpHoldLeft - dt);
+				}
+			}
+			/** Core: brak passive regen. Rush/OC/Lab ustawiają boostRegenMul > 1. */
+			if (!this.lastBoosting && this.boostRegenMul > 1) {
+				const airRatio =
+					RL_CAR.boostRegenGround > 0
+						? RL_CAR.boostRegenAir / RL_CAR.boostRegenGround
+						: 0;
+				const rate = this.isGrounded ? 1 : airRatio;
+				this.boostFuel = Math.min(
+					1,
+					this.boostFuel +
+						dt * RL_CAR.boostRegenGround * rate * this.boostRegenMul,
+				);
+			}
+		}
+
+		this.recoverFromCrash();
+	}
+
+	/** Wejście bota / AI — ten sam pipeline co gracz (ControlInput). */
+	updateInputs(input: SimulatedInput, dt: number): void {
+		this.control(new SimulatedControlInput(input), dt);
+	}
+
+	/** Wywoływane przed każdym krokiem Rapier (120 Hz sub-step). */
+	integrateHover(dt: number, substep = 0, substepCount = 1): void {
+		const isLastSubstep = substep >= substepCount - 1;
+		this.disableSuspensionTimer = Math.max(0, this.disableSuspensionTimer - dt);
+
+		this.castSuspension();
+		this.refreshStableFlatForward();
+		this.updateGroundedState(dt);
+		this.updateWallContactState(dt);
+
+		const meridian = isMeridianArenaActive();
+		const onWall = this.isOnWallOrRamp();
+		/** Turtle / nos w górę na murawie — NIE na ścianie/suficie (tam forward.y≈1 = jazda w górę). */
+		const isVerticalStand =
+			!onWall && Math.abs(this.getForward().y) > 0.85;
+		/**
+		 * Meridian: nie używaj isVerticalStand — przy wkopanym nosie forward.y≈1
+		 * i gate wyłączał align dokładnie wtedy, gdy jest potrzebny.
+		 */
+		const meridianContact =
+			meridian &&
+			this.wheelsGrounded >= 1 &&
+			this.disableSuspensionTimer <= 0;
+		const meridianDrive =
+			!this.flipActive &&
+			meridianContact &&
+			this.isGrounded &&
+			this.wheelsCompressing >= 1;
+		/** Tylko koła w dół — |upY| traktowało żółwia jak stabilną jazdę (klip 06:14). */
+		const stableDrive =
+			!meridian &&
+			!this.flipActive &&
+			this.isGrounded &&
+			this.getUpward().y >= 0.7 &&
+			!isVerticalStand &&
+			!onWall;
+
+		if (meridianContact) {
+			// Każdy substep — podwozie zawsze równolegle do stycznej sfery.
+			this.alignMeridianAttitude(dt, true);
+		}
+
+		if (meridianDrive || stableDrive) {
+			this.syncGroundJumpState();
+			this.applySuspensionForces();
+			if (!HOVER_SAFE_MODE) {
+				if (meridian) {
+					this.applyMeridianSurfaceForces();
+				} else {
+					this.applyWallRideForces();
+				}
+			}
+			this.frameDriveDtAcc += dt;
+			if (isLastSubstep) {
+				this.applyGroundDrive(this.frameDriveDtAcc, meridian);
+				this.frameDriveDtAcc = 0;
+				if (!meridian) {
+					this.lockGroundPitchRoll();
+				}
+			}
+		} else {
+			const canSuspension =
+				this.wheelsGrounded > 0 &&
+				this.disableSuspensionTimer <= 0 &&
+				(this.isGrounded || onWall || meridianContact);
+			/**
+			 * Wall drive: NIE wymagaj isGrounded — przy wjeździe w rampę approach
+			 * często > progu i grounded miga → bez align/drive auto zostaje płaskie i odpada.
+			 */
+			const wallDrive =
+				!meridian &&
+				!this.flipActive &&
+				onWall &&
+				this.canWallDrive(onWall);
+
+			if (onWall && !meridian && this.wheelsGrounded >= 1) {
+				/** Bez gazu/boost — nie twarde align (RL: coast → peel). */
+				if (Math.abs(this.lastThrottle) > 0.12 || this.lastBoosting) {
+					this.alignWallAttitude(dt);
+				}
+			}
+
+			if (wallDrive) {
+				this.syncGroundJumpState();
+				if (canSuspension) {
+					this.applySuspensionForces();
+				}
+				if (!HOVER_SAFE_MODE) {
+					this.applyWallRideForces();
+				}
+				this.frameDriveDtAcc += dt;
+				if (isLastSubstep) {
+					this.applyGroundDrive(this.frameDriveDtAcc, false);
+					this.frameDriveDtAcc = 0;
+				}
+				this.rapierRigidBody.setLinearDamping(RL_CAR.linearDamp);
+			} else {
+				this.frameDriveDtAcc = 0;
+				if (canSuspension) {
+					this.applySuspensionForces();
+				}
+				if (!HOVER_SAFE_MODE) {
+					if (
+						meridian &&
+						this.wheelsGrounded > 0 &&
+						this.disableSuspensionTimer <= 0
+					) {
+						this.applyMeridianSurfaceForces();
+					} else if (!meridian) {
+						this.applyWallRideForces();
+					}
+					if (!meridianContact) {
+						this.applyFlipPhysics(dt);
+						this.applyAirThrottle(dt);
+					}
+				}
+				if (!meridianContact) {
+					this.applyRlAirControl(dt);
+				}
+				let airDamp = RL_CAR.airLinearDamp;
+				if (this.lastBoosting && this.boostFuel > 0 && !this.isGrounded) {
+					airDamp *= RL_CAR.airBoostLinearDampMul;
+				}
+				this.rapierRigidBody.setLinearDamping(
+					meridianContact ? RL_CAR.linearDamp : airDamp,
+				);
+			}
+		}
+
+		this.recoverFromCrash();
+		this.resolveFloorHitboxContact();
+		this.unstickVerticalStand(dt);
+		this.unstickTurtle(dt);
+		this.logHoverTelemetry();
+	}
+
+	/** Wywoływane po world.step() — kinematyczna jazda po tarcie Rapiera. */
+	finalizeHoverStep(substep = 0, substepCount = 1, dt = 0): void {
+		/** Po solverze: przywróć ω + quat dodge (kontakty z murawą = corkscrew). */
+		if (this.flipActive) {
+			this.assertFlipPose();
+			if (dt > 0) {
+				this.applyFlipBoostPostStep(dt);
+			}
+		} else if (!this.isGrounded) {
+			/** RL CAR_MAX_ANG_SPEED — twardy cap po integracji (torque overshoot). */
+			const ang = this.rapierRigidBody.angvel();
+			this._vel.set(ang.x, ang.y, ang.z);
+			const before = this._vel.lengthSq();
+			this.clampVec(this._vel, RL_CAR.airMaxAngVel);
+			if (this._vel.lengthSq() + 1e-8 < before) {
+				this.rapierRigidBody.setAngvel(
+					{ x: this._vel.x, y: this._vel.y, z: this._vel.z },
+					true,
+				);
+			}
+		}
+		/** Po solverze — kontakt hitbox↔podłoga (jak Bullet w RL). */
+		if (dt > 0) {
+			this.resolveFloorHitboxContact();
+		}
+		if (substep < substepCount - 1) return;
+		const meridian = isMeridianArenaActive();
+		const onWall = this.isOnWallOrRamp();
+		const isVerticalStand =
+			!onWall && Math.abs(this.getForward().y) > 0.85;
+		const stableDrive =
+			!meridian &&
+			!this.flipActive &&
+			this.isGrounded &&
+			this.getUpward().y >= 0.7 &&
+			!isVerticalStand &&
+			!onWall;
+		const wallDrive =
+			!meridian &&
+			!this.flipActive &&
+			onWall &&
+			this.canWallDrive(onWall);
+		const meridianDrive =
+			meridian &&
+			!this.flipActive &&
+			this.isGrounded &&
+			this.wheelsCompressing >= 1 &&
+			this.wheelsGrounded >= 1;
+		if (meridian && this.wheelsGrounded >= 1 && this.disableSuspensionTimer <= 0) {
+			this.alignMeridianAttitude(1 / 60, true);
+		}
+		if ((stableDrive || wallDrive || meridianDrive) && this.groundDriveLinvel) {
+			const current = this.rapierRigidBody.linvel();
+			this._up.copy(this.surfaceNormal).normalize();
+			const currentUp =
+				current.x * this._up.x +
+				current.y * this._up.y +
+				current.z * this._up.z;
+			const targetUp =
+				this.groundDriveLinvel.x * this._up.x +
+				this.groundDriveLinvel.y * this._up.y +
+				this.groundDriveLinvel.z * this._up.z;
+			this._vel.set(
+				this.groundDriveLinvel.x - this._up.x * targetUp,
+				this.groundDriveLinvel.y - this._up.y * targetUp,
+				this.groundDriveLinvel.z - this._up.z * targetUp,
+			);
+			this._vel.x += this._up.x * currentUp;
+			this._vel.y += this._up.y * currentUp;
+			this._vel.z += this._up.z * currentUp;
+			this.rapierRigidBody.setLinvel(
+				{ x: this._vel.x, y: this._vel.y, z: this._vel.z },
+				true,
+			);
+		}
+		this.groundDriveLinvel = null;
+	}
+
+	afterPhysics(_dt: number): void {
+		this.syncWithRigidBody();
+		this.updateSuspensionDebugDraw();
+	}
+
+	disposeHoverDebug(): void {
+		this.suspensionViz?.dispose();
+		this.suspensionViz = null;
+	}
+
+	isBoosting(): boolean {
+		return this.boosting;
+	}
+
+	isFlipping(): boolean {
+		return this.flipActive;
+	}
+
+	/**
+	 * Flip reset: koła/hood na piłce w powietrzu przywraca dodge.
+	 * Wywoływać co klatkę z pozycją piłki (dt = frame lub physics).
+	 */
+	tryFlipResetFromBall(ballPos: THREE.Vector3, dt: number): boolean {
+		this.flipResetCooldown = Math.max(0, this.flipResetCooldown - dt);
+		if (this.flipResetCooldown > 0) {
+			this.flipResetDwell = 0;
+			return false;
+		}
+		/** Już masz dodge — nie „daj drugi”. */
+		if (this.canSecondJump && this.jumpCount < 2) {
+			this.flipResetDwell = 0;
+			return false;
+		}
+		/** Tylko powietrze — nie murawa/ściana. */
+		if (this.isGrounded || this.isOnWallOrRamp()) {
+			this.flipResetDwell = 0;
+			return false;
+		}
+		if (this.flipActive) {
+			this.flipResetDwell = 0;
+			return false;
+		}
+
+		const carPos = this.getPosition();
+		this._ballRel.subVectors(ballPos, carPos);
+		const dist = this._ballRel.length();
+		const maxDist =
+			RL_BALL.radius + RL_CAR.hitboxHalfY + RL_CAR.flipResetDistSlack;
+		if (dist < 1e-4 || dist > maxDist) {
+			this.flipResetDwell = Math.max(0, this.flipResetDwell - dt * 2);
+			return false;
+		}
+
+		this._up.copy(this.getUpward()).normalize();
+		const below = -this._ballRel.dot(this._up) / dist;
+		if (below < RL_CAR.flipResetBallBelowDot) {
+			this.flipResetDwell = Math.max(0, this.flipResetDwell - dt * 2);
+			return false;
+		}
+
+		this.flipResetDwell += dt;
+		if (this.flipResetDwell < RL_CAR.flipResetDwellSec) return false;
+
+		this.canSecondJump = true;
+		this.jumpCount = 1;
+		this.airJumpArmed = true;
+		this.dodgeWindowAge = 0.04;
+		this.flipResetDwell = 0;
+		this.flipResetCooldown = RL_CAR.flipResetCooldownSec;
+		this.flipResetPulse = true;
+		return true;
+	}
+
+	/** Jednorazowy cue HUD/VFX po udanym flip reset. */
+	consumeFlipResetPulse(): boolean {
+		if (!this.flipResetPulse) return false;
+		this.flipResetPulse = false;
+		return true;
+	}
+
+	isDemolished(): boolean {
+		return this.demolishLeft > 0.001;
+	}
+
+	isDemoInvulnerable(): boolean {
+		return this.demolishSpawnInvulnLeft > 0.001;
+	}
+
+	getDemolishLeft(): number {
+		return this.demolishLeft;
+	}
+
+	/**
+	 * RL demolish — ukryj, wyłącz collider, park pod areną.
+	 * Respawn przez `completeDemolishRespawn` po `tickDemolish` → true.
+	 */
+	beginDemolish(durationSec: number): void {
+		this.demolishLeft = Math.max(0.5, durationSec);
+		this.demolishSpawnInvulnLeft = 0;
+		this.rapierCollider.setEnabled(false);
+		this.threeJSGroup.visible = false;
+		this.rapierRigidBody.setLinvel({ x: 0, y: 0, z: 0 }, true);
+		this.rapierRigidBody.setAngvel({ x: 0, y: 0, z: 0 }, true);
+		this.rapierRigidBody.setTranslation({ x: 0, y: -80, z: 0 }, true);
+		this.resetJumpState();
+		this.boosting = false;
+		this.lastBoosting = false;
+	}
+
+	/**
+	 * Tick demolish. `true` gdy właśnie skończył się timer (gotowy do spawnu).
+	 */
+	tickDemolish(dt: number): boolean {
+		if (this.demolishSpawnInvulnLeft > 0) {
+			this.demolishSpawnInvulnLeft = Math.max(
+				0,
+				this.demolishSpawnInvulnLeft - dt,
+			);
+		}
+		if (this.demolishLeft <= 0) return false;
+		this.demolishLeft = Math.max(0, this.demolishLeft - dt);
+		this.rapierRigidBody.setLinvel({ x: 0, y: 0, z: 0 }, true);
+		this.rapierRigidBody.setAngvel({ x: 0, y: 0, z: 0 }, true);
+		return this.demolishLeft <= 0;
+	}
+
+	completeDemolishRespawn(invulnSec: number): void {
+		this.demolishLeft = 0;
+		this.demolishSpawnInvulnLeft = Math.max(0, invulnSec);
+		this.rapierCollider.setEnabled(true);
+		this.threeJSGroup.visible = true;
+		this.boostFuel = RL_CAR.boostSpawn;
+		this.resetJumpState();
+	}
+
+	/** Po dodge — pitch lock (RocketSim FLIP_PITCHLOCK_EXTRA_TIME). */
+	isPostFlipStabilizing(): boolean {
+		return this.flipPitchLockLeft > 0;
+	}
+
+	getBoostFuel(): number {
+		return this.boostFuel;
+	}
+
+	/** Boost pad / pickup — dodaje do zbiornika (0–1). */
+	addBoostFuel(amount: number): void {
+		if (amount <= 0) return;
+		this.boostFuel = Math.min(1, this.boostFuel + amount);
+	}
+
+	/** Ostatni input skrętu [-1, 1] — wizualizacja kół. */
+	getSteerInput(): number {
+		return this.lastYaw;
+	}
+
+	/** Ostatni air-roll Q/E [-1, 1] — feedback VFX. */
+	getRollInput(): number {
+		return this.lastRoll;
+	}
+
+	/** 0–1 blend powerslide — ślady opon / dym. */
+	getDriftBlend(): number {
+		return this.driftBlend;
+	}
+
+	getSurfaceNormal(): THREE.Vector3 {
+		return this.surfaceNormal;
+	}
+
+	isOnGround(): boolean {
+		return this.isGrounded;
+	}
+
+	/**
+	 * Chase cam: powietrze tylko gdy faktycznie w powietrzu / w dodge.
+	 * jumpCount>0 na ziemi + disableSuspension zostawiały „slow-mo” po flipie.
+	 */
+	isAirborneForCamera(): boolean {
+		if (this.flipActive) return true;
+		if (!this.isGrounded) return true;
+		if (
+			this.jumpCount > 0 &&
+			this.wheelsGrounded < RL_HOVER.groundedMinWheels
+		) {
+			return true;
+		}
+		return false;
+	}
+
+	/** Siła lądowania 0–1 — jednorazowo po dotknięciu ziemi (VFX). */
+	consumeLandingPulse(): number {
+		const pulse = this.landingPulse;
+		this.landingPulse = 0;
+		return pulse;
+	}
+
+	/** 0–1 po 1. skoku z ziemi / ściany. */
+	consumeJumpSfxPulse(): number {
+		const pulse = this.jumpSfxPulse;
+		this.jumpSfxPulse = 0;
+		return pulse;
+	}
+
+	/**
+	 * Po 2. skoku: `1` = dodge/flip, `2` = double jump, `0` = brak.
+	 */
+	consumeAerialSfxPulse(): number {
+		const pulse = this.aerialSfxPulse;
+		this.aerialSfxPulse = 0;
+		return pulse;
+	}
+
+	/** Liczba kół na powierzchni (0–4) — m.in. dla kamery (air flip lock). */
+	getWheelsGroundedCount(): number {
+		return this.wheelsGrounded;
+	}
+
+	isOnWallOrRamp(): boolean {
+		if (this.wallContactLeft > 0) {
+			return true;
+		}
+		if (
+			this.isGrounded &&
+			this.surfaceNormal.y < RL_CAR.wallNormalFlatThreshold
+		) {
+			return true;
+		}
+		/** Sufit: odwrócone auto + normal w dół — audit ceiling_speed_hold. */
+		return (
+			this.wheelsGrounded >= RL_HOVER.groundedMinWheels &&
+			this.surfaceNormal.y < -0.25 &&
+			this.getUpward().y < -0.35
+		);
+	}
+
+	/**
+	 * Wall/ramp drive — na łuku quarter-pipe zawieszenie często nie „compressing”,
+	 * choć 2+ kół trzyma powierzchnię (audit ramp_entry stall ~y=2.44).
+	 */
+	private canWallDrive(onWall: boolean): boolean {
+		if (!onWall || this.disableSuspensionTimer > 0) return false;
+		if (this.wheelsCompressing >= 1) return true;
+		if (this.wallContactLeft > 0 && this.wheelsGrounded >= 1) return true;
+		const ny = this.surfaceNormal.y;
+		return (
+			this.wheelsGrounded >= 2 &&
+			ny > 0.08 &&
+			ny < RL_CAR.wallNormalFlatThreshold
+		);
+	}
+
+	updateBallSteerContext(ballPos: THREE.Vector3): void {
+		const dist = this.getPosition().distanceTo(ballPos);
+		const t = THREE.MathUtils.clamp(
+			1 - dist / RL_CAR.steerNearBallRadius,
+			0,
+			1,
+		);
+		this.ballSteerMul = THREE.MathUtils.lerp(1, RL_CAR.steerNearBallMul, t * t);
+	}
+
+	setRecoveryAnchor(pos: THREE.Vector3): void {
+		this.recoveryPos.copy(pos);
+	}
+
+	/** Twardy reset na marker kickoff — płasko na kołach, zero prędkości. */
+	resetKickoffPose(x: number, y: number, z: number, yawY: number): void {
+		this.rapierRigidBody.setTranslation({ x, y, z }, true);
+		this.rapierRigidBody.setLinvel({ x: 0, y: 0, z: 0 }, true);
+		this.rapierRigidBody.setAngvel({ x: 0, y: 0, z: 0 }, true);
+		this._quat.setFromEuler(new THREE.Euler(0, yawY, 0, "YXZ"));
+		this.rapierRigidBody.setRotation(
+			{ x: this._quat.x, y: this._quat.y, z: this._quat.z, w: this._quat.w },
+			true,
+		);
+		this.rapierRigidBody.wakeUp();
+		this.resetJumpState();
+		/** Natychmiast „na kołach” — inaczej recovery jump/FSM widzi wheels=0 i skacze. */
+		this.isGrounded = true;
+		this.wheelsGrounded = 4;
+		this.wheelsCompressing = 4;
+		this.syncWithRigidBody();
+		this.recoveryPos.set(x, y, z);
+	}
+
+	/**
+	 * DEV / aerial smoke — dowolna poza + prędkość + stan skoku
+	 * (bez „na kołach”, żeby od razu czuć powietrze).
+	 */
+	applyDevSpawnPose(opts: {
+		x: number;
+		y: number;
+		z: number;
+		yawY: number;
+		pitch?: number;
+		roll?: number;
+		vel?: { x: number; y: number; z: number };
+		angVel?: { x: number; y: number; z: number };
+		boost?: number;
+		/** 0 = pełne jumpy, 1 = po 1. skoku (aerial/dodge), 2 = zużyte. */
+		jumpCount?: number;
+		grounded?: boolean;
+	}): void {
+		const pitch = opts.pitch ?? 0;
+		const roll = opts.roll ?? 0;
+		this.rapierRigidBody.setTranslation(
+			{ x: opts.x, y: opts.y, z: opts.z },
+			true,
+		);
+		const v = opts.vel ?? { x: 0, y: 0, z: 0 };
+		this.rapierRigidBody.setLinvel({ x: v.x, y: v.y, z: v.z }, true);
+		const av = opts.angVel ?? { x: 0, y: 0, z: 0 };
+		this.rapierRigidBody.setAngvel({ x: av.x, y: av.y, z: av.z }, true);
+		this._quat.setFromEuler(new THREE.Euler(pitch, opts.yawY, roll, "YXZ"));
+		this.rapierRigidBody.setRotation(
+			{ x: this._quat.x, y: this._quat.y, z: this._quat.z, w: this._quat.w },
+			true,
+		);
+		this.rapierRigidBody.wakeUp();
+		this.resetJumpState();
+		const jc = Math.max(0, Math.min(2, Math.floor(opts.jumpCount ?? 0)));
+		this.jumpCount = jc;
+		this.canSecondJump = jc < 2;
+		/** Spawn w powietrzu po 1. skoku — dodge od razu (jak po puszczeniu PPM). */
+		this.airJumpArmed = jc === 1;
+		if (opts.boost != null) {
+			this.boostFuel = THREE.MathUtils.clamp(opts.boost, 0, 1);
+		}
+		const grounded = opts.grounded === true;
+		this.isGrounded = grounded;
+		this.wheelsGrounded = grounded ? 4 : 0;
+		this.wheelsCompressing = grounded ? 4 : 0;
+		if (!grounded) {
+			this.disableSuspensionTimer = 0.05;
+			this.surfaceNormal.set(0, 1, 0);
+		}
+		this.syncWithRigidBody();
+		this.recoveryPos.set(opts.x, opts.y, opts.z);
+		carHorizontalForwardFromQuat(this._quat, this._stableFlatFwd);
+		if (this._stableFlatFwd.lengthSq() < 1e-4) {
+			this._stableFlatFwd.set(0, 0, 1);
+		} else {
+			this._stableFlatFwd.normalize();
+		}
+	}
+
+	private castSuspension(): void {
+		const pos = this.rapierRigidBody.translation();
+		const rot = this.rapierRigidBody.rotation();
+		this._quat.set(rot.x, rot.y, rot.z, rot.w);
+		this._up.set(0, 1, 0).applyQuaternion(this._quat).normalize();
+
+		let hitCount = 0;
+		let compressCount = 0;
+		const normalAcc = this._tmp.set(0, 0, 0);
+
+		for (let i = 0; i < CORNER_LOCAL.length; i++) {
+			const wh = this._wheelHits[i]!;
+			const dbg = _rayDebugScratch[i]!;
+			const local = CORNER_LOCAL[i]!;
+			this._cornerWorld.copy(local).applyQuaternion(this._quat);
+			this._cornerWorld.x += pos.x;
+			this._cornerWorld.y += pos.y + RL_CAR.hitboxHalfY * 0.15;
+			this._cornerWorld.z += pos.z;
+
+			dbg.origin.copy(this._cornerWorld);
+			this._rayDir.copy(this._up).multiplyScalar(-1);
+			dbg.end
+				.copy(this._cornerWorld)
+				.addScaledVector(this._rayDir, RL_HOVER.suspensionMaxLength);
+
+			const ray = new RAPIER.Ray(
+				{
+					x: this._cornerWorld.x,
+					y: this._cornerWorld.y,
+					z: this._cornerWorld.z,
+				},
+				{ x: this._rayDir.x, y: this._rayDir.y, z: this._rayDir.z },
+			);
+
+			const maxToi = RL_HOVER.suspensionMaxLength;
+			const hit = this.scene.rapierWorld.castRayAndGetNormal(
+				ray,
+				maxToi,
+				true,
+				undefined,
+				undefined,
+				undefined,
+				this.rapierRigidBody,
+				hoverRayColliderPredicate,
+			);
+
+			if (hit && hit.timeOfImpact <= RL_HOVER.suspensionRestLength + 0.1) {
+				wh.hit = true;
+				wh.inRange = true;
+				wh.compressing = hit.timeOfImpact < RL_HOVER.suspensionRestLength;
+				wh.distance = hit.timeOfImpact;
+				wh.normal.set(hit.normal.x, hit.normal.y, hit.normal.z);
+				// Normalna przeciw rayDir (= w stronę auta) — także na suficie (n.y < 0).
+				if (wh.normal.dot(this._rayDir) > 0) wh.normal.negate();
+				wh.point
+					.copy(this._rayDir)
+					.multiplyScalar(-hit.timeOfImpact)
+					.add(this._cornerWorld);
+				dbg.hit = true;
+				dbg.end
+					.copy(this._cornerWorld)
+					.addScaledVector(this._rayDir, hit.timeOfImpact);
+				normalAcc.add(wh.normal);
+				hitCount++;
+				if (wh.compressing) compressCount++;
+			} else {
+				wh.hit = false;
+				wh.inRange = false;
+				wh.compressing = false;
+				wh.distance = hit?.timeOfImpact ?? maxToi;
+				dbg.hit = false;
+				if (hit) {
+					dbg.end
+						.copy(this._cornerWorld)
+						.addScaledVector(this._rayDir, hit.timeOfImpact);
+				}
+			}
+		}
+
+		this.wheelsGrounded = hitCount;
+		this.wheelsCompressing = compressCount;
+
+		if (hitCount > 0) {
+			if (isMeridianArenaActive()) {
+				// Stabilny normal sfery (nie noisy trimesh / negate-by-y).
+				meridianSurfaceNormalAt(pos, this.surfaceNormal);
+				for (const wh of this._wheelHits) {
+					if (wh.inRange) wh.normal.copy(this.surfaceNormal);
+				}
+			} else {
+				this.surfaceNormal
+					.copy(normalAcc.multiplyScalar(1 / hitCount))
+					.normalize();
+			}
+		} else if (this.wallContactLeft <= 0) {
+			/** Grace ściany: zostaw ostatni normal — (0,1,0) + stick = wywrotka. */
+			this.surfaceNormal.set(0, 1, 0);
+		}
+
+		if (!isMeridianArenaActive()) {
+			this.castWallProbe(pos, hitCount);
+		} else {
+			this.wallProbeActive = false;
+		}
+	}
+
+	/**
+	 * Promienie z przodu (±kąt) — wjazd na bandę z każdego kierunku,
+	 * nie tylko prostopadle do ściany.
+	 */
+	private castWallProbe(
+		pos: { x: number; y: number; z: number },
+		wheelHits: number,
+	): void {
+		this.wallProbeActive = false;
+
+		carHorizontalForwardFromQuat(this._quat, this._fwd);
+		const horizLen = Math.hypot(this._fwd.x, this._fwd.z);
+		if (horizLen < 0.15) return;
+
+		const fx = this._fwd.x / horizLen;
+		const fz = this._fwd.z / horizLen;
+
+		let onRampApproach = false;
+		for (const wh of this._wheelHits) {
+			if (!wh.inRange) continue;
+			/** Płytka ćwiartka (n.y≈0.95) też liczy się jako podejście. */
+			if (wh.normal.y < 0.985 && wh.normal.y > 0.12) {
+				onRampApproach = true;
+				break;
+			}
+		}
+
+		const nearPerimeter =
+			Math.abs(pos.x) > RL_ARENA.HALF_WIDTH - RL_ARENA.RAMP_SIZE - 3.5 ||
+			Math.abs(pos.z) > RL_ARENA.HALF_LENGTH - RL_ARENA.RAMP_SIZE - 3.5;
+		if (nearPerimeter) onRampApproach = true;
+
+		const maxToi =
+			RL_CAR.hitboxHalfX + (onRampApproach || nearPerimeter ? 1.35 : 0.75);
+		const yawOffsets = onRampApproach ? [0, 0.42, -0.42, 0.85, -0.85] : [0, 0.38, -0.38];
+
+		let bestNy = 2;
+		let bestNx = 0;
+		let bestNz = 0;
+		let found = false;
+
+		for (const yaw of yawOffsets) {
+			const c = Math.cos(yaw);
+			const s = Math.sin(yaw);
+			const dx = fx * c - fz * s;
+			const dz = fx * s + fz * c;
+			this._cornerWorld.set(
+				pos.x + dx * RL_CAR.hitboxHalfX,
+				pos.y + RL_CAR.hitboxHalfY * 0.4,
+				pos.z + dz * RL_CAR.hitboxHalfX,
+			);
+			const ray = new RAPIER.Ray(
+				{
+					x: this._cornerWorld.x,
+					y: this._cornerWorld.y,
+					z: this._cornerWorld.z,
+				},
+				{ x: dx, y: 0, z: dz },
+			);
+			const hit = this.scene.rapierWorld.castRayAndGetNormal(
+				ray,
+				maxToi,
+				true,
+				undefined,
+				undefined,
+				undefined,
+				this.rapierRigidBody,
+				hoverRayColliderPredicate,
+			);
+			if (!hit) continue;
+
+			this._vel.set(hit.normal.x, hit.normal.y, hit.normal.z);
+			if (this._vel.dot({ x: dx, y: 0, z: dz }) > 0) this._vel.negate();
+			/** Akceptuj też płytką rampę — wcześniej próg 0.9 blokował wjazd. */
+			if (this._vel.y >= 0.985) continue;
+			if (this._vel.y < bestNy) {
+				bestNy = this._vel.y;
+				bestNx = this._vel.x;
+				bestNz = this._vel.z;
+				found = true;
+			}
+		}
+
+		if (!found) return;
+
+		this.wallProbeActive = true;
+		this._vel.set(bestNx, bestNy, bestNz).normalize();
+		if (wheelHits > 0) {
+			/** Koła na łuku — blend, nie hard-swap (nagły n wywraca auto). */
+			const blend = THREE.MathUtils.clamp(
+				(this.surfaceNormal.y - 0.25) / 0.65,
+				0,
+				0.62,
+			);
+			this.surfaceNormal.lerp(this._vel, blend).normalize();
+		} else {
+			this.surfaceNormal.copy(this._vel);
+		}
+	}
+
+	/**
+	 * „Na ziemi” tylko przy ściśniętej zawieszeniu i wolnym lądowaniu —
+	 * raycast w zasięgu podczas szybkiego opadu nie wyłącza boosta w powietrzu.
+	 */
+	private updateGroundedState(dt: number): void {
+		/**
+		 * Susp-off / flip: nie grounded.
+		 * Turf clearance: nie grounded TYLKO póki koła nie wciskają się mocno —
+		 * inaczej auto nigdy nie ląduje (klip 01-36: S = air pitch w nieskończoność).
+		 */
+		if (this.flipActive) {
+			this.tryWaveDashOnFlipLand();
+			this.isGrounded = false;
+			this.groundedReleaseLeft = 0;
+			return;
+		}
+		if (this.disableSuspensionTimer > 0) {
+			this.isGrounded = false;
+			this.groundedReleaseLeft = 0;
+			return;
+		}
+		/** Clearance tylko podnosi COM — nie blokuj grounded (lądowanie S). */
+
+		const vel = this.rapierRigidBody.linvel();
+		const n = this.surfaceNormal;
+		const approach = -(vel.x * n.x + vel.y * n.y + vel.z * n.z);
+
+		const onCeiling = n.y < -0.35 && this.getUpward().y < -0.35;
+		const approachLimit = onCeiling
+			? GROUND_APPROACH_MAX_MPS + 22
+			: GROUND_APPROACH_MAX_MPS;
+
+		const rawGrounded =
+			this.wheelsGrounded >= RL_HOVER.groundedMinWheels &&
+			(this.wheelsCompressing >= RL_HOVER.groundedMinWheels ||
+				(onCeiling && this.wheelsGrounded >= 2)) &&
+			approach < approachLimit;
+
+		if (rawGrounded) {
+			this.groundedReleaseLeft = RL_HOVER.groundReleaseGrace;
+			this.isGrounded = true;
+		} else if (
+			this.groundedReleaseLeft > 0 &&
+			(this.wheelsCompressing >= 1 ||
+				(onCeiling && this.wheelsGrounded >= 2)) &&
+			approach < approachLimit + 1.2
+		) {
+			this.groundedReleaseLeft = Math.max(0, this.groundedReleaseLeft - dt);
+			this.isGrounded = true;
+		} else {
+			this.isGrounded = false;
+			this.groundedReleaseLeft = 0;
+		}
+
+		if (this.isGrounded && !this.wasGroundedLastFrame) {
+			this.applySoftLanding();
+		}
+		this.wasGroundedLastFrame = this.isGrounded;
+	}
+
+	private countWallWheels(): number {
+		let count = 0;
+		for (const wh of this._wheelHits) {
+			if (!wh.inRange) continue;
+			if (wh.normal.y < RL_CAR.wallNormalFlatThreshold) count++;
+		}
+		return count;
+	}
+
+	private updateWallContactState(dt: number): void {
+		const wallWheels = this.countWallWheels();
+		if (
+			(wallWheels >= 1 &&
+				(this.wheelsCompressing >= 1 || this.wallContactLeft > 0)) ||
+			this.wallProbeActive
+		) {
+			this.wallContactLeft = RL_HOVER.wallContactGrace;
+		} else {
+			this.wallContactLeft = Math.max(0, this.wallContactLeft - dt);
+		}
+		const onWall = this.isOnWallOrRamp();
+		if (
+			this.bodyTraitsEnabled &&
+			this.bodyTraits.hook === "aeroSnap" &&
+			this.wasOnWallLastFrame &&
+			!onWall
+		) {
+			this.applyAeroSnapExit();
+		}
+		this.wasOnWallLastFrame = onWall;
+	}
+
+	/** low / AeroSnap — +curve po zejściu ze ściany (bez zmiany masy). */
+	private applyAeroSnapExit(): void {
+		const mul = this.bodyTraits.aeroSnapCurveMul;
+		if (mul <= 1) return;
+		const vel = this.getVelocity();
+		this._right.copy(this.getSideward()).normalize();
+		const side = vel.dot(this._right);
+		if (Math.abs(side) < 0.45) return;
+		const boost = Math.abs(side) * (mul - 1);
+		vel.addScaledVector(this._right, Math.sign(side) * boost);
+		clampSpeedMps(vel, RL_CAR.maxSpeed);
+		this.rapierRigidBody.setLinvel({ x: vel.x, y: vel.y, z: vel.z }, true);
+		const av = this.rapierRigidBody.angvel();
+		const yawBoost = Math.sign(side) * 0.55 * (mul - 1);
+		this.rapierRigidBody.setAngvel(
+			{ x: av.x, y: av.y + yawBoost, z: av.z },
+			true,
+		);
+	}
+
+	/**
+	 * Wavedash: flip + koła w murawę w oknie → cancel flip + burst w kierunku
+	 * horizontal velocity / flip forward (clean-room RocketSim cancel→grip).
+	 */
+	private tryWaveDashOnFlipLand(): void {
+		if (!this.flipActive) return;
+		if (
+			this.flipElapsed < RL_CAR.waveDashMinFlipElapsed ||
+			this.flipElapsed > RL_CAR.waveDashMaxFlipElapsed
+		) {
+			return;
+		}
+		if (this.isOnWallOrRamp()) return;
+		if (this.wheelsCompressing < RL_CAR.waveDashMinCompressWheels) return;
+		const y = this.rapierRigidBody.translation().y;
+		if (y > PLAYFIELD_SURFACE_Y + 1.35) return;
+
+		/** Cancel kinematic flip. */
+		this.flipActive = false;
+		this.flipTimer = 0;
+		this.flipPitchLockLeft = RL_CAR.flipPitchLockExtra * 0.55;
+		this.disableSuspensionTimer = Math.min(this.disableSuspensionTimer, 0.08);
+
+		const vel = this.getVelocity();
+		carHorizontalForwardFromQuat(this.rapierRigidBody.rotation(), this._fwd);
+		/** Burst w kierunku flipa (przód/tył) albo velocity. */
+		const flipSign = Math.sign(this.flipRelY) || 1;
+		const along =
+			Math.abs(vel.dot(this._fwd)) > 1.2
+				? Math.sign(vel.dot(this._fwd))
+				: -flipSign;
+		vel.addScaledVector(this._fwd, along * RL_CAR.waveDashSpeedBoost);
+		/** Lekki lift residual → grip. */
+		if (vel.y < 0) vel.y *= 0.35;
+		clampSpeedMps(vel, RL_CAR.maxSpeed);
+		this.rapierRigidBody.setLinvel({ x: vel.x, y: vel.y, z: vel.z }, true);
+		const av = this.rapierRigidBody.angvel();
+		this.rapierRigidBody.setAngvel(
+			{ x: av.x * 0.25, y: av.y * 0.55, z: av.z * 0.25 },
+			true,
+		);
+	}
+
+	private applySoftLanding(): void {
+		const vel = this.getVelocity();
+		const n = this.surfaceNormal;
+		/** Wjazd w rampę (nawet płytką) — nie zjadaj normalnej jak przy lądowaniu. */
+		let shallowRamp = false;
+		for (const wh of this._wheelHits) {
+			if (!wh.inRange) continue;
+			if (wh.normal.y < 0.985 && wh.normal.y > 0.12) {
+				shallowRamp = true;
+				break;
+			}
+		}
+		const rampOrWall =
+			this.wallContactLeft > 0 ||
+			this.wallProbeActive ||
+			shallowRamp ||
+			n.y < RL_CAR.wallNormalFlatThreshold;
+		const vn = vel.dot(n);
+		const impact = Math.max(0, -vn);
+		if (impact > 0.8 && !rampOrWall) {
+			this.landingPulse = THREE.MathUtils.clamp(impact / 9, 0.2, 1);
+		}
+		if (vn < -0.35) {
+			const retain = rampOrWall
+				? Math.max(
+						RL_CAR.landingNormalRetain,
+						shallowRamp
+							? RL_CAR.rampEntryNormalRetain
+							: 0.88,
+					)
+				: RL_CAR.landingNormalRetain;
+			vel.addScaledVector(n, -vn * (1 - retain));
+			this.rapierRigidBody.setLinvel({ x: vel.x, y: vel.y, z: vel.z }, true);
+		}
+
+		/**
+		 * Mid-flip: nie zjadaj residual spinu (half-flip klip 01-08 / 17-14).
+		 * Po cancelu spin≈0 + dawny pitch-lock skip → softlock nosem w trawę
+		 * (klip 17-04-27). Pitch-lock: chroń tylko gdy residual jeszcze kręci.
+		 */
+		if (this.flipActive) {
+			return;
+		}
+
+		const av = this.rapierRigidBody.angvel();
+		if (this.flipPitchLockLeft > 0) {
+			const spin = Math.hypot(av.x, av.y, av.z);
+			if (spin > 1.15) return;
+		}
+
+		const spinRetain = rampOrWall
+			? Math.max(RL_CAR.landingSpinRetain, 0.85)
+			: RL_CAR.landingSpinRetain;
+		this._vel.set(av.x, av.y, av.z).multiplyScalar(spinRetain);
+		this.rapierRigidBody.setAngvel(
+			{ x: this._vel.x, y: this._vel.y, z: this._vel.z },
+			true,
+		);
+	}
+
+	private performLiftOffJump(): void {
+		const onWall = this.isOnWallOrRamp();
+		this._up.copy(this.getUpward()).normalize();
+		const vel = this.getVelocity();
+		const vn = vel.dot(this._up);
+		if (vn < 0) vel.addScaledVector(this._up, -vn);
+		vel.addScaledVector(this._up, RL_CAR.jumpImpulse);
+		if (onWall && this.surfaceNormal.y < RL_CAR.wallNormalFlatThreshold) {
+			/**
+			 * Push zawsze „od ściany” — surfaceNormal i getUpward bywają
+			 * przeciwne po settle (drugi wall jump kleił z sep2 < 0).
+			 */
+			const align = this.surfaceNormal.dot(this._up);
+			const outward =
+				align >= 0 ? this.surfaceNormal : this._up;
+			vel.addScaledVector(outward, RL_CAR.wallJumpNormalBoost);
+		}
+		clampSpeedMps(vel, RL_CAR.maxSpeed);
+		this.rapierRigidBody.setLinvel({ x: vel.x, y: vel.y, z: vel.z }, true);
+
+		this.disableSuspensionTimer = 0.16;
+		this.jumpCooldown = RL_CAR.jumpGroundCooldown;
+		this.isGrounded = false;
+		this.jumpCount = 1;
+		this.dodgeWindowAge = 0;
+		this.airJumpArmed = false;
+		this.jumpHoldLeft = RL_CAR.jumpHoldMax;
+		this.jumpHoldElapsed = 0;
+		this.jumpStickyLeft = RL_CAR.stickyDuration;
+		this.wheelsGrounded = 0;
+		this.wheelsCompressing = 0;
+		if (onWall) {
+			/** Odklejenie — inaczej stick w tej samej klatce zjada impuls. */
+			this.wallContactLeft = 0;
+			this.wallProbeActive = false;
+			this.wallJumpDetachLeft = RL_CAR.wallJumpDetachSec;
+		}
+		this.jumpSfxPulse = onWall ? 0.85 : 1;
+	}
+
+	/**
+	 * Kontakt hitbox cuboid ↔ podłoga (RocketSim CARWORLD).
+	 * Zamiast „clearance hacks” — depenetracja + restitution jak Bullet.
+	 */
+	private resolveFloorHitboxContact(): void {
+		if (this.isOnWallOrRamp() || this.isRampSurfaceApproach()) return;
+		if (this.flipActive) return;
+		/**
+		 * Na stabilnej jeździe koła trzymają — nie walcz z suspensją.
+		 * Kontakt body jak w RL gdy pitch / powietrze.
+		 */
+		if (
+			this.isGrounded &&
+			this.getUpward().y > 0.72 &&
+			Math.abs(this.getForward().y) < 0.35
+		) {
+			return;
+		}
+
+		const pos = this.rapierRigidBody.translation();
+		const rot = this.rapierRigidBody.rotation();
+		this._quat.set(rot.x, rot.y, rot.z, rot.w);
+		const hx = RL_CAR.hitboxHalfX;
+		const hy = RL_CAR.hitboxHalfY;
+		const hz = RL_CAR.hitboxHalfZ;
+		const floor = PLAYFIELD_SURFACE_Y + 0.08;
+		let minY = Infinity;
+		for (const sx of [-1, 1]) {
+			for (const sy of [-1, 1]) {
+				for (const sz of [-1, 1]) {
+					this._tmp.set(sx * hx, sy * hy, sz * hz).applyQuaternion(
+						this._quat,
+					);
+					minY = Math.min(minY, pos.y + this._tmp.y);
+				}
+			}
+		}
+		if (minY >= floor) return;
+
+		const pen = floor - minY;
+		this.rapierRigidBody.setTranslation(
+			{ x: pos.x, y: pos.y + pen, z: pos.z },
+			true,
+		);
+		const vel = this.getVelocity();
+		const fy = this.getForward().y;
+		const pitched = Math.abs(fy) > 0.4;
+		const firstJump =
+			this.jumpCount === 1 && this.canSecondJump;
+		const aerialPitch =
+			firstJump && Math.abs(this.lastThrottle) > 0.35;
+		/**
+		 * 1×PPM+W/S → stójka ~90°: trzymaj COM nad hitboxHalfZ, inaczej nos
+		 * zahacza i tip/depen walczą z pitchiem.
+		 */
+		if (aerialPitch && pitched) {
+			const needY =
+				floor + RL_CAR.hitboxHalfZ + 0.1;
+			const cur = this.rapierRigidBody.translation();
+			if (cur.y < needY) {
+				this.rapierRigidBody.setTranslation(
+					{ x: cur.x, y: needY, z: cur.z },
+					true,
+				);
+			}
+		}
+		if (vel.y < 0) {
+			/**
+			 * 1×PPM pitch dig: tylko zatrzymaj wbijanie (bez bounce = „pół-flip”).
+			 * Przy aktywnym W/S: lekki lift z pen — nie klej do murawy przy 90°.
+			 */
+			if (aerialPitch && pitched) {
+				vel.y = Math.max(vel.y, pen * 6);
+			} else if (firstJump || !pitched) {
+				vel.y = 0;
+			} else {
+				vel.y = -vel.y * 0.28;
+			}
+			vel.x *= pitched ? 0.9 : 0.95;
+			vel.z *= pitched ? 0.9 : 0.95;
+			clampSpeedMps(vel, RL_CAR.maxSpeed);
+			this.rapierRigidBody.setLinvel(
+				{ x: vel.x, y: vel.y, z: vel.z },
+				true,
+			);
+		}
+		/**
+		 * Depenetracja sama nie daje tipping — auto staje na zderzaku po flipie.
+		 * Tip tylko przy softlocku (bez W/S) — inaczej zabija pętlę / stójkę 90°.
+		 * 1×PPM aerial: zero tip — ściąganie z pionu = „zahacza o murawę”.
+		 * Konwencja: +ω·right = nos w dół (jak W w air pitch).
+		 */
+		if (
+			pitched &&
+			Math.abs(fy) > 0.48 &&
+			Math.abs(this.lastThrottle) < 0.35 &&
+			!firstJump
+		) {
+			const right = this.getSideward();
+			const ang = this.rapierRigidBody.angvel();
+			const omegaPitch = ang.x * right.x + ang.y * right.y + ang.z * right.z;
+			const spin = Math.hypot(ang.x, ang.y, ang.z);
+			if (spin < 2.2) {
+				/** Nos w górę (fy>0) → +ω·right; nos w trawę → −ω·right. */
+				const want = fy > 0 ? 1 : -1;
+				const tipTarget =
+					want * THREE.MathUtils.clamp(Math.abs(fy) * 5.5, 2.2, 7.5);
+				if (omegaPitch * want < Math.abs(tipTarget) * 0.85) {
+					const add = (tipTarget - omegaPitch) * 0.55;
+					this.rapierRigidBody.setAngvel(
+						{
+							x: ang.x + right.x * add,
+							y: ang.y + right.y * add,
+							z: ang.z + right.z * add,
+						},
+						true,
+					);
+				}
+			}
+		}
+	}
+
+	private applySuspensionForces(): void {
+		if (this.disableSuspensionTimer > 0) return;
+		const body = this.rapierRigidBody;
+		const linvel = body.linvel();
+		const angvel = body.angvel();
+		const pos = body.translation();
+		const rot = body.rotation();
+		this._quat.set(rot.x, rot.y, rot.z, rot.w);
+		this._carUp.set(0, 1, 0).applyQuaternion(this._quat).normalize();
+
+		let forceSum = 0;
+
+		for (let i = 0; i < this._wheelHits.length; i++) {
+			const wh = this._wheelHits[i]!;
+			if (!wh.compressing) continue;
+
+			const compression = RL_HOVER.suspensionRestLength - wh.distance;
+			if (compression <= 0) continue;
+
+			this._velAt.set(
+				linvel.x +
+					angvel.y * (wh.point.z - pos.z) -
+					angvel.z * (wh.point.y - pos.y),
+				linvel.y +
+					angvel.z * (wh.point.x - pos.x) -
+					angvel.x * (wh.point.z - pos.z),
+				linvel.z +
+					angvel.x * (wh.point.y - pos.y) -
+					angvel.y * (wh.point.x - pos.x),
+			);
+			const vAlong = this._velAt.dot(this._carUp);
+			const forceMag =
+				RL_HOVER.suspensionStiffness * compression -
+				RL_HOVER.suspensionDamping * vAlong;
+			if (forceMag <= 0) continue;
+
+			this._force.copy(this._carUp).multiplyScalar(forceMag);
+			if (!this.auditSuspensionForce(i, forceMag, wh.distance, this._force)) {
+				continue;
+			}
+
+			forceSum += forceMag;
+			body.addForceAtPoint(
+				{ x: this._force.x, y: this._force.y, z: this._force.z },
+				{ x: wh.point.x, y: wh.point.y, z: wh.point.z },
+				true,
+			);
+		}
+
+		this.lastSuspensionForceMag = forceSum;
+
+		this.rapierRigidBody.setLinearDamping(RL_CAR.linearDamp);
+		this.rapierRigidBody.setAngularDamping(RL_CAR.angularDamp);
+	}
+
+	private applyWallRideForces(): void {
+		if (HOVER_SAFE_MODE || !this.isOnWallOrRamp()) return;
+		/** Skok ze ściany — nie klej z powrotem. */
+		if (this.wallJumpDetachLeft > 0 || this.disableSuspensionTimer > 0) {
+			return;
+		}
+
+		const body = this.rapierRigidBody;
+		const mass = RL_CAR.mass;
+		const n = this.surfaceNormal;
+		const speed = this.getVelocity().length();
+
+		/**
+		 * RL: stick wymaga gazu/boostu (albo residualnej prędkości).
+		 * Bez pedału — stick gaśnie, grawitacja ściąga (zwłaszcza sufit).
+		 */
+		const driveIntent = Math.max(
+			Math.abs(this.lastThrottle),
+			this.lastBoosting ? 0.9 : 0,
+		);
+		const coasting = driveIntent < 0.12;
+		const driveMul = coasting
+			? THREE.MathUtils.clamp((speed - 7) / 14, 0, 0.4)
+			: THREE.MathUtils.lerp(0.65, 1.12, THREE.MathUtils.clamp(driveIntent, 0, 1));
+
+		// Rapier stosuje grawitację świata. Kompensacja tylko gdy aktywnie kleimy —
+		// przy coast na suficie/ścianie grawitacja ma prawo oderwać auto.
+		if (
+			!coasting &&
+			driveMul > 0.35 &&
+			n.y < RL_CAR.wallNormalFlatThreshold
+		) {
+			const gDotN = WORLD_GRAVITY * n.y;
+			this._force.copy(n).multiplyScalar(-gDotN * mass);
+			body.addForce(
+				{ x: this._force.x, y: this._force.y, z: this._force.z },
+				true,
+			);
+		}
+
+		if (driveMul < 0.05) {
+			return;
+		}
+
+		/**
+		 * Płytka rampa: delikatny stick (pomaga wjechać), nie zero.
+		 * Fade dopiero blisko murawy — elipsa ma dłuższy run przy wysokim n.y.
+		 */
+		const flatFade =
+			n.y > 0.92
+				? THREE.MathUtils.clamp(1 - (n.y - 0.92) / 0.08, 0.28, 1)
+				: n.y > 0.82
+					? THREE.MathUtils.lerp(1, 0.82, (n.y - 0.82) / 0.1)
+					: 1;
+		if (flatFade < 0.08) return;
+
+		const speedMul = THREE.MathUtils.clamp(
+			0.75 + speed / RL_CAR.wallSpeedStickRef,
+			0.8,
+			1.35,
+		);
+		const ceilingMul =
+			n.y < -0.35 ? RL_CAR.wallCeilingStickMul : n.y < 0.2 ? 1.12 : 1;
+		/** Quarter-pipe: stick na wjeździe; na zjeździe mocno ścinamy (klip). */
+		const vy = this.getVelocity().y;
+		const descending = vy < -1.2 && n.y > 0.18 && n.y < 0.9;
+		const curveMul =
+			n.y > 0.15 && n.y < 0.85 ? (descending ? 0.72 : 1.22) : 1;
+		const descentMul = descending ? 0.42 : 1;
+		/** Wjazd: nie gaś sticku przy niskiej prędkości (dawniej 0.55 = odpychanie). */
+		const slowMul = speed < 5 ? 0.9 : speed < 11 ? 0.94 : 1;
+		const stick =
+			RL_HOVER.wallStickAccel *
+			mass *
+			RL_HOVER.wallRideStickMul *
+			speedMul *
+			ceilingMul *
+			curveMul *
+			descentMul *
+			slowMul *
+			driveMul *
+			flatFade;
+		this._force.copy(n).multiplyScalar(-stick);
+		body.addForce(
+			{ x: this._force.x, y: this._force.y, z: this._force.z },
+			true,
+		);
+
+		if (!coasting && n.y < 0.45) {
+			const dfMul = n.y < -0.35 ? 1.25 : 0.85;
+			this._force
+				.copy(n)
+				.multiplyScalar(
+					-RL_CAR.wallDownforce * mass * dfMul * driveMul * flatFade,
+				);
+			body.addForce(
+				{ x: this._force.x, y: this._force.y, z: this._force.z },
+				true,
+			);
+		}
+
+		/** Sep-damping tylko przy aktywnym wall-ride — coast może odlecieć. */
+		if (coasting) return;
+
+		const vel = this.getVelocity();
+		let vn = vel.dot(n);
+		const descendingNow = vel.y < -1.2 && n.y > 0.18 && n.y < 0.9;
+		if (vn > 0.28 && !descendingNow) {
+			const damp = vn > 2.2 ? 0.78 : 0.52;
+			vel.addScaledVector(n, -vn * damp);
+			body.setLinvel({ x: vel.x, y: vel.y, z: vel.z }, true);
+			vn = vel.dot(n);
+		}
+		/** Pionowa banda: tnij launch ponad krawędź (nie hamuj wspinaczki na łuku). */
+		if (Math.abs(n.y) < 0.22 && vel.y > 6.8) {
+			vel.y *= 0.58;
+			body.setLinvel({ x: vel.x, y: vel.y, z: vel.z }, true);
+		}
+		const sepMax =
+			n.y < -0.35
+				? RL_CAR.wallRideSeparationMax * 0.75
+				: Math.abs(n.y) < 0.35
+					? RL_CAR.wallRideSeparationMax * 0.65
+					: RL_CAR.wallRideSeparationMax;
+		if (vn > sepMax) {
+			vel.addScaledVector(n, -(vn - sepMax));
+			body.setLinvel({ x: vel.x, y: vel.y, z: vel.z }, true);
+		}
+	}
+
+	/**
+	 * Meridian: grawitacja świata → składowa styczna do sfery + stick do powierzchni.
+	 * Bez tego auto odpada / flipuje na krzywiznie.
+	 */
+	private applyMeridianSurfaceForces(): void {
+		if (HOVER_SAFE_MODE || this.wheelsGrounded < 1) return;
+		const body = this.rapierRigidBody;
+		const mass = RL_CAR.mass;
+		const n = this.surfaceNormal;
+
+		// Anuluj składową grawitacji wzdłuż normalnej (efekt: „dół” = w sferę).
+		const gDotN = WORLD_GRAVITY * n.y;
+		this._force.copy(n).multiplyScalar(-gDotN * mass);
+		body.addForce(
+			{ x: this._force.x, y: this._force.y, z: this._force.z },
+			true,
+		);
+
+		const stick =
+			RL_HOVER.wallStickAccel * mass * RL_HOVER.wallRideStickMul * 1.35;
+		this._force.copy(n).multiplyScalar(-stick);
+		body.addForce(
+			{ x: this._force.x, y: this._force.y, z: this._force.z },
+			true,
+		);
+
+		this._force.copy(n).multiplyScalar(-RL_CAR.wallDownforce * mass * 0.85);
+		body.addForce(
+			{ x: this._force.x, y: this._force.y, z: this._force.z },
+			true,
+		);
+
+		const vel = this.getVelocity();
+		let vn = vel.dot(n);
+		if (vn > 0.15) {
+			vel.addScaledVector(n, -vn * 0.9);
+			body.setLinvel({ x: vel.x, y: vel.y, z: vel.z }, true);
+			vn = vel.dot(n);
+		}
+		if (vn > 0.8) {
+			vel.addScaledVector(n, -(vn - 0.8));
+			body.setLinvel({ x: vel.x, y: vel.y, z: vel.z }, true);
+		}
+	}
+
+	/**
+	 * Podwozie równolegle do ściany/sufitu — miękki slerp (nie hard-snap jak Meridian).
+	 */
+	private alignWallAttitude(dt: number): void {
+		if (this.wheelsGrounded < 1 || this.flipActive) return;
+		if (this.wallJumpDetachLeft > 0) return;
+		if (this.surfaceNormal.y >= RL_CAR.wallNormalFlatThreshold) return;
+
+		const n = this.surfaceNormal;
+		this._carUp.copy(this.getUpward());
+		const align = this._carUp.dot(n);
+		if (align > 0.985) return;
+
+		this._fwd.copy(this.getForward());
+		this.projectOnPlane(this._fwd, n);
+		if (this._fwd.lengthSq() < 1e-8) {
+			this._fwd.copy(this.getSideward());
+			this.projectOnPlane(this._fwd, n);
+		}
+		if (this._fwd.lengthSq() < 1e-8) return;
+		this._fwd.normalize();
+		this._right.crossVectors(n, this._fwd).normalize();
+		this._fwd.crossVectors(this._right, n).normalize();
+
+		this._alignMat.makeBasis(this._right, n, this._fwd);
+		this._quat.setFromRotationMatrix(this._alignMat);
+
+		const rot = this.rapierRigidBody.rotation();
+		this._tmpQ.set(rot.x, rot.y, rot.z, rot.w);
+		const rate = THREE.MathUtils.clamp(
+			dt * RL_CAR.wallAlignSlerp * 60,
+			0,
+			0.45,
+		);
+		this._tmpQ.slerp(this._quat, rate);
+		this.rapierRigidBody.setRotation(
+			{ x: this._tmpQ.x, y: this._tmpQ.y, z: this._tmpQ.z, w: this._tmpQ.w },
+			true,
+		);
+
+		const av = this.rapierRigidBody.angvel();
+		this._vel.set(av.x, av.y, av.z);
+		const yawRate = this._vel.dot(n);
+		const keep = this._vel.addScaledVector(n, -yawRate).multiplyScalar(0.55);
+		this.rapierRigidBody.setAngvel(
+			{
+				x: n.x * yawRate + keep.x,
+				y: n.y * yawRate + keep.y,
+				z: n.z * yawRate + keep.z,
+			},
+			true,
+		);
+	}
+
+	/**
+	 * Podwozie równolegle do stycznej sfery (jak lockGroundPitchRoll, ale lokalnie).
+	 * getForward() = lokalne +Z — bez negacji w makeBasis.
+	 */
+	private alignMeridianAttitude(dt: number, hardSnap: boolean): void {
+		if (this.wheelsGrounded < 1) return;
+		if (this.flipActive) return;
+
+		const n = this.surfaceNormal;
+		this._carUp.copy(this.getUpward());
+		const align = this._carUp.dot(n);
+
+		// Zachowaj yaw: rzut forward na płaszczyznę styczną.
+		this._fwd.copy(this.getForward());
+		this.projectOnPlane(this._fwd, n);
+		if (this._fwd.lengthSq() < 1e-8) {
+			this._fwd.copy(this.getSideward());
+			this.projectOnPlane(this._fwd, n);
+		}
+		if (this._fwd.lengthSq() < 1e-8) return;
+		this._fwd.normalize();
+		// right = up × forward (układ prawoskrętny, forward = +Z).
+		this._right.crossVectors(n, this._fwd).normalize();
+		this._fwd.crossVectors(this._right, n).normalize();
+
+		this._alignMat.makeBasis(this._right, n, this._fwd);
+		this._quat.setFromRotationMatrix(this._alignMat);
+
+		const rot = this.rapierRigidBody.rotation();
+		this._tmpQ.set(rot.x, rot.y, rot.z, rot.w);
+
+		if (hardSnap || align < 0.92) {
+			// Twardy snap — nos nie ma szans wbić się w mesha.
+			this._tmpQ.copy(this._quat);
+		} else {
+			const rate = THREE.MathUtils.clamp(dt * 28, 0, 1);
+			this._tmpQ.slerp(this._quat, rate);
+		}
+
+		this.rapierRigidBody.setRotation(
+			{ x: this._tmpQ.x, y: this._tmpQ.y, z: this._tmpQ.z, w: this._tmpQ.w },
+			true,
+		);
+
+		// Zostaw tylko spin wokół normalnej (sterowanie); zero pitch/roll.
+		const av = this.rapierRigidBody.angvel();
+		this._vel.set(av.x, av.y, av.z);
+		const yawRate = this._vel.dot(n);
+		this.rapierRigidBody.setAngvel(
+			{ x: n.x * yawRate, y: n.y * yawRate, z: n.z * yawRate },
+			true,
+		);
+
+		// Zabij prędkość wbijającą w powierzchnię (nos / całe auto).
+		const vel = this.getVelocity();
+		const intoSurface = -vel.dot(n);
+		if (intoSurface > 0.05) {
+			vel.addScaledVector(n, intoSurface);
+			this.rapierRigidBody.setLinvel({ x: vel.x, y: vel.y, z: vel.z }, true);
+		}
+	}
+
+	private auditSuspensionForce(
+		wheelIndex: number,
+		forceMag: number,
+		rayDist: number,
+		forceVec: THREE.Vector3,
+	): boolean {
+		const badMag =
+			!Number.isFinite(forceMag) ||
+			forceMag > HOVER_FORCE_MAX ||
+			!Number.isFinite(forceVec.x) ||
+			!Number.isFinite(forceVec.y) ||
+			!Number.isFinite(forceVec.z) ||
+			Math.abs(forceVec.x) > HOVER_FORCE_MAX ||
+			Math.abs(forceVec.y) > HOVER_FORCE_MAX ||
+			Math.abs(forceVec.z) > HOVER_FORCE_MAX;
+
+		if (badMag) {
+			console.error(
+				`[CRITICAL PHYSICS FAIL] Siła zawieszenia poza limitem: ${forceMag.toFixed(1)} N ` +
+					`(wektor ${forceVec.x.toFixed(1)}, ${forceVec.y.toFixed(1)}, ${forceVec.z.toFixed(1)}) | ` +
+					`Odległość raycastu: ${rayDist.toFixed(4)} m | koło #${wheelIndex}`,
+			);
+			return false;
+		}
+		return true;
+	}
+
+	private logHoverTelemetry(): void {
+		if (HOVER_TELEMETRY_EVERY_STEPS <= 0) return;
+		this.physicsStepCounter++;
+		if (this.physicsStepCounter % HOVER_TELEMETRY_EVERY_STEPS !== 0) return;
+
+		const t = this.rapierRigidBody.translation();
+		const v = this.rapierRigidBody.linvel();
+		console.info(
+			`[HOVER] safe=${HOVER_SAFE_MODE} wheels=${this.wheelsGrounded}/4 grounded=${this.isGrounded} ` +
+				`suspOff=${this.disableSuspensionTimer.toFixed(2)}s jumpCd=${this.jumpCooldown.toFixed(2)}s ` +
+				`F_sum=${this.lastSuspensionForceMag.toFixed(0)}N pos=(${t.x.toFixed(2)},${t.y.toFixed(2)},${t.z.toFixed(2)}) ` +
+				`vel=(${v.x.toFixed(2)},${v.y.toFixed(2)},${v.z.toFixed(2)})`,
+		);
+	}
+
+	private updateSuspensionDebugDraw(): void {
+		if (!this.suspensionViz) return;
+		this.suspensionViz.update(_rayDebugScratch);
+	}
+
+	private applyGroundDrive(dt: number, meridian = false): void {
+		if (this.wheelsGrounded < RL_HOVER.groundedMinWheels) return;
+		const onWallSurface =
+			this.isOnWallOrRamp() &&
+			this.surfaceNormal.y < RL_CAR.wallNormalFlatThreshold;
+		// Meridian / wall: auto przechylone względem świata — gate world-up blokował jazdę.
+		// Signed: żółw (upY≈−1) nie dostaje ground drive (klip 06:14).
+		if (!meridian && !onWallSurface && this.getUpward().y < 0.7)
+			return;
+
+		this._up.copy(this.surfaceNormal);
+		this._fwd.copy(this.getForward());
+		this._right.copy(this.getSideward());
+		this.projectOnPlane(this._fwd, this._up);
+		this.projectOnPlane(this._right, this._up);
+		if (this._fwd.lengthSq() < 1e-6) return;
+		this._fwd.normalize();
+		this._right.normalize();
+
+		const vel = this.getVelocity();
+		const velUp = this._tmp.copy(this._up).multiplyScalar(vel.dot(this._up));
+		const velPlane = this._vel.copy(vel).sub(velUp);
+
+		let speedFwd = velPlane.dot(this._fwd);
+		let speedRight = velPlane.dot(this._right);
+
+		const accelUu = rlGroundDriveAccelUu(
+			mpsToUu(speedFwd),
+			this.lastThrottle,
+			this.lastBoosting,
+		);
+		speedFwd += uuAccelToMps2(accelUu) * dt;
+		const maxSpd = onWallSurface ? RL_CAR.wallMaxSpeed : RL_CAR.maxSpeed;
+		speedFwd = THREE.MathUtils.clamp(
+			speedFwd,
+			-RL_CAR.reverseMaxSpeed,
+			maxSpd,
+		);
+
+		const grip = THREE.MathUtils.lerp(
+			RL_CAR.lateralGrip,
+			RL_CAR.driftGrip,
+			this.driftBlend,
+		);
+		speedRight *= Math.max(0, 1 - grip * dt);
+		const driftingNow = this.driftBlend > 0.35;
+		if (!driftingNow && Math.abs(speedRight) < 0.05) speedRight = 0;
+
+		if (!driftingNow && Math.abs(this.lastThrottle) > 0.08) {
+			const spd = Math.hypot(speedFwd, speedRight);
+			const sign = speedFwd >= 0 ? 1 : -1;
+			speedFwd = THREE.MathUtils.lerp(
+				speedFwd,
+				spd * sign,
+				dt * RL_CAR.groundAlign,
+			);
+			speedRight = THREE.MathUtils.lerp(
+				speedRight,
+				0,
+				dt * RL_CAR.groundAlign * 1.6,
+			);
+		}
+
+		this._vel
+			.copy(this._fwd)
+			.multiplyScalar(speedFwd)
+			.add(this._right.multiplyScalar(speedRight))
+			.add(velUp);
+		clampSpeedMps(this._vel, maxSpd);
+		this.groundDriveLinvel = { x: this._vel.x, y: this._vel.y, z: this._vel.z };
+
+		const av = this.rapierRigidBody.angvel();
+		const speedAlong = Math.hypot(speedFwd, speedRight);
+		const LOW_SPEED = 0.8;
+		const steerScale =
+			(THREE.MathUtils.lerp(1, RL_CAR.driftSteerMul, this.driftBlend)) *
+			this.ballSteerMul;
+		const surfaceYaw =
+			onWallSurface || meridian
+				? av.x * this._up.x + av.y * this._up.y + av.z * this._up.z
+				: av.y;
+
+		const setYawAround = (yawRate: number): void => {
+			if (onWallSurface || meridian) {
+				const n = this._up;
+				const spin = av.x * n.x + av.y * n.y + av.z * n.z;
+				const keepX = av.x - n.x * spin;
+				const keepY = av.y - n.y * spin;
+				const keepZ = av.z - n.z * spin;
+				this.rapierRigidBody.setAngvel(
+					{
+						x: n.x * yawRate + keepX * 0.35,
+						y: n.y * yawRate + keepY * 0.35,
+						z: n.z * yawRate + keepZ * 0.35,
+					},
+					true,
+				);
+			} else {
+				this.rapierRigidBody.setAngvel(
+					{ x: av.x, y: yawRate, z: av.z },
+					true,
+				);
+			}
+		};
+
+		if (Math.abs(this.lastYaw) < 0.01) {
+			if (!driftingNow) {
+				if (onWallSurface || meridian) {
+					const n = this._up;
+					const spin = av.x * n.x + av.y * n.y + av.z * n.z;
+					/** Soft decay — twarde zero yaw = „klej” jak na szynie. */
+					const keep = spin * Math.exp(-14 * dt);
+					this.rapierRigidBody.setAngvel(
+						{
+							x: av.x - n.x * (spin - keep),
+							y: av.y - n.y * (spin - keep),
+							z: av.z - n.z * (spin - keep),
+						},
+						true,
+					);
+				} else if (Math.abs(av.y) > 1e-4) {
+					this.rapierRigidBody.setAngvel(
+						{ x: av.x, y: av.y * Math.exp(-14 * dt), z: av.z },
+						true,
+					);
+				}
+			}
+		} else if (speedAlong < LOW_SPEED) {
+			setYawAround(this.lastYaw * RL_CAR.groundTurnInPlace * steerScale);
+		} else {
+			const target =
+				rlTargetYawRate(mpsToUu(speedFwd), this.lastYaw) * steerScale;
+			const maxDelta =
+				RL_CAR.yawAngAccel * dt * (1 + 0.35 * this.driftBlend);
+			const newYaw =
+				surfaceYaw +
+				THREE.MathUtils.clamp(target - surfaceYaw, -maxDelta, maxDelta);
+			setYawAround(newYaw);
+		}
+
+		if (this.lastBoosting) {
+			this.boostFuel = Math.max(0, this.boostFuel - dt * RL_CAR.boostDrain);
+		}
+	}
+
+	private getCarAxes(): {
+		right: THREE.Vector3;
+		up: THREE.Vector3;
+		forward: THREE.Vector3;
+	} {
+		this._right.copy(this.getSideward()).normalize();
+		this._up.copy(this.getUpward()).normalize();
+		this._fwd.copy(this.getForward()).normalize();
+		return { right: this._right, up: this._up, forward: this._fwd };
+	}
+
+	private effectiveDodgeDeadzone(): number {
+		if (!this.bodyTraitsEnabled) return RL_CAR.dodgeDeadzone;
+		return pivotDodgeDeadzone(
+			this.bodyTraits,
+			RL_CAR.dodgeDeadzone,
+			mpsToUu(this.getVelocity().length()),
+		);
+	}
+
+	/** Air control — mały deadzone (RL nie używa dodgeDeadzone do pitch/yaw). */
+	private filterAirStick(v: number): number {
+		return Math.abs(v) >= 0.05 ? v : 0;
+	}
+
+	private applyRlAirControl(dt: number): void {
+		const axes = this.getCarAxes();
+		let pitchIn = this.filterAirStick(this.lastThrottle);
+		let yawIn = this.filterAirStick(this.lastYaw);
+		let rollIn = this.filterAirStick(this.lastRoll);
+
+		const pos = this.rapierRigidBody.translation();
+		/** Pełny air pitch tuż po skoku — attenuacja przy murawie poza fresh window. */
+		const heightAbove = pos.y - PLAYFIELD_SURFACE_Y;
+		const freshAerial =
+			this.jumpCount === 1 &&
+			this.canSecondJump &&
+			this.dodgeWindowAge < 0.55;
+		const strongPitch = Math.abs(pitchIn) > 0.55;
+		if (heightAbove < 1.35 && !freshAerial && !strongPitch) {
+			pitchIn *= THREE.MathUtils.smoothstep(heightAbove, 0.55, 1.35);
+		}
+		/**
+		 * Koła prawie na ziemi — tłumi pitch tylko bez trzymanego W/S
+		 * (inaczej nie da się domknąć pętli / wyjść ze stójki — klip 13:53).
+		 */
+		if (
+			!freshAerial &&
+			!strongPitch &&
+			!this.isOnWallOrRamp() &&
+			this.jumpCount === 1 &&
+			heightAbove < 1.05 &&
+			(this.wheelsGrounded >= 1 || heightAbove < 0.75)
+		) {
+			pitchIn *= THREE.MathUtils.smoothstep(heightAbove, 0.4, 1.05) * 0.35;
+		}
+
+		const fastAerialSetup =
+			this.jumpCount === 1 &&
+			this.canSecondJump &&
+			pitchIn < -0.32;
+		const firstJumpAerialPitch =
+			this.jumpCount === 1 && this.canSecondJump;
+		/**
+		 * Softlock przy murawie bez inputu — nie pogłębiaj stójki.
+		 * 1×PPM aerial: NIE ucinaj W/S przy |fy|>0.62 — inaczej nie da się
+		 * dojść / utrzymać ~90° (partial W + murawa).
+		 */
+		if (
+			!fastAerialSetup &&
+			!strongPitch &&
+			!firstJumpAerialPitch &&
+			!this.isOnWallOrRamp() &&
+			heightAbove < 1.15 &&
+			this.getVelocity().y < 0.15
+		) {
+			const fy = this.getForward().y;
+			const ang = this.rapierRigidBody.angvel();
+			const spin = Math.hypot(ang.x, ang.y, ang.z);
+			if (spin < 1.8) {
+				if (fy > 0.62 && pitchIn < 0) pitchIn = 0;
+				if (fy < -0.62 && pitchIn > 0) pitchIn = 0;
+			}
+		}
+
+		/**
+		 * RL: Powerslide / Air Roll na tym samym bindzie (Shift / L1).
+		 * W powietrzu A/D → beczka (roll), nie yaw. Q/E nadal dodają roll.
+		 */
+		if (this.lastDrifting) {
+			/** A/D jak Q/E (E−Q): A = lewo = ten sam znak co Q. */
+			const stickRoll = -this.filterAirStick(this.lastYaw);
+			rollIn = THREE.MathUtils.clamp(rollIn + stickRoll, -1, 1);
+			yawIn = 0;
+		}
+
+		if (this.neutralJumpLockLeft > 0) {
+			rollIn = this.filterAirStick(rollIn);
+		}
+
+		/**
+		 * RocketSim: podczas flipa air pitch zablokowany; yaw/roll z air control
+		 * tylko przy flip-cancel. U nas spin jest kinematyczny — Q/E doklejamy
+		 * w applyFlipSpin na oś nosa. Tu nie walcz z overwrite ω.
+		 */
+		if (this.flipActive) {
+			this.rapierRigidBody.setAngularDamping(0);
+			return;
+		}
+
+		let pitchScale = 1;
+		if (this.flipPitchLockLeft > 0) {
+			pitchScale = 0;
+		}
+
+		const av = this.rapierRigidBody.angvel();
+		const mass = RL_CAR.mass;
+		const pitchOmega =
+			av.x * axes.right.x + av.y * axes.right.y + av.z * axes.right.z;
+		const yawOmega = av.x * axes.up.x + av.y * axes.up.y + av.z * axes.up.z;
+		const rollOmega =
+			av.x * axes.forward.x + av.y * axes.forward.y + av.z * axes.forward.z;
+
+		this._force.set(0, 0, 0);
+
+		// Po flopie (pitch lock): brak air pitch z W/S — residual ω dokręca ~360°.
+		// Nie dampuj pitch tutaj: airPitchDamp zabijał residual → half-flip (klip 01-08).
+		if (this.flipPitchLockLeft > 0) {
+			/* pitch input już wyzerowany przez pitchScale */
+		} else if (Math.abs(pitchIn) > 0.01 || Math.abs(pitchOmega) > 0.01) {
+			const pitchAccel = pitchIn * RL_CAR.pitchAngAccel * pitchScale;
+			const pitchDamp =
+				pitchOmega *
+				RL_CAR.airPitchDamp *
+				(1 - Math.min(1, Math.abs(pitchIn * pitchScale)));
+			this._force.addScaledVector(axes.right, (pitchAccel - pitchDamp) * mass);
+		}
+
+		if (Math.abs(yawIn) > 0.01 || Math.abs(yawOmega) > 0.01) {
+			const yawAccel = yawIn * RL_CAR.yawAngAccel;
+			const yawDamp = yawOmega * RL_CAR.airYawDamp * (1 - Math.abs(yawIn));
+			this._force.addScaledVector(axes.up, (yawAccel - yawDamp) * mass);
+		}
+
+		/**
+		 * RLUtilities / RocketSim: damp rollu ZAWSZE pełny (H.x = −50, bez 1−|roll|).
+		 * Wcześniej przy Q/E=±1 damp=0 → lodowaty spin do capu, trudny stop.
+		 */
+		if (Math.abs(rollIn) > 0.01 || Math.abs(rollOmega) > 0.01) {
+			const rollAccel = rollIn * RL_CAR.rollAngAccel;
+			const rollDamp = rollOmega * RL_CAR.airRollDamp;
+			let rollCmd = rollAccel - rollDamp;
+			/** RL: |ω| ≤ CAR_MAX_ANG_SPEED — przy capie tylko damp, bez dalszego napędu. */
+			if (
+				Math.abs(rollOmega) >= RL_CAR.airMaxAngVel * 0.98 &&
+				rollAccel * rollOmega > 0
+			) {
+				rollCmd = -rollDamp;
+			}
+			this._force.addScaledVector(axes.forward, rollCmd * mass);
+		}
+
+		const hasInput =
+			Math.abs(pitchIn) > 0.01 ||
+			Math.abs(yawIn) > 0.01 ||
+			Math.abs(rollIn) > 0.01;
+
+		this.rapierRigidBody.setAngularDamping(
+			hasInput ? RL_CAR.airAngularDamp : RL_CAR.airAngularDamp * 2.8,
+		);
+
+		if (this._force.lengthSq() < 1e-4) return;
+
+		this.rapierRigidBody.addTorque(
+			{ x: this._force.x, y: this._force.y, z: this._force.z },
+			true,
+		);
+
+		const maxAv = RL_CAR.airMaxAngVel;
+		const ang = this.rapierRigidBody.angvel();
+		this._vel.set(ang.x, ang.y, ang.z);
+		this.clampVec(this._vel, maxAv);
+		if (
+			Math.abs(this._vel.x - ang.x) > 1e-4 ||
+			Math.abs(this._vel.y - ang.y) > 1e-4 ||
+			Math.abs(this._vel.z - ang.z) > 1e-4
+		) {
+			this.rapierRigidBody.setAngvel(
+				{ x: this._vel.x, y: this._vel.y, z: this._vel.z },
+				true,
+			);
+		}
+
+		void dt;
+	}
+
+	private applyAirThrottle(dt: number): void {
+		/** Flip: boost w applyFlipBoostPostStep (po solverze — klip 18-03). */
+		if (this.flipActive) return;
+
+		const throttle = this.filterAirStick(this.lastThrottle);
+		if (Math.abs(throttle) < 0.01 && !this.lastBoosting) return;
+
+		this._fwd.copy(this.getForward()).normalize();
+		let accelUu = rlAirThrottleAccelUu(throttle);
+		if (this.lastBoosting && this.boostFuel > 0) {
+			accelUu += rlAirBoostAccelUu() * Math.max(0.25, this.boostForceMul);
+			this.boostFuel = Math.max(0, this.boostFuel - dt * RL_CAR.boostDrain);
+		}
+		if (Math.abs(accelUu) < 0.01) return;
+
+		const accel = uuAccelToMps2(accelUu);
+		this._vel.copy(this.rapierRigidBody.linvel());
+		this._vel.addScaledVector(this._fwd, accel * dt);
+		clampSpeedMps(this._vel, RL_CAR.maxSpeed);
+		this.rapierRigidBody.setLinvel(
+			{ x: this._vel.x, y: this._vel.y, z: this._vel.z },
+			true,
+		);
+	}
+
+	/**
+	 * Boost / gaz w trakcie dodge — PO world.step(), żeby solver nie zjadał Δv.
+	 * Kierunek = nos auta (RL); przy samym boostcie i niskim nosem lekki lift.
+	 */
+	private applyFlipBoostPostStep(dt: number): void {
+		if (!this.flipActive || !this.lastBoosting || this.boostFuel <= 0) return;
+
+		this._fwd.copy(this.getForward());
+		if (this._fwd.lengthSq() < 1e-8) return;
+		this._fwd.normalize();
+
+		const throttle = this.filterAirStick(this.lastThrottle);
+		let accelUu = rlAirThrottleAccelUu(throttle);
+		if (this.lastBoosting) {
+			accelUu += rlAirBoostAccelUu() * Math.max(0.25, this.boostForceMul);
+		}
+		if (Math.abs(accelUu) < 0.01) return;
+
+		/** Sam LMB w połowie salta: nos w dół → dodaj komponent w górę (fast aerial). */
+		if (
+			Math.abs(throttle) < 0.01 &&
+			this._fwd.y < 0.35 &&
+			Math.abs(this.flipRelY) > 0.1
+		) {
+			this._tmp.set(0, 1, 0);
+			this._fwd.lerp(this._tmp, 0.45).normalize();
+		}
+
+		const vel = this.getVelocity();
+		vel.addScaledVector(this._fwd, uuAccelToMps2(accelUu) * dt);
+		clampSpeedMps(vel, RL_CAR.maxSpeed);
+		this.rapierRigidBody.setLinvel({ x: vel.x, y: vel.y, z: vel.z }, true);
+		this.boostFuel = Math.max(0, this.boostFuel - dt * RL_CAR.boostDrain);
+		this.flipGravityOffLeft = Math.max(this.flipGravityOffLeft, dt * 4);
+	}
+
+	private processJumpPress(input: ControlInput): void {
+		this.castSuspension();
+		/** Dach / bok — szybki flip na koła zamiast zwykłego skoku / aerial. */
+		if (this.tryPerformRecoveryFlip()) return;
+
+		const groundedForJump =
+			this.wheelsGrounded >= RL_HOVER.groundedMinWheels &&
+			this.disableSuspensionTimer <= 0 &&
+			this.jumpCooldown <= 0;
+		/** Wall re-jump — po mocnym detach jumpCount bywa 1, a alongN blokuje reset. */
+		const wallRejump =
+			this.isOnWallOrRamp() &&
+			this.wheelsCompressing >= 1 &&
+			this.jumpCooldown <= 0 &&
+			this.disableSuspensionTimer <= 0 &&
+			this.wallJumpDetachLeft <= 0;
+		if (groundedForJump || wallRejump) {
+			this.performLiftOffJump();
+			/**
+			 * Bounce / podwójny edge z jednego PPM: zjedz resztę kolejki,
+			 * żeby W/S nie odpaliło dodge w następnej klatce (klip 23-21).
+			 */
+			drainJumpEdges(input);
+			return;
+		}
+		if (!HOVER_SAFE_MODE) {
+			this.handleJump(input);
+		}
+	}
+
+	private handleJump(input: ControlInput): void {
+		this.trySecondJumpAir(input);
+	}
+
+	/** Drugi skok w powietrzu — tylko rising edge PPM po puszczeniu 1. skoku. */
+	private trySecondJumpAir(input: ControlInput): void {
+		if (
+			this.isGrounded ||
+			!this.canSecondJump ||
+			this.jumpCount !== 1 ||
+			!this.airJumpArmed ||
+			this.dodgeWindowAge >= RL_CAR.dodgeWindow ||
+			this.dodgeWindowAge < 0.05
+		) {
+			return;
+		}
+		const throttle = input.forward();
+		const yaw = input.yaw();
+		const inputMag = Math.abs(throttle) + Math.abs(yaw);
+		const wantsFlip = inputMag >= this.effectiveDodgeDeadzone();
+
+		/**
+		 * Po 1×PPM+W nos w trawie — nie ghost double-jump (neutral).
+		 * Recovery / reverse flip (S przy nosie w dół) musi przejść (klip 17-04-27).
+		 */
+		const h =
+			this.rapierRigidBody.translation().y - PLAYFIELD_SURFACE_Y;
+		const noseDig = Math.abs(this.getForward().y) > 0.55;
+		if (h < 0.55 && noseDig && !wantsFlip) {
+			return;
+		}
+
+		if (wantsFlip) {
+			this.performFlip(throttle, yaw);
+			this.aerialSfxPulse = 1;
+		} else {
+			this.performDoubleJump();
+			this.aerialSfxPulse = 2;
+		}
+		this.canSecondJump = false;
+		this.jumpCount = 2;
+		this.jumpHoldLeft = 0;
+	}
+
+	/**
+	 * Yaw z quata (`carHorizontalForwardFromQuat`) odwraca się gdy |pitch|>90°.
+	 * Trzymamy ostatni stabilny poziom-przód, póki auto nie jest prawie pionowo.
+	 */
+	private refreshStableFlatForward(): void {
+		const fy = this.getForward().y;
+		if (Math.abs(fy) > 0.72) return;
+		carHorizontalForwardFromQuat(this.rapierRigidBody.rotation(), this._fwd);
+		if (this._fwd.lengthSq() < 1e-4) return;
+		/** Odrzuć skok o ~180° (artefakt ekstrakcji yaw). */
+		if (this._fwd.dot(this._stableFlatFwd) < -0.2) return;
+		this._stableFlatFwd.copy(this._fwd).normalize();
+	}
+
+	private performDoubleJump(): void {
+		this._up.copy(this.getUpward());
+		const vel = this.getVelocity();
+		const vn = vel.dot(this._up);
+		if (vn < 0) vel.addScaledVector(this._up, -vn);
+		vel.addScaledVector(this._up, RL_CAR.doubleJumpImpulse);
+		clampSpeedMps(vel, RL_CAR.maxSpeed);
+		this.rapierRigidBody.setLinvel({ x: vel.x, y: vel.y, z: vel.z }, true);
+
+		/**
+		 * RL: neutral double jump NIE spłaszcza auta — tylko impuls.
+		 * Flatten tu zabijał aerial setup (klip: „zawieszony” flip / utrata pitch).
+		 */
+		this.neutralJumpLockLeft = RL_CAR.neutralJumpLockTime;
+	}
+
+	private performFlip(throttle: number, yaw: number): void {
+		const stick = { throttle, yaw };
+		const { dodgeX, dodgeY } = rlDodgeDirection(stick);
+		/** RocketSim flipRelTorque = (−dodgeY, dodgeX, 0). */
+		this.flipRelX = -dodgeY;
+		this.flipRelY = dodgeX;
+
+		const rot = this.rapierRigidBody.rotation();
+		this._quat.set(rot.x, rot.y, rot.z, rot.w);
+
+		/**
+		 * Tylko pełny turtle — NIE spłaszczaj po air pitch (up.y≈0 przy nosie w dół).
+		 * Euler x=z=0 + yaw z quata przy |pitch|>90° odwraca kierunek flipa
+		 * (wolny 2×PPM+W — klip 14:05).
+		 */
+		if (!this.isOnWallOrRamp() && this.getUpward().y < -0.2) {
+			this._fwd.copy(this._stableFlatFwd);
+			if (this._fwd.lengthSq() < 1e-4) {
+				carHorizontalForwardFromQuat(this._quat, this._fwd);
+			}
+			carHorizontalRightFromForward(this._fwd, this._right);
+			this._up.set(0, 1, 0);
+			this._alignMat.makeBasis(this._right, this._up, this._fwd);
+			this._quat.setFromRotationMatrix(this._alignMat);
+			this.rapierRigidBody.setRotation(
+				{
+					x: this._quat.x,
+					y: this._quat.y,
+					z: this._quat.z,
+					w: this._quat.w,
+				},
+				true,
+			);
+		}
+
+		/**
+		 * Spin: osie car-local w world (kontynuacja air pitch).
+		 * Poziome osie z yaw-quata odwracają się po |pitch|>90°.
+		 */
+		this._flipAxisPitch.copy(this.getSideward()).normalize();
+		this._flipAxisRoll.copy(this.getForward()).normalize();
+		if (this._flipAxisPitch.lengthSq() < 1e-4) {
+			this._flipAxisPitch.set(1, 0, 0);
+		}
+		if (this._flipAxisRoll.lengthSq() < 1e-4) {
+			this._flipAxisRoll.set(0, 0, 1);
+		}
+
+		/** Impuls dodge — stabilny poziom (nie odwrócony yaw). */
+		this._fwd.copy(this._stableFlatFwd);
+		if (Math.abs(this.getForward().y) < 0.55) {
+			carHorizontalForwardFromQuat(this._quat, this._tmp);
+			if (
+				this._tmp.lengthSq() > 1e-4 &&
+				(this._stableFlatFwd.lengthSq() < 1e-4 ||
+					this._tmp.dot(this._stableFlatFwd) >= -0.15)
+			) {
+				this._fwd.copy(this._tmp);
+			}
+		}
+		if (this._fwd.lengthSq() < 1e-4) {
+			this._fwd.set(this._flipAxisRoll.x, 0, this._flipAxisRoll.z);
+		}
+		if (this._fwd.lengthSq() < 1e-4) {
+			this._fwd.set(0, 0, 1);
+		} else {
+			this._fwd.normalize();
+		}
+		carHorizontalRightFromForward(this._fwd, this._tmp);
+
+		/**
+		 * Nie zeruj ω przed spinem — po air pitch (PPM+W) zero→ramp = dip,
+		 * zero „przyspieszenia” na 2. PPM. applyFlipSpin od razu ustawia ω flipa.
+		 */
+		this._flipQuat.copy(this._quat);
+		this.rapierRigidBody.setAngularDamping(0);
+
+		const forwardSpeedUu = mpsToUu(this.getVelocity().dot(this._fwd));
+		if (dodgeX !== 0 || dodgeY !== 0) {
+			const { alongFwd, alongSide } = rlDodgeImpulseComponentsMps(
+				stick,
+				forwardSpeedUu,
+			);
+			const isCardinalFwdBack =
+				Math.abs(dodgeX) >= Math.abs(dodgeY) && Math.abs(dodgeX) > 0.1;
+			const vel = this.getVelocity();
+			if (isCardinalFwdBack) {
+				const lateral = vel.dot(this._tmp);
+				vel.addScaledVector(this._tmp, -lateral);
+			}
+			vel.addScaledVector(this._fwd, alongFwd);
+			vel.addScaledVector(this._tmp, alongSide);
+			clampSpeedMps(vel, RL_CAR.maxSpeed);
+			this.rapierRigidBody.setLinvel({ x: vel.x, y: vel.y, z: vel.z }, true);
+		}
+		this.flipImpulseTicksLeft = 0;
+
+		this.flipPitchRateMul =
+			dodgeX < -0.1 && Math.abs(dodgeX) >= Math.abs(dodgeY)
+				? RL_CAR.backflipPitchTorqueMul
+				: 1;
+		this.flipActive = true;
+		this.flipTimer = RL_CAR.flipDuration;
+		this.flipElapsed = 0;
+		this.flipAngleAccum = 0;
+		this.flipGravityOffLeft = RL_CAR.flipGravityOffDuration;
+		this.disableSuspensionTimer = Math.max(
+			this.disableSuspensionTimer,
+			RL_CAR.flipDuration + 0.15,
+		);
+		/** Od razu pełny spin — widać kick jak RL torque→cap (bez 3-tick dip). */
+		this.applyFlipSpin(0, false);
+	}
+
+	/** Po world.step — nadpisz quat/ω (solver nie może skosić salta). */
+	assertFlipPose(): void {
+		if (!this.flipActive) return;
+		this.applyFlipSpin(0, false);
+	}
+
+	/**
+	 * Spin dodge: REPLACE ω na zamrożonych osiach + kinematyczny quat.
+	 * @param integrate — true w pre-step (obróć quat o dt); false = tylko re-assert.
+	 */
+	private applyFlipSpin(dt: number, integrate: boolean): void {
+		const pitchInput = -this.lastThrottle;
+		const pitchScale = rlFlipCancelPitchScale(
+			this.flipRelY,
+			pitchInput,
+			this.flipElapsed,
+			RL_CAR.flipNoCancelTime,
+		);
+		/**
+		 * Spin-up: start od ~70% capu (widoczny kick), pełne 100% w ~5 tickach @120 Hz.
+		 * Po air pitch: nie schodź poniżej istniejącego ω w tym samym znaku (dip na 2. PPM).
+		 */
+		const ramp = Math.min(
+			1,
+			0.7 + 0.3 * Math.min(1, this.flipElapsed / (5 / RL_CAR.physicsTickHz)),
+		);
+		let pitchRate =
+			this.flipRelY *
+			pitchScale *
+			RL_CAR.flipMaxAngVel *
+			this.flipPitchRateMul *
+			ramp;
+		let rollRate = this.flipRelX * RL_CAR.flipMaxAngVel * ramp;
+		/**
+		 * Dziedzicz air-spin tylko wzdłuż dominantnej osi dodge —
+		 * inaczej residual pitch przy sideflipie psuje płaszczyznę roll.
+		 */
+		if (this.flipElapsed < 0.08) {
+			const av = this.rapierRigidBody.angvel();
+			const alongPitch =
+				av.x * this._flipAxisPitch.x +
+				av.y * this._flipAxisPitch.y +
+				av.z * this._flipAxisPitch.z;
+			const alongRoll =
+				av.x * this._flipAxisRoll.x +
+				av.y * this._flipAxisRoll.y +
+				av.z * this._flipAxisRoll.z;
+			if (
+				Math.abs(this.flipRelY) >= Math.abs(this.flipRelX) * 0.85 &&
+				Math.abs(alongPitch) > Math.abs(pitchRate) &&
+				Math.sign(alongPitch) === Math.sign(pitchRate)
+			) {
+				pitchRate = alongPitch;
+			}
+			if (
+				Math.abs(this.flipRelX) >= Math.abs(this.flipRelY) * 0.85 &&
+				Math.abs(alongRoll) > Math.abs(rollRate) &&
+				Math.sign(alongRoll) === Math.sign(rollRate)
+			) {
+				rollRate = alongRoll;
+			}
+		}
+		this._vel.set(0, 0, 0);
+		this._vel.addScaledVector(this._flipAxisPitch, pitchRate);
+		this._vel.addScaledVector(this._flipAxisRoll, rollRate);
+
+		/**
+		 * Q/E podczas dodge — dokłada spin wokół nosa (jak air roll w speedflipie).
+		 * Clamp |ω|, żeby nie rozwalać kinematycznego salta.
+		 */
+		const airRoll = this.filterAirStick(this.lastRoll);
+		const driftRoll = this.lastDrifting
+			? -this.filterAirStick(this.lastYaw)
+			: 0;
+		const rollIn = THREE.MathUtils.clamp(airRoll + driftRoll, -1, 1);
+		if (Math.abs(rollIn) > 0.01) {
+			this._fwd.set(0, 0, 1).applyQuaternion(this._flipQuat).normalize();
+			this._vel.addScaledVector(this._fwd, rollIn * 2.4);
+			this.clampVec(this._vel, RL_CAR.flipMaxAngVel * 1.12);
+		}
+
+		if (integrate && dt > 0) {
+			/** dq/dt = ½ ω_world ⊗ q */
+			const hx = this._vel.x * dt * 0.5;
+			const hy = this._vel.y * dt * 0.5;
+			const hz = this._vel.z * dt * 0.5;
+			const qx = this._flipQuat.x;
+			const qy = this._flipQuat.y;
+			const qz = this._flipQuat.z;
+			const qw = this._flipQuat.w;
+			this._flipQuat
+				.set(
+					qx + hx * qw + hy * qz - hz * qy,
+					qy - hx * qz + hy * qw + hz * qx,
+					qz + hx * qy - hy * qx + hz * qw,
+					qw - hx * qx - hy * qy - hz * qz,
+				)
+				.normalize();
+			this.flipAngleAccum += Math.hypot(pitchRate, rollRate) * dt;
+		}
+
+		this.rapierRigidBody.setRotation(
+			{
+				x: this._flipQuat.x,
+				y: this._flipQuat.y,
+				z: this._flipQuat.z,
+				w: this._flipQuat.w,
+			},
+			true,
+		);
+		this.rapierRigidBody.setAngvel(
+			{ x: this._vel.x, y: this._vel.y, z: this._vel.z },
+			true,
+		);
+	}
+
+	private applyFlipPhysics(dt: number): void {
+		if (this.flipImpulseTicksLeft > 0) {
+			this.flipImpulseTicksLeft--;
+			const vel = this.getVelocity();
+			vel.addScaledVector(this._flipImpulseFwdDir, this.flipImpulseFwdPerTick);
+			vel.addScaledVector(
+				this._flipImpulseSideDir,
+				this.flipImpulseSidePerTick,
+			);
+			clampSpeedMps(vel, RL_CAR.maxSpeed);
+			this.rapierRigidBody.setLinvel({ x: vel.x, y: vel.y, z: vel.z }, true);
+		}
+
+		if (this.jumpStickyLeft > 0) {
+			this.jumpStickyLeft = Math.max(0, this.jumpStickyLeft - dt);
+			this._force.set(0, -RL_CAR.stickyForce * RL_CAR.mass, 0);
+			this.rapierRigidBody.addForce(
+				{ x: this._force.x, y: this._force.y, z: this._force.z },
+				true,
+			);
+		}
+
+		if (this.flipGravityOffLeft > 0) {
+			this.flipGravityOffLeft -= dt;
+			this._force.set(0, RL_CAR.mass * Math.abs(WORLD_GRAVITY), 0);
+			this.rapierRigidBody.addForce(
+				{ x: this._force.x, y: this._force.y, z: this._force.z },
+				true,
+			);
+		} else if (
+			this.flipActive &&
+			this.lastBoosting &&
+			this.boostFuel > 0
+		) {
+			/** Boost w flipie — anty-g bez pełnego flipGravityOff (klip 18-03). */
+			this._force.set(0, RL_CAR.mass * Math.abs(WORLD_GRAVITY), 0);
+			this.rapierRigidBody.addForce(
+				{ x: this._force.x, y: this._force.y, z: this._force.z },
+				true,
+			);
+		} else if (this.gravityScale < 0.999) {
+			const lift =
+				RL_CAR.mass * Math.abs(WORLD_GRAVITY) * (1 - this.gravityScale);
+			this.rapierRigidBody.addForce({ x: 0, y: lift, z: 0 }, true);
+		}
+
+		if (!this.flipActive) return;
+
+		this.flipTimer -= dt;
+		this.flipElapsed += dt;
+
+		this.applyFlipSpin(dt, true);
+
+		if (
+			this.flipElapsed > RL_CAR.flipVertDampStart &&
+			this.flipTimer > 0 &&
+			!(this.lastBoosting && this.boostFuel > 0)
+		) {
+			const vel = this.getVelocity();
+			const mul = RL_CAR.flipVertDampMul ** (dt * RL_CAR.physicsTickHz);
+			const dampUp = this.flipElapsed < RL_CAR.flipVertDampEnd;
+			const vy = vel.y;
+			if (vy < 0 || dampUp) {
+				vel.y = vy * mul;
+				this.rapierRigidBody.setLinvel({ x: vel.x, y: vel.y, z: vel.z }, true);
+			}
+		}
+
+		/**
+		 * RocketSim FLIP_TORQUE_TIME: po 0.65 s kończymy kinematyczny spin w powietrzu.
+		 * Sticky flipActive po timerze (stary warunek fullTurn zawsze) blokował air
+		 * control — W/S = „obrót auta” (klip 01-08-24).
+		 * Wyjątek: blisko murawy dokręcamy kinematycznie do ~360° (klip 17-14 scrape),
+		 * inaczej collider zabija residual → half-flip.
+		 */
+		if (this.flipTimer <= 0) {
+			const pitchInput = -this.lastThrottle;
+			const cancelScale = rlFlipCancelPitchScale(
+				this.flipRelY,
+				pitchInput,
+				this.flipElapsed,
+				RL_CAR.flipNoCancelTime,
+			);
+			const cancelled = cancelScale < 0.55;
+			const fullTurn = this.flipAngleAccum >= Math.PI * 2 - 0.1;
+			const y = this.rapierRigidBody.translation().y;
+			const nearTurf =
+				!this.isOnWallOrRamp() &&
+				(this.wheelsGrounded >= 1 ||
+					y < PLAYFIELD_SURFACE_Y + 1.55);
+			/** Tylko front/backflip przy murawie — sideflip nie sticky (klip 01-36). */
+			const pitchFlip =
+				Math.abs(this.flipRelY) >= Math.abs(this.flipRelX) * 0.85;
+			if (!fullTurn && !cancelled && nearTurf && pitchFlip) {
+				return;
+			}
+			this.flipActive = false;
+			const av = this.rapierRigidBody.angvel();
+			const keep = cancelled ? 0.22 : 0.95;
+			this.rapierRigidBody.setAngvel(
+				{ x: av.x * keep, y: av.y * keep, z: av.z * keep },
+				true,
+			);
+			if (cancelled) {
+				/**
+				 * Cancel = świadome ucięcie spinu. Pitch-lock tu blokował W/S
+				 * przy nosie w trawę → stójka (klip 17-04-27: S+JUMP, nos w dół).
+				 * Residual i tak ≈0 (keep 0.22) — nie trzeba FLIP_PITCHLOCK.
+				 */
+				this.flipPitchLockLeft = 0;
+			} else {
+				const remaining = Math.max(
+					0,
+					Math.PI * 2 - 0.05 - this.flipAngleAccum,
+				);
+				const speed = Math.hypot(av.x, av.y, av.z) * keep;
+				const finishSec = speed > 0.4 ? remaining / speed : 0;
+				this.flipPitchLockLeft = Math.min(
+					1.05,
+					Math.max(RL_CAR.flipPitchLockExtra, finishSec + 0.1),
+				);
+			}
+		}
+	}
+
+	private applyJumpHold(held: boolean, dt: number): void {
+		if (!held || this.jumpHoldLeft <= 0) return;
+		this._up.copy(this.getUpward());
+		if (this.getVelocity().dot(this._up) <= 0) {
+			this.jumpHoldLeft = 0;
+			return;
+		}
+		this.jumpHoldElapsed += dt;
+		this.jumpHoldLeft -= dt;
+		/** RocketSim JUMP_PRE_MIN_ACCEL_SCALE gdy jumpTime < JUMP_MIN_TIME. */
+		const preMin =
+			this.jumpHoldElapsed < RL_CAR.jumpHoldMinTime
+				? RL_CAR.jumpHoldPreMinScale
+				: 1;
+		this._force
+			.copy(this._up)
+			.multiplyScalar(RL_CAR.jumpHoldAccel * RL_CAR.mass * preMin);
+		this.rapierRigidBody.addForce(
+			{ x: this._force.x, y: this._force.y, z: this._force.z },
+			true,
+		);
+	}
+
+	private syncGroundJumpState(): void {
+		if (this.flipActive) return;
+		if (
+			this.jumpCount <= 0 ||
+			this.wheelsCompressing < RL_HOVER.groundedMinWheels ||
+			this.wallJumpDetachLeft > 0
+		) {
+			return;
+		}
+		const flatOk =
+			isMeridianArenaActive() ||
+			this.surfaceNormal.y >= RL_CAR.wallNormalFlatThreshold;
+		const wallOk =
+			this.isOnWallOrRamp() &&
+			this.surfaceNormal.y < RL_CAR.wallNormalFlatThreshold;
+		if (!flatOk && !wallOk) return;
+
+		const vel = this.getVelocity();
+		const alongN = isMeridianArenaActive()
+			? vel.dot(this.surfaceNormal)
+			: flatOk
+				? vel.y
+				: vel.dot(this.surfaceNormal);
+		if (Math.abs(alongN) < 1.0) {
+			this.resetJumpState();
+		}
+	}
+
+	private resetJumpState(): void {
+		this.jumpCount = 0;
+		this.dodgeWindowAge = 0;
+		this.airJumpArmed = false;
+		this.canSecondJump = true;
+		this.flipActive = false;
+		this.flipTimer = 0;
+		this.flipElapsed = 0;
+		this.flipAngleAccum = 0;
+		this.flipRelX = 0;
+		this.flipRelY = 0;
+		this.flipPitchRateMul = 1;
+		this.flipPitchLockLeft = 0;
+		this.neutralJumpLockLeft = 0;
+		this.jumpStickyLeft = 0;
+		this.jumpHoldLeft = 0;
+		this.jumpHoldElapsed = 0;
+		this.disableSuspensionTimer = 0;
+		this.wallJumpDetachLeft = 0;
+		this.flipResetDwell = 0;
+	}
+
+	private lockGroundPitchRoll(): void {
+		if (this.flipActive) return;
+		if (this.wheelsGrounded < RL_HOVER.groundedMinWheels) return;
+		if (this.getUpward().y < 0.7) return;
+		if (
+			!this.isGrounded ||
+			this.surfaceNormal.y < RL_CAR.wallNormalFlatThreshold
+		)
+			return;
+
+		const av = this.rapierRigidBody.angvel();
+		if (Math.abs(av.x) > 1e-4 || Math.abs(av.z) > 1e-4) {
+			this.rapierRigidBody.setAngvel({ x: 0, y: av.y, z: 0 }, true);
+		}
+
+		const rot = this.rapierRigidBody.rotation();
+		this._quat.set(rot.x, rot.y, rot.z, rot.w);
+		const euler = new THREE.Euler().setFromQuaternion(this._quat, "YXZ");
+		if (Math.abs(euler.x) > 0.001 || Math.abs(euler.z) > 0.001) {
+			euler.x = 0;
+			euler.z = 0;
+			this._quat.setFromEuler(euler);
+			this.rapierRigidBody.setRotation(
+				{ x: this._quat.x, y: this._quat.y, z: this._quat.z, w: this._quat.w },
+				true,
+			);
+		}
+	}
+
+	private projectOnPlane(v: THREE.Vector3, n: THREE.Vector3): void {
+		v.addScaledVector(n, -v.dot(n));
+	}
+
+	private clampVec(v: THREE.Vector3, max: number): void {
+		const len = v.length();
+		if (len > max) v.multiplyScalar(max / len);
+	}
+
+	/**
+	 * RL autoflip na dachu/boku.
+	 * Na dachu koła NIE mają kontaktu — nie wymagaj wheelsGrounded
+	 * (klip: S+JUMP na żółwiu odpalał backflip zamiast wstania).
+	 */
+	private tryPerformRecoveryFlip(): boolean {
+		if (this.recoveryCooldown > 0 || this.flipActive) return false;
+		/**
+		 * Po 1. skoku: PPM = dodge / double jump, NIE auto-recovery.
+		 * Pełny air pitch (stójka) → nos w dół blisko murawy → recovery
+		 * kradło 2. skok (klip 07:30 / testy frontflip).
+		 */
+		if (this.canSecondJump && this.jumpCount === 1) return false;
+
+		if (isMeridianArenaActive()) {
+			const n = this.surfaceNormal;
+			const surfaceAlign = this.getUpward().dot(n);
+			const noseStand = Math.abs(this.getForward().dot(n)) > 0.7;
+			/** Dach / mocny bok / stanie na nosie — nie tylko pełny turtle. */
+			const needsRecover =
+				surfaceAlign < -0.25 ||
+				(surfaceAlign < 0.4 && noseStand) ||
+				(Math.abs(surfaceAlign) < 0.35 && noseStand);
+			if (!needsRecover) return false;
+			const sphere = getMeridianSphere();
+			const t = this.rapierRigidBody.translation();
+			let onSurface =
+				this.wheelsGrounded >= 1 || this.isGrounded;
+			if (!onSurface && sphere) {
+				const dist = Math.hypot(
+					t.x - sphere.center.x,
+					t.y - sphere.center.y,
+					t.z - sphere.center.z,
+				);
+				onSurface = Math.abs(dist - sphere.radius) < 3.2;
+			}
+			if (!onSurface) return false;
+			this.performGroundRecoveryFlip(n);
+			return true;
+		}
+
+		if (
+			this.isOnWallOrRamp() &&
+			this.surfaceNormal.y < RL_CAR.wallNormalFlatThreshold
+		) {
+			const n = this.surfaceNormal;
+			const surfaceAlign = this.getUpward().dot(n);
+			if (surfaceAlign >= 0.35) return false;
+			if (surfaceAlign > -0.25) return false;
+			if (this.wheelsGrounded < 1 && !this.isGrounded) return false;
+			this.performGroundRecoveryFlip(n);
+			return true;
+		}
+
+		const upY = this.getUpward().y;
+		const pos = this.rapierRigidBody.translation();
+		const nearFloor = pos.y < PLAYFIELD_SURFACE_Y + 1.6;
+		/** Dach: upY mocno ujemny; bok/kant: do ~50° od pionu. */
+		const turtled = upY < -0.35 && nearFloor;
+		const onSide =
+			upY < 0.62 &&
+			upY > -0.55 &&
+			nearFloor &&
+			(this.wheelsGrounded >= 1 ||
+				this.isGrounded ||
+				Math.abs(upY) < 0.35 ||
+				(this.surfaceNormal.y > 0.88 &&
+					Math.hypot(
+						this.getVelocity().x,
+						this.getVelocity().y,
+						this.getVelocity().z,
+					) < 4));
+
+		if (!turtled && !onSide) return false;
+		/** W powietrzu wysoko — nie kradnij dodge’a. */
+		if (!nearFloor) return false;
+
+		this.performGroundRecoveryFlip(this._carUp.set(0, 1, 0));
+		return true;
+	}
+
+	/** Impuls + angvel w stronę targetUp (world +Y albo normalna Meridian). */
+	private performGroundRecoveryFlip(targetUp?: THREE.Vector3): void {
+		const upTarget = targetUp ?? this._carUp.set(0, 1, 0);
+		this._up.copy(this.getUpward()).normalize();
+		this._tmp.crossVectors(this._up, upTarget);
+		if (this._tmp.lengthSq() < 0.01) {
+			this._tmp.copy(this.getForward()).normalize();
+		} else {
+			this._tmp.normalize();
+		}
+
+		const align = THREE.MathUtils.clamp(this._up.dot(upTarget), -1, 1);
+		const tilt = Math.acos(align);
+		const mass = this.rapierRigidBody.mass();
+		const torqueMag = mass * (14 + tilt * 10);
+		this.rapierRigidBody.applyTorqueImpulse(
+			{
+				x: this._tmp.x * torqueMag,
+				y: this._tmp.y * torqueMag,
+				z: this._tmp.z * torqueMag,
+			},
+			true,
+		);
+
+		const prev = this.rapierRigidBody.angvel();
+		const rate = 7.2 + tilt * 4.2;
+		this.rapierRigidBody.setAngvel(
+			{
+				x: prev.x * 0.18 + this._tmp.x * rate,
+				y: prev.y * 0.22 + this._tmp.y * rate,
+				z: prev.z * 0.18 + this._tmp.z * rate,
+			},
+			true,
+		);
+
+		const vel = this.getVelocity();
+		if (isMeridianArenaActive()) {
+			vel.multiplyScalar(0.7);
+			const along = vel.dot(upTarget);
+			vel.addScaledVector(upTarget, Math.max(0, 3.4 - along));
+		} else {
+			vel.x *= 0.55;
+			vel.z *= 0.55;
+			vel.y = Math.max(vel.y, 0) + 3.4;
+		}
+		clampSpeedMps(vel, RL_CAR.maxSpeed);
+		this.rapierRigidBody.setLinvel({ x: vel.x, y: vel.y, z: vel.z }, true);
+
+		this.recoveryCooldown = 0.5;
+		this.disableSuspensionTimer = 0.4;
+		this.isGrounded = false;
+		this.resetJumpState();
+	}
+
+	/**
+	 * Płytka rampa / wall-probe — nie mylić z softlockiem na murawie.
+	 * Tylko sygnały powierzchni (NIE AABB „blisko bandy”) — inaczej turtle
+	 * przy bramce/ścianie nigdy się nie odkleja (klip 05-43 ~10–14 s, Q-spam).
+	 */
+	private isRampSurfaceApproach(): boolean {
+		if (this.wallProbeActive || this.wallContactLeft > 0) return true;
+		if (this.surfaceNormal.y < 0.98) return true;
+		for (const wh of this._wheelHits) {
+			if (!wh.inRange) continue;
+			if (wh.normal.y < 0.985 && wh.normal.y > 0.08) return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Nos / tył w powierzchnię — bez drive/lock → softlock.
+	 * Po krótkiej chwili spłaszcz (także Meridian — klip 00-37).
+	 */
+	private unstickVerticalStand(dt: number): void {
+		if (this.flipActive) {
+			this.verticalStandTimer = 0;
+			return;
+		}
+
+		const meridian = isMeridianArenaActive();
+		if (!meridian && (this.isOnWallOrRamp() || this.isRampSurfaceApproach())) {
+			this.verticalStandTimer = 0;
+			return;
+		}
+
+		let noseStand = false;
+		let nearSurface = false;
+		if (meridian) {
+			const n = this.surfaceNormal;
+			const fwdInto = Math.abs(this.getForward().dot(n));
+			const upAlign = Math.abs(this.getUpward().dot(n));
+			noseStand = fwdInto > 0.72 && upAlign < 0.55;
+			const sphere = getMeridianSphere();
+			const t = this.rapierRigidBody.translation();
+			nearSurface = this.wheelsGrounded >= 1 || this.isGrounded;
+			if (!nearSurface && sphere) {
+				const dist = Math.hypot(
+					t.x - sphere.center.x,
+					t.y - sphere.center.y,
+					t.z - sphere.center.z,
+				);
+				nearSurface = Math.abs(dist - sphere.radius) < 2.8;
+			}
+		} else {
+			const fwdY = Math.abs(this.getForward().y);
+			const pos = this.rapierRigidBody.translation();
+			const vel = this.getVelocity();
+			const vy = Math.abs(vel.y);
+			/**
+			 * Wysoki aerial = stójka OK.
+			 * Wkopany nos przy murawie (także z jumpCount>0) = softlock → prostuj
+			 * (klip 07:39 skok+W).
+			 */
+			const highAir = pos.y > PLAYFIELD_SURFACE_Y + 2.4 && vy > 1.0;
+			if (highAir) {
+				this.verticalStandTimer = 0;
+				return;
+			}
+			nearSurface = pos.y < PLAYFIELD_SURFACE_Y + 1.75 && vy < 2.5;
+			/** ≥0.55 — luka 0.55–0.78 = stójka na zderzaku bez unstick (SS). */
+			noseStand = fwdY >= 0.55 && nearSurface;
+		}
+
+		if (!noseStand || !nearSurface) {
+			this.verticalStandTimer = 0;
+			return;
+		}
+		/** Gracz trzyma W/S — to aerial pitch / pętla, nie softlock. */
+		if (Math.abs(this.lastThrottle) > 0.4) {
+			this.verticalStandTimer = 0;
+			return;
+		}
+		this.verticalStandTimer += dt;
+		/**
+		 * 1×PPM aerial: krótka stójka ~90° OK; softlock na zderzaku dopiero po
+		 * ~0.55 s bez W/S (test 3c). Wcześniej propped mylił stójkę z klejem.
+		 */
+		const firstJumpAerial =
+			this.jumpCount === 1 && this.canSecondJump && !this.flipActive;
+		const hNow =
+			this.rapierRigidBody.translation().y - PLAYFIELD_SURFACE_Y;
+		const vel = this.getVelocity();
+		const ang = this.rapierRigidBody.angvel();
+		const propped =
+			Math.hypot(vel.x, vel.z) < 3.2 &&
+			Math.abs(vel.y) < 0.55 &&
+			Math.hypot(ang.x, ang.y, ang.z) < 2.4 &&
+			hNow < 1.45;
+		const minStandSec = firstJumpAerial
+			? 0.55
+			: propped
+				? 0.08
+				: 0.06;
+		if (this.verticalStandTimer < minStandSec) return;
+
+		if (meridian) {
+			this.alignMeridianAttitude(dt, true);
+			const av = this.rapierRigidBody.angvel();
+			this.rapierRigidBody.setAngvel(
+				{ x: av.x * 0.25, y: av.y * 0.25, z: av.z * 0.25 },
+				true,
+			);
+			if (this.verticalStandTimer > 0.55) this.verticalStandTimer = 0;
+			return;
+		}
+
+		const rot = this.rapierRigidBody.rotation();
+		this._quat.set(rot.x, rot.y, rot.z, rot.w);
+		const euler = new THREE.Euler().setFromQuaternion(this._quat, "YXZ");
+		const k = Math.exp(-14 * dt);
+		euler.x *= k;
+		euler.z *= k;
+		if (this.verticalStandTimer > 0.7) {
+			euler.x = 0;
+			euler.z = 0;
+			this.verticalStandTimer = 0;
+		}
+		this._quat.setFromEuler(euler);
+		this.rapierRigidBody.setRotation(
+			{
+				x: this._quat.x,
+				y: this._quat.y,
+				z: this._quat.z,
+				w: this._quat.w,
+			},
+			true,
+		);
+
+		const pos = this.rapierRigidBody.translation();
+		const minY = PLAYFIELD_SURFACE_Y + RL_CAR.hitboxHalfY + 0.04;
+		if (pos.y < minY) {
+			this.rapierRigidBody.setTranslation(
+				{ x: pos.x, y: minY, z: pos.z },
+				true,
+			);
+		}
+		const av = this.rapierRigidBody.angvel();
+		this.rapierRigidBody.setAngvel(
+			{ x: av.x * 0.45, y: av.y * 0.9, z: av.z * 0.45 },
+			true,
+		);
+	}
+
+	/**
+	 * Dach / bok / kant na murawie — spłaszcz do kół w dół.
+	 * Bez tego softlock po flipie (klip: auto na kancie przy bandzie).
+	 */
+	private unstickTurtle(dt: number): void {
+		if (this.flipActive) {
+			this.turtleStandTimer = 0;
+			return;
+		}
+		if (isMeridianArenaActive()) {
+			const n = this.surfaceNormal;
+			const surfaceAlign = this.getUpward().dot(n);
+			const sphere = getMeridianSphere();
+			const t = this.rapierRigidBody.translation();
+			let nearSurface = this.wheelsGrounded >= 1 || this.isGrounded;
+			if (!nearSurface && sphere) {
+				const dist = Math.hypot(
+					t.x - sphere.center.x,
+					t.y - sphere.center.y,
+					t.z - sphere.center.z,
+				);
+				nearSurface = Math.abs(dist - sphere.radius) < 2.8;
+			}
+			if (surfaceAlign > -0.25 || !nearSurface) {
+				this.turtleStandTimer = 0;
+				return;
+			}
+			this.turtleStandTimer += dt;
+			if (this.turtleStandTimer < 0.2) return;
+			this.alignMeridianAttitude(dt, true);
+			const mAng = this.rapierRigidBody.angvel();
+			this.rapierRigidBody.setAngvel(
+				{ x: mAng.x * 0.22, y: mAng.y * 0.35, z: mAng.z * 0.22 },
+				true,
+			);
+			this.turtleStandTimer = 0;
+			return;
+		}
+
+		const upY = this.getUpward().y;
+		const pos = this.rapierRigidBody.translation();
+		const nearFloor = pos.y < PLAYFIELD_SURFACE_Y + 2.2;
+		const vel = this.getVelocity();
+		const speed = Math.hypot(vel.x, vel.y, vel.z);
+		const ang = this.rapierRigidBody.angvel();
+		const angSpeed = Math.hypot(ang.x, ang.y, ang.z);
+		/**
+		 * Kant / bok przy prawie płaskiej podłodze — odklejaj nawet blisko rampy.
+		 * isRampSurfaceApproach() inaczej blokuje unstick przy białej linii (SS).
+		 */
+		const flatFloorEdge =
+			nearFloor &&
+			this.surfaceNormal.y > 0.88 &&
+			upY < 0.82 &&
+			upY > -0.9 &&
+			speed < 6.5 &&
+			angSpeed < 3.5;
+		const realWall =
+			this.isOnWallOrRamp() &&
+			this.surfaceNormal.y < RL_CAR.wallNormalFlatThreshold;
+		if (realWall) {
+			this.turtleStandTimer = 0;
+			return;
+		}
+		if (this.isRampSurfaceApproach() && !flatFloorEdge) {
+			this.turtleStandTimer = 0;
+			return;
+		}
+		/**
+		 * 1×PPM aerial (ascent / mid-air): nie turtle — to wyglądało jak zepsuty flip.
+		 * Turtle tylko przy opadaniu blisko trawy (odzysk).
+		 */
+		if (this.jumpCount === 1 && this.canSecondJump) {
+			const h =
+				this.rapierRigidBody.translation().y - PLAYFIELD_SURFACE_Y;
+			if (!(vel.y < -0.2 && h < 1.15) && !flatFloorEdge) {
+				this.turtleStandTimer = 0;
+				return;
+			}
+		}
+		/** Nose-up → unstickVerticalStand (chyba że gracz pitchuje). */
+		if (this.getForward().y > 0.55 && upY > 0.35) {
+			this.turtleStandTimer = 0;
+			return;
+		}
+		/**
+		 * Do ~35° od pionu (upY≈0.82) — wcześniej próg 0.55 zostawiał kant
+		 * po flipie bez odklejenia.
+		 */
+		if (upY >= 0.82 || !nearFloor) {
+			this.turtleStandTimer = 0;
+			return;
+		}
+		/**
+		 * Trzymane W/S / Q/E / Shift+A/D = celowy air pitch/roll.
+		 * Stary warunek tylko na throttle + `|fwd.y|>0.4` odpadał na dachu
+		 * (fy≈0) → turtle snap = wahadło / ucięta beczka (PPM+Q).
+		 * Kant z kontaktem kół: nadal odklejaj mimo gazu gdy |fwd.y| małe.
+		 */
+		const wantsAirManeuver =
+			Math.abs(this.lastThrottle) > 0.4 ||
+			Math.abs(this.lastRoll) > 0.4 ||
+			(this.lastDrifting && Math.abs(this.lastYaw) > 0.4);
+		if (wantsAirManeuver) {
+			const aerial =
+				!this.isGrounded && this.wheelsGrounded < 1;
+			if (aerial || Math.abs(this.getForward().y) > 0.4) {
+				this.turtleStandTimer = 0;
+				return;
+			}
+		}
+		/**
+		 * 1×PPM stójka ~90° (nos/tył w trawę, up poziomo): nie turtle —
+		 * wyglądało jak zahaczanie i ściąganie z pionu po puszczeniu W/S.
+		 */
+		if (
+			this.jumpCount === 1 &&
+			this.canSecondJump &&
+			Math.abs(this.getForward().y) > 0.7
+		) {
+			this.turtleStandTimer = 0;
+			return;
+		}
+		this.turtleStandTimer += dt;
+		const wait =
+			flatFloorEdge || upY < 0.45
+				? upY < -0.15
+					? 0.07
+					: 0.1
+				: 0.14;
+		if (this.turtleStandTimer < wait) {
+			/** Lekki tipping w stronę kół — zanim pełny snap. */
+			if (flatFloorEdge && angSpeed < 2.2) {
+				this._up.copy(this.getUpward());
+				this._tmp.crossVectors(this._up, this._carUp.set(0, 1, 0));
+				if (this._tmp.lengthSq() > 0.02) {
+					this._tmp.normalize();
+					const tip = (0.82 - upY) * 4.5;
+					this.rapierRigidBody.setAngvel(
+						{
+							x: ang.x + this._tmp.x * tip,
+							y: ang.y + this._tmp.y * tip * 0.25,
+							z: ang.z + this._tmp.z * tip,
+						},
+						true,
+					);
+				}
+			}
+			return;
+		}
+
+		/**
+		 * Koła w dół z zachowaniem poziomego nosa — NIE Euler yaw.
+		 * Po half-flip (dach, nos w tył) Euler YXZ często ma yaw=π;
+		 * zerowanie pitch/roll = obrót o 180° (klip 07:09).
+		 */
+		this._fwd.copy(this.getForward());
+		this._fwd.y = 0;
+		if (this._fwd.lengthSq() < 1e-6) {
+			this._fwd.copy(this.getSideward());
+			this._fwd.y = 0;
+		}
+		if (this._fwd.lengthSq() < 1e-6) {
+			this._fwd.set(0, 0, 1);
+		} else {
+			this._fwd.normalize();
+		}
+		carHorizontalRightFromForward(this._fwd, this._right);
+		this._up.set(0, 1, 0);
+		this._alignMat.makeBasis(this._right, this._up, this._fwd);
+		this._quat.setFromRotationMatrix(this._alignMat);
+		this.turtleStandTimer = 0;
+		this.rapierRigidBody.setRotation(
+			{
+				x: this._quat.x,
+				y: this._quat.y,
+				z: this._quat.z,
+				w: this._quat.w,
+			},
+			true,
+		);
+
+		const minY = PLAYFIELD_SURFACE_Y + RL_CAR.hitboxHalfY + 0.08;
+		this.rapierRigidBody.setTranslation(
+			{ x: pos.x, y: Math.max(pos.y, minY), z: pos.z },
+			true,
+		);
+		const v = this.rapierRigidBody.linvel();
+		this.rapierRigidBody.setLinvel(
+			{ x: v.x * 0.88, y: Math.max(v.y, 1.2), z: v.z * 0.88 },
+			true,
+		);
+		/** Zachowaj trochę ω — nie hard freeze (RL autoflip feel). */
+		this.rapierRigidBody.setAngvel(
+			{ x: ang.x * 0.22, y: ang.y * 0.35, z: ang.z * 0.22 },
+			true,
+		);
+	}
+
+	private recoverFromCrash(): void {
+		const t = this.rapierRigidBody.translation();
+		const v = this.rapierRigidBody.linvel();
+		const sphere = getMeridianSphere();
+		const outOfBounds = sphere
+			? t.y < -5 ||
+				Math.hypot(
+					t.x - sphere.center.x,
+					t.y - sphere.center.y,
+					t.z - sphere.center.z,
+				) >
+					sphere.radius + 25
+			: t.y < -5 || Math.abs(t.x) > 100;
+		if (
+			!Number.isFinite(t.x) ||
+			!Number.isFinite(t.y) ||
+			!Number.isFinite(t.z) ||
+			outOfBounds
+		) {
+			this.rapierRigidBody.setTranslation(
+				{ x: this.recoveryPos.x, y: this.recoveryPos.y, z: this.recoveryPos.z },
+				true,
+			);
+			this.rapierRigidBody.setLinvel({ x: 0, y: 0, z: 0 }, true);
+			this.rapierRigidBody.setAngvel({ x: 0, y: 0, z: 0 }, true);
+			this.resetJumpState();
+		} else if (
+			!Number.isFinite(v.x) ||
+			!Number.isFinite(v.y) ||
+			!Number.isFinite(v.z)
+		) {
+			this.rapierRigidBody.setLinvel({ x: 0, y: 0, z: 0 }, true);
+			this.rapierRigidBody.setAngvel({ x: 0, y: 0, z: 0 }, true);
+		}
+	}
+}
+
+export default RocketCar;

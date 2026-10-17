@@ -1,0 +1,30 @@
+{
+  "pass": true,
+  "cases": [
+    {
+      "id": "drop_bounce",
+      "pass": true,
+      "detail": "peakY=1.56 (want 1.45–2.05, CR=0.6)"
+    },
+    {
+      "id": "soft_hit",
+      "pass": true,
+      "detail": "peakHoriz=2.97 first=2.97 vy=0.00"
+    },
+    {
+      "id": "flip_hit",
+      "pass": true,
+      "detail": "maxHoriz=12.78 flipped=false (want solid shot ≥10)"
+    },
+    {
+      "id": "ground_roll",
+      "pass": true,
+      "detail": "horiz@2s=3.45 (want 2.8–6.5)"
+    },
+    {
+      "id": "wall_bounce",
+      "pass": true,
+      "detail": "minX=31.21 vx=-4.04"
+    }
+  ]
+}

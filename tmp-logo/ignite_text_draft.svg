@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="559" viewBox="0 0 1024 559">
+  <defs>
+    <linearGradient id="letterFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FF5A00"/>
+      <stop offset="28%" stop-color="#FF8A1A"/>
+      <stop offset="55%" stop-color="#FFD56A"/>
+      <stop offset="80%" stop-color="#FFF6E8"/>
+      <stop offset="100%" stop-color="#E8EEF4"/>
+    </linearGradient>
+  </defs>
+  <g id="word" transform="translate(512.0,290.7) skewX(-12)">
+    <text x="0" y="0" text-anchor="middle" dominant-baseline="middle"
+      font-family="Anton, Impact, sans-serif" font-size="223.6"
+      letter-spacing="-0.03em" fill="url(#letterFill)" stroke="#0B1524"
+      stroke-width="32.42" stroke-linejoin="round" stroke-linecap="round"
+      paint-order="stroke fill">Ign!te</text>
+    <text x="0" y="0" text-anchor="middle" dominant-baseline="middle"
+      font-family="Anton, Impact, sans-serif" font-size="223.6"
+      letter-spacing="-0.03em" fill="none" stroke="#FF8A1A"
+      stroke-width="7.27" stroke-linejoin="round" opacity="0.92">Ign!te</text>
+  </g>
+</svg>

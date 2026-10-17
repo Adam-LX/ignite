@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Ignite — scoreboard polish preview</title>
+<link rel="stylesheet" href="/src/style.css"/>
+<style>
+  body{margin:0;min-height:100vh;background:#0a1220;font-family:Orbitron,system-ui,sans-serif}
+  .preview-stage{position:relative;height:100vh;background:
+    radial-gradient(ellipse 80% 60% at 50% 40%,#1a3050 0%,#070d16 70%)}
+  #hud{display:block!important}
+  #match-scoreboard{opacity:1;visibility:visible;background:rgba(0,0,0,.55)}
+  #match-scoreboard .match-scoreboard__panel{opacity:1;transform:none}
+  .preview-label{position:fixed;left:12px;bottom:12px;z-index:200;color:#9ab;font:12px/1.4 system-ui}
+</style>
+</head>
+<body>
+<div class="preview-stage">
+  <div id="hud">
+    <div id="scoreboard-cluster">
+      <div id="scoreboard">
+        <div class="team-block blue"><div class="team-block__plate">
+          <span class="team-label">BLUE</span>
+          <span class="team-score" id="score-blue">2</span>
+        </div></div>
+        <div id="score-center"><span id="match-status">3:42</span></div>
+        <div class="team-block orange"><div class="team-block__plate">
+          <span class="team-label">ORANGE</span>
+          <span class="team-score" id="score-orange">1</span>
+        </div></div>
+      </div>
+    </div>
+  </div>
+  <div id="match-scoreboard" class="match-scoreboard show" aria-hidden="false">
+    <div class="match-scoreboard__panel">
+      <span class="match-scoreboard__glow match-scoreboard__glow--blue"></span>
+      <span class="match-scoreboard__glow match-scoreboard__glow--orange"></span>
+      <span class="match-scoreboard__edge match-scoreboard__edge--blue"></span>
+      <span class="match-scoreboard__edge match-scoreboard__edge--orange"></span>
+      <div class="match-scoreboard__scorebug">
+        <div class="match-scoreboard__bug match-scoreboard__bug--blue">
+          <span class="match-scoreboard__bug-name">BLUE</span>
+          <span class="match-scoreboard__bug-score">2</span>
+        </div>
+        <div class="match-scoreboard__bug-mid"><span class="match-scoreboard__bug-clock">3:42</span></div>
+        <div class="match-scoreboard__bug match-scoreboard__bug--orange">
+          <span class="match-scoreboard__bug-score">1</span>
+          <span class="match-scoreboard__bug-name">ORANGE</span>
+        </div>
+      </div>
+      <h2 class="match-scoreboard__title">Statystyki meczu</h2>
+      <div class="match-scoreboard__teams">
+        <section class="match-scoreboard__team match-scoreboard__team--blue">
+          <header class="match-scoreboard__team-head"><span class="match-scoreboard__team-badge">BLUE</span></header>
+          <table class="match-scoreboard__table"><thead><tr>
+            <th>Gracz</th><th>Pkt</th><th>G</th><th>A</th><th>S</th><th>C</th><th>T</th><th>Sh</th>
+          </tr></thead><tbody>
+            <tr class="match-scoreboard__row match-scoreboard__row--you match-scoreboard__row--lead" data-team="blue" style="animation:none;opacity:1;transform:none">
+              <td><span class="match-scoreboard__name"><span class="match-scoreboard__stripe"></span><span class="match-scoreboard__rank match-scoreboard__rank--lead">1</span><span class="match-scoreboard__name-text">Adam · TY</span></span></td>
+              <td><span class="match-scoreboard__value match-scoreboard__value--score">420</span></td>
+              <td><span class="match-scoreboard__value">2</span></td><td>1</td><td>3</td><td>2</td><td>18</td><td>5</td>
+            </tr>
+            <tr class="match-scoreboard__row" data-team="blue" style="animation:none;opacity:1;transform:none">
+              <td><span class="match-scoreboard__name"><span class="match-scoreboard__stripe"></span><span class="match-scoreboard__rank">2</span><span class="match-scoreboard__name-text">Rook</span></span></td>
+              <td><span class="match-scoreboard__value match-scoreboard__value--score">180</span></td>
+              <td>0</td><td>1</td><td>1</td><td>1</td><td>9</td><td>2</td>
+            </tr>
+          </tbody></table>
+        </section>
+        <div class="match-scoreboard__rift"></div>
+        <section class="match-scoreboard__team match-scoreboard__team--orange">
+          <header class="match-scoreboard__team-head"><span class="match-scoreboard__team-badge">ORANGE</span></header>
+          <table class="match-scoreboard__table"><thead><tr>
+            <th>Gracz</th><th>Pkt</th><th>G</th><th>A</th><th>S</th><th>C</th><th>T</th><th>Sh</th>
+          </tr></thead><tbody>
+            <tr class="match-scoreboard__row match-scoreboard__row--lead" data-team="orange" style="animation:none;opacity:1;transform:none">
+              <td><span class="match-scoreboard__name"><span class="match-scoreboard__stripe"></span><span class="match-scoreboard__rank match-scoreboard__rank--lead">1</span><span class="match-scoreboard__name-text">Zara</span></span></td>
+              <td><span class="match-scoreboard__value match-scoreboard__value--score">310</span></td>
+              <td>1</td><td>0</td><td>2</td><td>1</td><td>14</td><td>4</td>
+            </tr>
+            <tr class="match-scoreboard__row" data-team="orange" style="animation:none;opacity:1;transform:none">
+              <td><span class="match-scoreboard__name"><span class="match-scoreboard__stripe"></span><span class="match-scoreboard__rank">2</span><span class="match-scoreboard__name-text">Drex</span></span></td>
+              <td><span class="match-scoreboard__value match-scoreboard__value--score">95</span></td>
+              <td>0</td><td>1</td><td>0</td><td>0</td><td>7</td><td>1</td>
+            </tr>
+          </tbody></table>
+        </section>
+      </div>
+      <p class="match-scoreboard__hint">Przytrzymaj Tab</p>
+    </div>
+  </div>
+</div>
+<p class="preview-label">Preview: /_preview/scoreboard-polish.html</p>
+</body>
+</html>

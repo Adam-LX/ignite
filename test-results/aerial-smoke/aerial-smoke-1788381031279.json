@@ -1,0 +1,97 @@
+{
+  "stamp": "2026-09-02T20:30:31.279Z",
+  "allPass": true,
+  "verdicts": [
+    {
+      "id": "midair_approach",
+      "pass": true,
+      "detail": "minY=0.23 maxY=4.50 ballPeak=6.48 maxSpd=17.1 nan=0 clip=0 touches≈5",
+      "metrics": {
+        "minY": 0.2286013513803482,
+        "maxY": 4.500573635101318,
+        "maxSpeed": 17.106424289225348,
+        "nanFrames": 0,
+        "floorClip": 0,
+        "ballTouches": 5
+      }
+    },
+    {
+      "id": "double_jump_window",
+      "pass": true,
+      "detail": "minY=2.29 maxY=13.34 ballPeak=5.82 maxSpd=23.0 nan=0 clip=0 touches≈0",
+      "metrics": {
+        "minY": 2.290644645690918,
+        "maxY": 13.34437084197998,
+        "maxSpeed": 23.01919488713408,
+        "nanFrames": 0,
+        "floorClip": 0,
+        "ballTouches": 0
+      }
+    },
+    {
+      "id": "wall_leave_aerial",
+      "pass": true,
+      "detail": "minY=1.49 maxY=10.29 ballPeak=10.98 maxSpd=12.0 nan=0 clip=0 touches≈0",
+      "metrics": {
+        "minY": 1.4886143207550049,
+        "maxY": 10.291062355041504,
+        "maxSpeed": 11.96487175101099,
+        "nanFrames": 0,
+        "floorClip": 0,
+        "ballTouches": 0
+      }
+    },
+    {
+      "id": "ceiling_pinch",
+      "pass": true,
+      "detail": "minY=0.63 maxY=32.09 ballPeak=29.97 maxSpd=22.4 nan=0 clip=0 touches≈0",
+      "metrics": {
+        "minY": 0.6336889266967773,
+        "maxY": 32.09110641479492,
+        "maxSpeed": 22.41900730219059,
+        "nanFrames": 0,
+        "floorClip": 0,
+        "ballTouches": 0
+      }
+    },
+    {
+      "id": "falling_recovery",
+      "pass": true,
+      "detail": "minY=0.23 maxY=7.40 ballPeak=1.00 maxSpd=12.7 nan=0 clip=0 touches≈0",
+      "metrics": {
+        "minY": 0.2300645262002945,
+        "maxY": 7.3984832763671875,
+        "maxSpeed": 12.737482384269743,
+        "nanFrames": 0,
+        "floorClip": 0,
+        "ballTouches": 0
+      }
+    },
+    {
+      "id": "fast_aerial_launch",
+      "pass": true,
+      "detail": "minY=0.23 maxY=0.60 ballPeak=8.49 maxSpd=23.0 nan=0 clip=0 touches≈4",
+      "metrics": {
+        "minY": 0.22934451699256897,
+        "maxY": 0.5989843010902405,
+        "maxSpeed": 23.00312898934663,
+        "nanFrames": 0,
+        "floorClip": 0,
+        "ballTouches": 4
+      }
+    },
+    {
+      "id": "lob_pop_midfield",
+      "pass": true,
+      "detail": "minY=0.45 maxY=6.07 ballPeak=3.80 maxSpd=22.2 nan=0 clip=0 touches≈3",
+      "metrics": {
+        "minY": 0.4497322142124176,
+        "maxY": 6.067873954772949,
+        "maxSpeed": 22.16064860248327,
+        "nanFrames": 0,
+        "floorClip": 0,
+        "ballTouches": 3
+      }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "pass": true,
+  "sec": 90,
+  "goals": 0,
+  "maxBlue": 0,
+  "maxOrange": 0,
+  "maxTouches": 0,
+  "topDownHits": 0,
+  "blackBarHits": 0,
+  "samples": 76,
+  "pageErrors": [],
+  "note": "zero goli w endurance — sprawdź probe:matches (nie auto-FAIL)"
+}

@@ -1,0 +1,4157 @@
+/**
+ * Ignite menu — styl inspirowany RL Play Menu:
+ * kwadratowe karty playlist, czysty dark HUD, środek wolny na arenę 3D.
+ */
+
+body.menu-active #main-menu {
+	--rl-panel: rgba(12, 16, 24, 0.88);
+	--rl-panel-solid: #121820;
+	--rl-border: rgba(255, 255, 255, 0.1);
+	--rl-text: #f2f5f8;
+	--rl-muted: #8b97a8;
+	--menu-accent: #4da8ff;
+	--menu-accent-dim: rgba(77, 168, 255, 0.2);
+	--menu-accent-glow: rgba(77, 168, 255, 0.45);
+	--neon-cyan: #4da8ff;
+	--neon-pink: #ff6a3d;
+	--bg-glass: var(--rl-panel);
+	--border-dim: var(--rl-border);
+}
+
+body.menu-active #main-menu[data-selected-accent="duel"] {
+	--menu-accent: #4da8ff;
+	--menu-accent-dim: rgba(77, 168, 255, 0.22);
+	--menu-accent-glow: rgba(77, 168, 255, 0.5);
+}
+
+body.menu-active #main-menu[data-selected-accent="team"] {
+	--menu-accent: #3dffe8;
+	--menu-accent-dim: rgba(61, 255, 232, 0.18);
+	--menu-accent-glow: rgba(61, 255, 232, 0.45);
+}
+
+body.menu-active #main-menu[data-selected-accent="chaos"] {
+	--menu-accent: #b06cff;
+	--menu-accent-dim: rgba(176, 108, 255, 0.2);
+	--menu-accent-glow: rgba(176, 108, 255, 0.48);
+}
+
+body.menu-active #main-menu[data-selected-accent="ignition"] {
+	--menu-accent: #ff8c3a;
+	--menu-accent-dim: rgba(255, 140, 58, 0.22);
+	--menu-accent-glow: rgba(255, 140, 58, 0.5);
+}
+
+body.menu-active #main-menu[data-selected-accent="lab"] {
+	--menu-accent: #50ffbe;
+	--menu-accent-dim: rgba(80, 255, 190, 0.18);
+	--menu-accent-glow: rgba(80, 255, 190, 0.45);
+}
+
+body.menu-active .main-menu__vignette--ultrawide {
+	display: block !important;
+	position: absolute;
+	inset: 0;
+	background: radial-gradient(
+		ellipse 58% 68% at 50% 42%,
+		transparent 40%,
+		rgba(0, 0, 0, 0.28) 70%,
+		rgba(0, 0, 0, 0.68) 100%
+	);
+	pointer-events: none;
+	z-index: 1;
+}
+
+body.menu-active .main-menu__vignette--soft {
+	opacity: 0.1 !important;
+}
+
+body.menu-active #main-menu .main-menu__layout,
+body.menu-active #main-menu .main-menu-overlay {
+	position: absolute !important;
+	inset: 0 !important;
+	z-index: 14 !important;
+	pointer-events: none !important;
+	display: flex !important;
+	align-items: stretch !important;
+	justify-content: center !important;
+	padding: clamp(16px, 2.5vh, 36px) clamp(18px, 2.5vw, 40px) !important;
+	box-sizing: border-box !important;
+	font-family: "Orbitron", sans-serif !important;
+	font-weight: 900 !important;
+	color: var(--rl-text) !important;
+	animation: none !important;
+}
+
+body.menu-active #main-menu .main-menu__fx {
+	pointer-events: none;
+}
+
+body.menu-active #main-menu .ui-safe-zone--rl-play {
+	width: 100%;
+	max-width: min(1920px, 100%);
+	height: 100%;
+	position: relative;
+	display: grid !important;
+	grid-template-rows: auto 1fr auto;
+	gap: clamp(12px, 2vh, 20px);
+	pointer-events: none;
+	overflow: visible;
+}
+
+body.menu-active #main-menu .main-menu-overlay {
+	overflow: visible !important;
+}
+
+body.menu-active #main-menu .rl-topbar,
+body.menu-active #main-menu .rl-dock,
+body.menu-active #main-menu .rl-ticker,
+body.menu-active #main-menu .rl-play {
+	pointer-events: auto;
+}
+
+/* --- TOP BAR --- */
+body.menu-active #main-menu .rl-topbar {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: clamp(16px, 2vw, 28px);
+	z-index: 3;
+}
+
+body.menu-active #main-menu .rl-brand {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+}
+
+body.menu-active #main-menu .logo-ignite {
+	margin: 0;
+	line-height: 0;
+}
+
+body.menu-active #main-menu .logo-ignite__img {
+	display: block;
+	width: auto;
+	height: clamp(5.6rem, 9.5vw, 9rem);
+	max-width: min(720px, 62vw);
+	object-fit: contain;
+	object-position: left center;
+	filter: drop-shadow(0 2px 14px rgba(0, 0, 0, 0.55));
+	pointer-events: none;
+	user-select: none;
+}
+
+body.menu-active #main-menu .logo-meta {
+	display: flex;
+	gap: 0.75rem;
+	font-size: clamp(0.58rem, 0.72vw, 0.68rem);
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--rl-muted);
+}
+
+body.menu-active #main-menu .rl-topnav {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: stretch;
+	justify-content: flex-end;
+	gap: 0.4rem;
+	max-width: min(820px, 64vw);
+}
+
+/** Player banner — skosy scorebuga + gradient płyty + hatch/carbon pattern. */
+body.menu-active #main-menu .rl-player-banner-dock {
+	--pb-slash: clamp(36px, 5vw, 52px);
+	--pb-h: clamp(3.85rem, 8vh, 4.9rem);
+	--pb-hi: #5eb6ff;
+	--pb-mid: #1a7ef0;
+	--pb-lo: #0648a8;
+	--pb-glow: rgba(80, 180, 255, 0.55);
+	--pb-line-a: rgba(140, 220, 255, 0.95);
+	--pb-line-b: rgba(40, 140, 255, 0.55);
+	position: fixed;
+	left: 50%;
+	bottom: clamp(5.5rem, 12vh, 7.5rem);
+	transform: translateX(-50%);
+	z-index: 28;
+	display: flex;
+	justify-content: center;
+	align-items: flex-end;
+	width: min(42rem, 82vw);
+	pointer-events: none;
+	filter:
+		drop-shadow(0 16px 28px rgba(0, 0, 0, 0.68))
+		drop-shadow(0 0 22px rgba(30, 120, 255, 0.22));
+}
+
+body.menu-active #main-menu .rl-player-banner {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: var(--pb-h);
+	min-height: var(--pb-h);
+	padding: 0 calc(var(--pb-slash) + 1.2rem);
+	box-sizing: border-box;
+	border: none;
+	border-radius: 0;
+	overflow: hidden;
+	isolation: isolate;
+	clip-path: polygon(
+		var(--pb-slash) 0,
+		100% 0,
+		calc(100% - var(--pb-slash)) 100%,
+		0 100%
+	);
+	-webkit-clip-path: polygon(
+		var(--pb-slash) 0,
+		100% 0,
+		calc(100% - var(--pb-slash)) 100%,
+		0 100%
+	);
+	/* warstwy: soft vignette → tint → hatch → carbon → art */
+	background-color: #061018;
+	background-image:
+		radial-gradient(
+			140% 160% at 50% 45%,
+			transparent 35%,
+			rgba(2, 6, 14, 0.28) 78%,
+			rgba(2, 6, 14, 0.45) 100%
+		),
+		linear-gradient(
+			165deg,
+			color-mix(in srgb, var(--pb-hi) 72%, transparent) 0%,
+			color-mix(in srgb, var(--pb-mid) 55%, transparent) 46%,
+			color-mix(in srgb, var(--pb-lo) 78%, transparent) 100%
+		),
+		repeating-linear-gradient(
+			-18deg,
+			transparent 0 9px,
+			rgba(255, 255, 255, 0.045) 9px 10px,
+			transparent 10px 22px,
+			rgba(0, 0, 0, 0.07) 22px 23px
+		),
+		repeating-linear-gradient(
+			0deg,
+			transparent 0 3px,
+			rgba(255, 255, 255, 0.03) 3px 4px
+		),
+		radial-gradient(
+			circle at 1px 1px,
+			rgba(255, 255, 255, 0.07) 0.7px,
+			transparent 1.1px
+		),
+		var(--player-banner);
+	background-size:
+		auto,
+		auto,
+		auto,
+		auto,
+		6px 6px,
+		cover;
+	background-position: center;
+	pointer-events: none;
+	flex: 0 0 auto;
+}
+
+/** Glass sheen + diagonal flare (bez ciemnych pasków na skosach). */
+body.menu-active #main-menu .rl-player-banner::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	z-index: 1;
+	background:
+		linear-gradient(
+			180deg,
+			rgba(255, 255, 255, 0.42) 0%,
+			rgba(255, 255, 255, 0.1) 26%,
+			transparent 58%
+		),
+		linear-gradient(
+			108deg,
+			transparent 0%,
+			rgba(255, 255, 255, 0.18) 40%,
+			rgba(180, 230, 255, 0.12) 48%,
+			transparent 62%
+		);
+}
+
+/** Dolna kreska + soft top rim */
+body.menu-active #main-menu .rl-player-banner::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	z-index: 2;
+	background:
+		linear-gradient(
+			90deg,
+			transparent 8%,
+			var(--pb-line-a) 35%,
+			var(--pb-line-b) 70%,
+			transparent 96%
+		)
+		bottom / 100% 3px no-repeat,
+		linear-gradient(
+			90deg,
+			transparent 10%,
+			rgba(255, 255, 255, 0.35) 50%,
+			transparent 90%
+		)
+		top / 100% 1px no-repeat;
+	box-shadow: inset 0 -3px 14px var(--pb-glow);
+}
+
+body.menu-active #main-menu .rl-player-banner__name {
+	position: relative;
+	z-index: 3;
+	font-family: "Orbitron", var(--font-display), sans-serif;
+	font-size: clamp(1.35rem, 2.8vw, 2.2rem);
+	font-weight: 900;
+	font-synthesis: none;
+	line-height: 1;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: #f4f9ff;
+	-webkit-text-fill-color: #f4f9ff;
+	text-shadow:
+		0 1px 0 rgba(0, 0, 0, 0.65),
+		0 2px 10px rgba(0, 0, 0, 0.6),
+		0 0 18px color-mix(in srgb, var(--pb-hi) 55%, transparent),
+		0 0 2px rgba(180, 230, 255, 0.5);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 100%;
+}
+
+@media (max-width: 900px) {
+	body.menu-active #main-menu .rl-player-banner-dock {
+		--pb-slash: 28px;
+		--pb-h: clamp(3.25rem, 8vh, 4rem);
+		width: min(92vw, 34rem);
+		bottom: clamp(4.8rem, 11vh, 6.2rem);
+	}
+}
+
+body.menu-active #main-menu .rl-tab {
+	--tab-skew-deg: -10deg;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	justify-content: center;
+	gap: 0.18rem;
+	min-width: clamp(102px, 9.5vw, 138px);
+	flex: 0 1 auto;
+	padding: 0.7rem 1.05rem 0.7rem 0.95rem;
+	background: linear-gradient(
+		155deg,
+		rgba(72, 86, 112, 0.98) 0%,
+		rgba(36, 46, 64, 0.97) 45%,
+		rgba(18, 24, 36, 0.99) 100%
+	);
+	border: 1px solid rgba(220, 235, 255, 0.42);
+	border-radius: 0;
+	color: #ffffff;
+	font: inherit;
+	cursor: pointer;
+	transform: skewX(var(--tab-skew-deg));
+	transform-origin: center center;
+	box-shadow:
+		6px 10px 22px rgba(0, 0, 0, 0.5),
+		inset 0 1px 0 rgba(255, 255, 255, 0.22),
+		inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+	transition:
+		border-color 0.2s ease,
+		background 0.2s ease,
+		box-shadow 0.2s ease,
+		transform 0.2s ease,
+		filter 0.2s ease,
+		color 0.2s ease;
+}
+
+body.menu-active #main-menu .rl-tab:hover,
+body.menu-active #main-menu .rl-tab.active,
+body.menu-active #main-menu .rl-tab:focus-visible {
+	--tab-skew-deg: -12deg;
+	border-color: color-mix(in srgb, var(--menu-accent) 80%, white);
+	color: #ffffff;
+	box-shadow:
+		8px 12px 26px rgba(0, 0, 0, 0.5),
+		0 0 22px color-mix(in srgb, var(--menu-accent) 35%, transparent),
+		inset 0 -3px 0 var(--menu-accent),
+		inset 0 1px 0 rgba(255, 255, 255, 0.28);
+	background: linear-gradient(
+		155deg,
+		color-mix(in srgb, var(--menu-accent) 48%, #ffffff) 0%,
+		color-mix(in srgb, var(--menu-accent) 58%, #1a2438) 38%,
+		color-mix(in srgb, var(--menu-accent) 28%, #0a101c) 100%
+	);
+	outline: none;
+	filter: brightness(1.06);
+}
+
+body.menu-active #main-menu .rl-tab__title,
+body.menu-active #main-menu .rl-tab__sub {
+	transform: skewX(calc(var(--tab-skew-deg) * -1));
+	transform-origin: left center;
+}
+
+body.menu-active #main-menu .rl-tab__title {
+	font-size: clamp(0.74rem, 0.92vw, 0.9rem);
+	font-weight: 900;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: #ffffff;
+	text-shadow:
+		0 0 10px rgba(0, 0, 0, 0.55),
+		0 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+body.menu-active #main-menu .rl-tab__sub {
+	font-size: clamp(0.58rem, 0.72vw, 0.7rem);
+	letter-spacing: 0.06em;
+	color: #b8f7ff;
+	opacity: 1;
+	max-width: 10.5rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	line-height: 1.25;
+	text-shadow:
+		0 0 8px rgba(0, 0, 0, 0.45),
+		0 1px 2px rgba(0, 0, 0, 0.75);
+}
+
+body.menu-active #main-menu .rl-tab:hover .rl-tab__sub,
+body.menu-active #main-menu .rl-tab.active .rl-tab__sub,
+body.menu-active #main-menu .rl-tab:focus-visible .rl-tab__sub {
+	color: #ffffff;
+}
+
+/* --- BOTTOM STACK (dock + ticker) --- */
+body.menu-active #main-menu .rl-bottom {
+	z-index: 3;
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+	min-width: 0;
+	overflow: visible;
+	pointer-events: none;
+}
+
+body.menu-active #main-menu .rl-bottom .rl-dock,
+body.menu-active #main-menu .rl-bottom .rl-ticker {
+	pointer-events: auto;
+}
+
+/* --- DOCK PLAYLIST (RL play cards) --- */
+body.menu-active #main-menu .rl-dock {
+	z-index: 3;
+	display: flex;
+	flex-direction: column;
+	gap: 0.45rem;
+	padding: clamp(8px, 1.1vh, 12px) clamp(10px, 1.2vw, 16px)
+		clamp(6px, 0.9vh, 10px);
+	overflow: visible;
+	background: transparent;
+	border-top: none;
+	box-shadow: none;
+}
+
+body.menu-active #main-menu .rl-dock__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+body.menu-active #main-menu .rl-dock__head h2 {
+	margin: 0;
+	font-size: clamp(0.68rem, 0.85vw, 0.8rem);
+	letter-spacing: 0.22em;
+	text-transform: uppercase;
+	color: var(--rl-muted);
+	font-weight: 700;
+}
+
+body.menu-active #main-menu .rl-deck-toggle {
+	padding: 0.4rem 0.8rem;
+	background: rgba(255, 255, 255, 0.04);
+	border: 1px solid var(--rl-border);
+	border-radius: 2px;
+	color: var(--rl-muted);
+	font: inherit;
+	font-size: clamp(0.55rem, 0.7vw, 0.65rem);
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+body.menu-active #main-menu .rl-deck-toggle:hover {
+	color: #fff;
+	border-color: var(--menu-accent);
+	box-shadow: 0 0 16px var(--menu-accent-dim);
+}
+
+body.menu-active #main-menu {
+	/* Jednolity układ: karty dzielą cały tor równo — bez scrolla / strzałek */
+	--rl-row-h: clamp(250px, 36vh, 340px);
+	--rl-card-h: var(--rl-row-h);
+	--mode-card-radius: 14px;
+	--rl-card-gap: 0.55rem;
+	--rl-card-pad-y: 0.55rem;
+	--rl-play-w: clamp(158px, 13vw, 200px);
+}
+
+body.menu-active #main-menu .rl-dock {
+	padding-left: clamp(8px, 1vw, 16px);
+	padding-right: clamp(14px, 1.6vw, 24px);
+	overflow: visible;
+}
+
+body.menu-active #main-menu .rl-bottom {
+	overflow: visible;
+	min-width: 0;
+}
+
+body.menu-active #main-menu .rl-dock__body {
+	display: flex;
+	align-items: stretch;
+	gap: clamp(12px, 1.3vw, 18px);
+	min-width: 0;
+	overflow: visible;
+	width: 100%;
+	height: calc(var(--rl-row-h) + (var(--rl-card-pad-y) * 2));
+	min-height: calc(var(--rl-row-h) + (var(--rl-card-pad-y) * 2));
+	max-height: none;
+	box-sizing: border-box;
+}
+
+/* Tor kart zajmuje całą dostępną szerokość obok PLAY */
+body.menu-active #main-menu .rl-playlists,
+body.menu-active #main-menu .rl-playlists.main-menu__modes-track {
+	position: relative;
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: visible !important;
+	display: flex;
+	align-items: stretch;
+	height: 100%;
+}
+
+body.menu-active #main-menu .main-menu__modes-blur {
+	display: none !important;
+}
+
+/* Strzałki wyłączone — panel miesci wszystkie karty */
+body.menu-active #main-menu .rl-playlists__nav {
+	display: none !important;
+}
+
+body.menu-active #main-menu .rl-playlists__grid,
+body.menu-active #main-menu .modes-list__cards {
+	display: flex !important;
+	flex-flow: row nowrap;
+	align-items: stretch;
+	justify-content: stretch;
+	gap: var(--rl-card-gap) !important;
+	flex: 1 1 auto;
+	width: 100% !important;
+	max-width: 100% !important;
+	min-width: 0 !important;
+	height: 100%;
+	min-height: 0;
+	box-sizing: border-box;
+	overflow: visible !important;
+	padding: var(--rl-card-pad-y) 0.25rem !important;
+	margin: 0 !important;
+	scroll-snap-type: none;
+	scrollbar-width: none;
+	perspective: none;
+}
+
+body.menu-active #main-menu .mode-card,
+body.menu-active #main-menu .mode-card.mode-card--rl-play,
+body.menu-active #main-menu .mode-card.mode-card--wypas,
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas .mode-card.mode-card--wypas,
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas .mode-card.mode-card--wypas.mode-card--rl-play {
+	--wypas-art-glow: var(--menu-accent);
+	--plate-tilt-y: 0deg;
+	--plate-tilt-x: 0deg;
+	--plate-lift: 0px;
+	--plate-scale: 1;
+	--card-scale: 1 !important;
+	--card-lift: 0px !important;
+	--card-slash: clamp(18px, calc(var(--rl-card-h) * 0.08), 30px);
+	position: relative !important;
+	display: flex !important;
+	flex-direction: column !important;
+	align-items: flex-start !important;
+	justify-content: flex-end !important;
+	gap: 0.35rem;
+	box-sizing: border-box !important;
+	/* Równy podział całego toru — core i experimental */
+	flex: 1 1 0 !important;
+	width: auto !important;
+	min-width: 0 !important;
+	max-width: none !important;
+	height: 100% !important;
+	min-height: 0 !important;
+	max-height: none !important;
+	aspect-ratio: auto !important;
+	margin: 0 !important;
+	padding: 0.75rem 0.85rem 0.85rem 0.95rem !important;
+	--mode-card-radius: 14px;
+	--mode-ring-angle: 0deg;
+	background: #070a10 !important;
+	border: 1px solid color-mix(in srgb, var(--wypas-art-glow) 28%, #2a3548) !important;
+	border-radius: var(--mode-card-radius) !important;
+	clip-path: none !important;
+	-webkit-clip-path: none !important;
+	box-shadow:
+		10px 14px 28px rgba(0, 0, 0, 0.5),
+		inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+	color: #fff !important;
+	text-align: left !important;
+	cursor: pointer;
+	font: inherit;
+	overflow: hidden !important;
+	opacity: 0.78;
+	filter: saturate(0.78) brightness(0.82) !important;
+	transform-style: flat !important;
+	transform-origin: center center;
+	transition:
+		border-color 0.22s ease,
+		box-shadow 0.24s ease,
+		opacity 0.22s ease,
+		filter 0.28s ease,
+		transform 0.28s cubic-bezier(0.22, 1, 0.36, 1) !important;
+	z-index: 1;
+	isolation: isolate;
+	contain: none !important;
+}
+
+body.menu-active #main-menu .mode-card:last-child {
+	margin-right: 0 !important;
+}
+
+/* Lift bez spin/pick — keyframes spin/pick mają priorytet przez wykluczenie */
+body.menu-active #main-menu .mode-card:not(.mode-card--spin):not(.mode-card--pick),
+body.menu-active #main-menu .mode-card.mode-card--rl-play:not(.mode-card--spin):not(.mode-card--pick),
+body.menu-active #main-menu .mode-card.mode-card--wypas:not(.mode-card--spin):not(.mode-card--pick),
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas .mode-card.mode-card--wypas:not(.mode-card--spin):not(.mode-card--pick),
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas .mode-card.mode-card--wypas.mode-card--rl-play:not(.mode-card--spin):not(.mode-card--pick) {
+	transform: translateY(var(--card-lift, 0px)) scale(var(--card-scale, 1)) !important;
+}
+
+body.menu-active #main-menu .mode-card__art,
+body.menu-active #main-menu.main-menu--wypas .mode-card--wypas .mode-card__art,
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas .mode-card__art {
+	position: absolute !important;
+	inset: 0 !important;
+	z-index: 0 !important;
+	flex: none !important;
+	min-height: 0 !important;
+	display: block !important;
+	pointer-events: none;
+	transform: translateZ(0);
+	overflow: hidden !important;
+	clip-path: none !important;
+	border-radius: inherit !important;
+}
+
+body.menu-active #main-menu .mode-card__art-img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center 34%;
+	display: block;
+	transform: scale(1.06);
+	transform-origin: center 40%;
+	transition: transform 0.7s cubic-bezier(0.2, 1, 0.28, 1), filter 0.4s ease;
+	filter: saturate(1.05) contrast(1.06) brightness(0.96);
+}
+
+body.menu-active #main-menu .mode-card__art-tint {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	pointer-events: none;
+	background:
+		radial-gradient(
+			120% 80% at 70% 20%,
+			color-mix(in srgb, var(--wypas-art-glow) 34%, transparent),
+			transparent 58%
+		),
+		linear-gradient(
+			160deg,
+			color-mix(in srgb, var(--wypas-art-glow) 18%, transparent) 0%,
+			transparent 42%
+		);
+	mix-blend-mode: soft-light;
+	opacity: 0.72;
+	transition: opacity 0.28s ease;
+}
+
+body.menu-active #main-menu .mode-card__art-shade {
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	background:
+		linear-gradient(
+			180deg,
+			rgba(4, 6, 10, 0.06) 0%,
+			rgba(4, 6, 10, 0.14) 38%,
+			rgba(4, 6, 10, 0.68) 70%,
+			rgba(2, 4, 8, 0.94) 100%
+		),
+		linear-gradient(
+			115deg,
+			color-mix(in srgb, var(--wypas-art-glow) 18%, transparent),
+			transparent 52%
+		);
+}
+
+body.menu-active #main-menu .mode-card__shine {
+	position: absolute;
+	inset: -40% -60%;
+	z-index: 3;
+	pointer-events: none;
+	background: linear-gradient(
+		115deg,
+		transparent 32%,
+		rgba(255, 255, 255, 0.28) 48%,
+		transparent 64%
+	);
+	transform: translateX(-55%) rotate(8deg);
+	opacity: 0;
+	transition: opacity 0.35s ease, transform 0.75s cubic-bezier(0.2, 1, 0.28, 1);
+}
+
+body.menu-active #main-menu .mode-card__badges,
+body.menu-active #main-menu .mode-card__title,
+body.menu-active #main-menu .mode-card__desc,
+body.menu-active #main-menu .mode-card__mutator {
+	position: relative;
+	z-index: 3;
+	transform: none;
+}
+
+body.menu-active #main-menu .mode-card__title,
+body.menu-active #main-menu .mode-card__desc,
+body.menu-active #main-menu .mode-card__mutator {
+	max-width: 100%;
+}
+
+/* Per-mode framing */
+body.menu-active #main-menu .mode-card--duel {
+	--wypas-art-glow: #4da8ff;
+}
+body.menu-active #main-menu .mode-card--duel .mode-card__art-img {
+	object-position: 42% 28%;
+}
+
+body.menu-active #main-menu .mode-card--team {
+	--wypas-art-glow: #3dffe8;
+}
+body.menu-active #main-menu .mode-card--team .mode-card__art-img {
+	object-position: 55% 36%;
+}
+
+body.menu-active #main-menu .mode-card--chaos {
+	--wypas-art-glow: #b06cff;
+}
+body.menu-active #main-menu .mode-card--chaos .mode-card__art-img {
+	object-position: 62% 40%;
+}
+
+body.menu-active #main-menu .mode-card--ignition,
+body.menu-active #main-menu .mode-card--featured,
+body.menu-active #main-menu .mode-card--ignition-test {
+	--wypas-art-glow: #ff8c3a;
+}
+body.menu-active #main-menu .mode-card--ignition .mode-card__art-img,
+body.menu-active #main-menu .mode-card--featured .mode-card__art-img,
+body.menu-active #main-menu .mode-card--ignition-test .mode-card__art-img {
+	object-position: 48% 30%;
+}
+
+body.menu-active #main-menu .mode-card--lab {
+	--wypas-art-glow: #50ffbe;
+}
+body.menu-active #main-menu .mode-card--lab .mode-card__art-img {
+	object-position: 50% 45%;
+}
+
+body.menu-active #main-menu .mode-card__bar {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	height: 3px;
+	z-index: 4;
+	background: linear-gradient(
+		90deg,
+		transparent 0%,
+		var(--wypas-art-glow) 18%,
+		color-mix(in srgb, var(--wypas-art-glow) 70%, white) 50%,
+		var(--wypas-art-glow) 82%,
+		transparent 100%
+	);
+	box-shadow: 0 0 16px color-mix(in srgb, var(--wypas-art-glow) 55%, transparent);
+	opacity: 0.55;
+	transition: height 0.22s ease, opacity 0.22s ease;
+}
+
+body.menu-active #main-menu .mode-card__badges {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+	margin-bottom: 0.2rem;
+}
+
+body.menu-active #main-menu .mode-card__badge {
+	display: inline-flex;
+	align-items: center;
+	padding: 0.18rem 0.5rem;
+	font-size: clamp(0.54rem, 0.68vw, 0.64rem);
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	font-weight: 800;
+	color: color-mix(in srgb, var(--wypas-art-glow) 75%, white);
+	border: 1px solid color-mix(in srgb, var(--wypas-art-glow) 42%, rgba(255, 255, 255, 0.2));
+	background:
+		linear-gradient(
+			180deg,
+			color-mix(in srgb, var(--wypas-art-glow) 22%, rgba(8, 12, 18, 0.55)),
+			color-mix(in srgb, var(--wypas-art-glow) 8%, rgba(4, 8, 14, 0.72))
+		);
+	backdrop-filter: blur(8px) saturate(1.2);
+	-webkit-backdrop-filter: blur(8px) saturate(1.2);
+	border-radius: 6px;
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.14),
+		0 4px 12px rgba(0, 0, 0, 0.28);
+}
+
+body.menu-active #main-menu .mode-card__badge--experimental {
+	color: #ffc078;
+	border-color: rgba(255, 179, 71, 0.55);
+	background:
+		linear-gradient(
+			180deg,
+			rgba(255, 160, 60, 0.28),
+			rgba(40, 22, 8, 0.72)
+		);
+}
+
+body.menu-active #main-menu .mode-card__title {
+	display: block;
+	font-size: clamp(0.72rem, 1.05vw, 1.02rem);
+	font-weight: 900;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	line-height: 1.15;
+	color: #fff;
+	text-shadow: 0 2px 10px rgba(0, 0, 0, 0.65);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	max-width: 100%;
+}
+
+body.menu-active #main-menu .mode-card__desc,
+body.menu-active #main-menu .mode-card__mutator {
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	font-size: clamp(0.52rem, 0.65vw, 0.62rem);
+	line-height: 1.3;
+	color: var(--rl-muted);
+}
+
+/* Experimental — ten sam układ kart; tylko clamp opisu */
+body.menu-active #main-menu[data-mode-deck="experimental"] .mode-card__desc,
+body.menu-active #main-menu[data-mode-deck="experimental"] .mode-card__mutator {
+	-webkit-line-clamp: 2;
+	line-clamp: 2;
+}
+
+/* Index jako watermark */
+body.menu-active #main-menu .mode-card__index {
+	position: absolute !important;
+	top: auto !important;
+	right: 0.15rem !important;
+	bottom: -0.15rem !important;
+	left: auto !important;
+	z-index: 2 !important;
+	font-size: clamp(3.2rem, 6.5vh, 4.8rem) !important;
+	font-weight: 900 !important;
+	letter-spacing: -0.04em !important;
+	line-height: 0.85 !important;
+	color: transparent !important;
+	-webkit-text-stroke: 1.5px color-mix(in srgb, var(--wypas-art-glow) 28%, rgba(255, 255, 255, 0.18));
+	opacity: 0.35 !important;
+	pointer-events: none;
+	transform: none !important;
+	user-select: none;
+}
+
+@keyframes menu-plate-spin {
+	0% {
+		transform: perspective(1100px) translateY(0) scale(1) rotateY(0deg);
+		filter: brightness(1);
+	}
+	25% {
+		transform: perspective(1100px) translateY(-14px) scale(1.05) rotateY(90deg);
+		filter: brightness(1.12);
+	}
+	50% {
+		transform: perspective(1100px) translateY(-18px) scale(1.07) rotateY(180deg);
+		filter: brightness(1.18);
+	}
+	75% {
+		transform: perspective(1100px) translateY(-12px) scale(1.05) rotateY(270deg);
+		filter: brightness(1.1);
+	}
+	100% {
+		transform: perspective(1100px) translateY(-5px) scale(1.04) rotateY(360deg);
+		filter: brightness(1.04);
+	}
+}
+
+/* Zaokrąglone płyty — bez skosu / clip-path (żeby pierścień gradientowy działał). */
+body.menu-active #main-menu .mode-card:last-child:not(.mode-card--spin):not(.mode-card--pick),
+body.menu-active #main-menu .mode-card.mode-card--wypas:last-child:not(.mode-card--spin):not(.mode-card--pick),
+body.menu-active #main-menu .mode-card.mode-card--wypas.active:not(.mode-card--spin):not(.mode-card--pick),
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas .mode-card.mode-card--wypas:not(.mode-card--spin):not(.mode-card--pick),
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas .mode-card.mode-card--wypas:last-child:not(.mode-card--spin):not(.mode-card--pick),
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas .mode-card.mode-card--wypas.active:not(.mode-card--spin):not(.mode-card--pick),
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas .mode-card.mode-card--wypas:hover:not(.mode-card--spin):not(.mode-card--pick),
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas .mode-card.mode-card--wypas:focus-visible:not(.mode-card--spin):not(.mode-card--pick),
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas .mode-card.mode-card--wypas.active:hover:not(.mode-card--spin):not(.mode-card--pick) {
+	--card-lift: 0px !important;
+	--card-scale: 1 !important;
+	border-radius: var(--mode-card-radius, 14px) !important;
+	contain: none !important;
+	overflow: hidden !important;
+	clip-path: none !important;
+	-webkit-clip-path: none !important;
+	transform: translateY(var(--card-lift, 0px)) scale(var(--card-scale, 1)) !important;
+}
+
+body.menu-active #main-menu .mode-card:is(:hover, :focus-visible, .selected, .active):not(.mode-card--spin):not(.mode-card--pick),
+body.menu-active #main-menu .mode-card.mode-card--wypas:is(:hover, :focus-visible, .active):not(.mode-card--spin):not(.mode-card--pick) {
+	--plate-lift: 0px;
+	--plate-scale: 1;
+	--plate-tilt-y: 0deg;
+	--plate-tilt-x: 0deg;
+	--card-scale: 1.015 !important;
+	--card-lift: -5px !important;
+	opacity: 1 !important;
+	filter: none !important;
+	z-index: 6 !important;
+	outline: none;
+	border-color: color-mix(in srgb, var(--wypas-art-glow) 72%, white) !important;
+	box-shadow:
+		12px 18px 32px rgba(0, 0, 0, 0.55),
+		0 0 22px color-mix(in srgb, var(--wypas-art-glow) 22%, transparent),
+		inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+	transform: translateY(var(--card-lift, -5px)) scale(var(--card-scale, 1.015)) !important;
+}
+
+/* Gruba animowana ramka gradientowa — TYLKO aktywna karta */
+@property --mode-ring-angle {
+	syntax: "<angle>";
+	inherits: false;
+	initial-value: 0deg;
+}
+
+@keyframes mode-card-ring-spin {
+	to {
+		--mode-ring-angle: 360deg;
+	}
+}
+
+body.menu-active #main-menu .mode-card::after,
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas .mode-card.mode-card--wypas::after {
+	content: "" !important;
+	display: block !important;
+	position: absolute !important;
+	inset: 0 !important;
+	z-index: 12 !important;
+	pointer-events: none !important;
+	box-sizing: border-box !important;
+	border: none !important;
+	border-radius: inherit !important;
+	opacity: 0;
+	box-shadow: none;
+	background: transparent !important;
+	padding: 0 !important;
+	-webkit-mask: none;
+	mask: none;
+	animation: none !important;
+	transition:
+		opacity 0.18s ease,
+		box-shadow 0.18s ease;
+}
+
+body.menu-active #main-menu .mode-card.active::after,
+body.menu-active #main-menu .mode-card.selected::after,
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas
+	.mode-card.mode-card--wypas.active::after,
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas
+	.mode-card.mode-card--wypas.selected::after {
+	opacity: 1 !important;
+	inset: 0 !important;
+	/* Animowany gradient + zaokrąglenie jak wcześniej */
+	padding: 3.5px !important;
+	border: none !important;
+	border-radius: inherit !important;
+	background: conic-gradient(
+		from var(--mode-ring-angle, 0deg),
+		#ffffff 0deg,
+		color-mix(in srgb, var(--wypas-art-glow) 75%, #ffffff) 70deg,
+		rgba(255, 255, 255, 0.35) 130deg,
+		#ffffff 180deg,
+		color-mix(in srgb, var(--wypas-art-glow) 90%, #fff6e8) 250deg,
+		rgba(255, 255, 255, 0.4) 310deg,
+		#ffffff 360deg
+	) !important;
+	-webkit-mask:
+		linear-gradient(#fff 0 0) content-box,
+		linear-gradient(#fff 0 0);
+	-webkit-mask-composite: xor;
+	mask:
+		linear-gradient(#fff 0 0) content-box,
+		linear-gradient(#fff 0 0);
+	mask-composite: exclude;
+	box-shadow:
+		0 0 0 1px rgba(255, 255, 255, 0.35),
+		0 0 18px rgba(255, 255, 255, 0.35),
+		0 0 32px color-mix(in srgb, var(--wypas-art-glow) 35%, transparent) !important;
+	animation: mode-card-ring-spin 2.8s linear infinite !important;
+}
+
+body.menu-active #main-menu .mode-card.active,
+body.menu-active #main-menu .mode-card.selected,
+body.menu-active #main-menu .mode-card.mode-card--wypas.active,
+body.menu-active #main-menu .mode-card.mode-card--wypas.selected,
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas .mode-card.mode-card--wypas.active,
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas .mode-card.mode-card--wypas.selected {
+	opacity: 1 !important;
+	filter: none !important;
+	--card-lift: -6px;
+	--card-scale: 1.02;
+	border-color: rgba(255, 255, 255, 0.45) !important;
+	border-radius: var(--mode-card-radius, 14px) !important;
+	box-shadow:
+		12px 20px 34px rgba(0, 0, 0, 0.58),
+		0 0 28px color-mix(in srgb, var(--wypas-art-glow) 32%, transparent),
+		inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
+}
+
+body.menu-active #main-menu .mode-card:is(:hover, :focus-visible, .selected, .active, .mode-card--pick)
+	.mode-card__art-img {
+	transform: scale(1.16);
+	filter: saturate(1.2) contrast(1.1) brightness(1.06);
+}
+
+body.menu-active #main-menu .mode-card.active .mode-card__art-img,
+body.menu-active #main-menu .mode-card.selected .mode-card__art-img {
+	animation: mode-card-ken-burns 9s ease-in-out infinite alternate;
+}
+
+@keyframes mode-card-ken-burns {
+	from {
+		transform: scale(1.1);
+	}
+	to {
+		transform: scale(1.2);
+	}
+}
+
+body.menu-active #main-menu .mode-card:is(:hover, :focus-visible, .selected, .active, .mode-card--pick)
+	.mode-card__art-tint {
+	opacity: 1;
+}
+
+body.menu-active #main-menu .mode-card:is(:hover, :focus-visible, .selected, .active, .mode-card--pick)
+	.mode-card__shine {
+	opacity: 1;
+	transform: translateX(58%) rotate(8deg);
+}
+
+body.menu-active #main-menu .mode-card:is(:hover, :focus-visible, .selected, .active, .mode-card--pick)
+	.mode-card__bar {
+	height: 5px;
+	opacity: 1;
+}
+
+body.menu-active #main-menu .mode-card.active .mode-card__index,
+body.menu-active #main-menu .mode-card.selected .mode-card__index {
+	opacity: 0.5 !important;
+	-webkit-text-stroke-color: color-mix(in srgb, var(--wypas-art-glow) 55%, rgba(255, 255, 255, 0.35));
+}
+
+/* Settle: lekki pulse bez walki z apex-card-pick-outer */
+body.menu-active #main-menu .mode-card.mode-card--pick:not(.mode-card--spin) .mode-card__art-img {
+	animation: mode-card-settle-art 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes mode-card-settle-art {
+	0% {
+		transform: scale(1.08);
+	}
+	55% {
+		transform: scale(1.2);
+	}
+	100% {
+		transform: scale(1.14);
+	}
+}
+
+body.menu-active #main-menu .mode-card.mode-card--pick:not(.mode-card--spin) {
+	filter: none !important;
+	opacity: 1 !important;
+	z-index: 8 !important;
+}
+
+/* Stagger intro — wygrywa z apex nth-child (ta sama idea, delay z --card-stagger) */
+@keyframes mode-card-stagger-live {
+	from {
+		opacity: 0;
+		transform: translateY(22px) scale(0.96);
+		filter: saturate(0.6) brightness(0.7);
+	}
+	to {
+		opacity: 0.78;
+		transform: translateY(0) scale(1);
+		filter: saturate(0.78) brightness(0.82);
+	}
+}
+
+@keyframes mode-card-stagger-live-active {
+	from {
+		opacity: 0;
+		transform: translateY(22px) scale(0.96);
+		filter: saturate(0.6) brightness(0.7);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(-6px) scale(1.02);
+		filter: none;
+	}
+}
+
+body.menu-active #main-menu.main-menu--cards-intro.main-menu--apex .mode-card.mode-card--wypas:not(.mode-card--spin),
+body.menu-active #main-menu.main-menu--cards-intro .mode-card:not(.mode-card--spin) {
+	animation: mode-card-stagger-live 0.55s cubic-bezier(0.22, 1, 0.36, 1) backwards !important;
+	animation-delay: calc(var(--card-stagger, 0) * 55ms) !important;
+}
+
+body.menu-active #main-menu.main-menu--cards-intro.main-menu--apex .mode-card.mode-card--wypas.active:not(.mode-card--spin),
+body.menu-active #main-menu.main-menu--cards-intro.main-menu--apex .mode-card.mode-card--wypas.selected:not(.mode-card--spin),
+body.menu-active #main-menu.main-menu--cards-intro .mode-card.active:not(.mode-card--spin),
+body.menu-active #main-menu.main-menu--cards-intro .mode-card.selected:not(.mode-card--spin) {
+	animation-name: mode-card-stagger-live-active !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	body.menu-active #main-menu .mode-card.active .mode-card__art-img,
+	body.menu-active #main-menu .mode-card.selected .mode-card__art-img,
+	body.menu-active #main-menu .mode-card.mode-card--pick .mode-card__art-img {
+		animation: none !important;
+	}
+	body.menu-active #main-menu.main-menu--cards-intro .mode-card {
+		animation: none !important;
+		opacity: 0.78;
+		transform: none;
+	}
+	body.menu-active #main-menu.main-menu--cards-intro .mode-card.active,
+	body.menu-active #main-menu.main-menu--cards-intro .mode-card.selected {
+		opacity: 1;
+		filter: none;
+	}
+}
+
+body.menu-active #main-menu .mode-card.mode-card--spin {
+	z-index: 40 !important;
+	animation: menu-plate-spin 0.68s cubic-bezier(0.4, 0.0, 0.2, 1) both !important;
+	transition: none !important;
+	transform-style: preserve-3d !important;
+	backface-visibility: visible !important;
+	will-change: transform, filter;
+	border-color: color-mix(in srgb, var(--wypas-art-glow) 85%, white) !important;
+	box-shadow:
+		0 22px 40px rgba(0, 0, 0, 0.55),
+		0 0 0 2px color-mix(in srgb, var(--wypas-art-glow) 45%, white),
+		0 0 36px color-mix(in srgb, var(--wypas-art-glow) 32%, transparent) !important;
+	overflow: visible !important;
+	contain: none !important;
+}
+
+body.menu-active #main-menu .mode-card--wypas.active.mode-card--spin,
+body.menu-active #main-menu .mode-card--wypas.mode-card--spin,
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas.active.mode-card--spin,
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas.mode-card--spin {
+	animation: menu-plate-spin 0.68s cubic-bezier(0.4, 0.0, 0.2, 1) both !important;
+	transform-style: preserve-3d !important;
+	z-index: 50 !important;
+	overflow: visible !important;
+}
+
+body.menu-active #main-menu .rl-playlists__grid:has(.mode-card--spin) {
+	perspective: 1200px;
+	perspective-origin: 50% 45%;
+	overflow: visible !important;
+}
+
+body.menu-active #main-menu .mode-card.mode-card--spin .mode-card__inner,
+body.menu-active #main-menu .mode-card.mode-card--spin .mode-card__art {
+	transform-style: preserve-3d !important;
+	backface-visibility: visible !important;
+}
+
+body.menu-active #main-menu .mode-card.mode-card--spin .mode-card__shine {
+	opacity: 0.85;
+	animation: menu-plate-shine 0.68s cubic-bezier(0.4, 0.0, 0.2, 1) both;
+}
+
+@keyframes menu-plate-shine {
+	0% {
+		transform: translateX(-70%) rotate(8deg);
+		opacity: 0.2;
+	}
+	40% {
+		opacity: 1;
+	}
+	100% {
+		transform: translateX(70%) rotate(8deg);
+		opacity: 0.35;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	body.menu-active #main-menu .mode-card.mode-card--spin {
+		animation: none !important;
+	}
+	body.menu-active #main-menu .mode-card.active::after,
+	body.menu-active #main-menu .mode-card.selected::after {
+		animation: none !important;
+		--mode-ring-angle: 40deg;
+	}
+	body.menu-active #main-menu .mode-card:is(:hover, :focus-visible, .active, .selected) {
+		--plate-tilt-y: 0deg;
+		--plate-tilt-x: 0deg;
+		--plate-lift: 0px;
+		--card-skew-deg: 0deg;
+	}
+	body.menu-active #main-menu .mode-card,
+	body.menu-active #main-menu .mode-card.mode-card--rl-play {
+		--card-skew-deg: 0deg;
+	}
+	body.menu-active #main-menu .rl-tab {
+		--tab-skew-deg: 0deg;
+	}
+	body.menu-active #main-menu .rl-play,
+	body.menu-active #main-menu .btn-massive-play {
+		--play-skew-deg: 0deg;
+	}
+}
+
+/* --- PLAY — pełny, zaokrąglony, bez ucięcia --- */
+body.menu-active #main-menu .rl-play,
+body.menu-active #main-menu .btn-massive-play {
+	flex: 0 0 var(--rl-play-w);
+	align-self: stretch;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 0.3rem;
+	width: var(--rl-play-w) !important;
+	min-width: var(--rl-play-w) !important;
+	max-width: var(--rl-play-w) !important;
+	padding: 0.85rem 1.15rem !important;
+	margin: 0 0.35rem 0 0.25rem !important;
+	z-index: 4;
+	flex-shrink: 0;
+	height: 100%;
+	max-height: 100%;
+	box-sizing: border-box;
+	background: linear-gradient(
+		155deg,
+		color-mix(in srgb, var(--menu-accent) 88%, white),
+		var(--menu-accent) 42%,
+		color-mix(in srgb, var(--menu-accent) 68%, #0a0c10)
+	) !important;
+	border: none !important;
+	border-radius: var(--mode-card-radius, 14px) !important;
+	clip-path: none !important;
+	-webkit-clip-path: none !important;
+	color: #0a0c10 !important;
+	font: inherit;
+	font-size: clamp(1.15rem, 1.7vw, 1.65rem) !important;
+	font-weight: 900 !important;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	text-align: center;
+	cursor: pointer;
+	position: relative;
+	isolation: isolate;
+	overflow: hidden;
+	box-shadow:
+		12px 16px 34px var(--menu-accent-dim),
+		inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+	transform: none !important;
+	transform-origin: center center;
+	transition:
+		transform 0.2s ease,
+		box-shadow 0.2s ease,
+		filter 0.2s ease,
+		background 0.2s ease !important;
+}
+
+body.menu-active #main-menu .rl-play::before,
+body.menu-active #main-menu .btn-massive-play::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	z-index: 0;
+	background: linear-gradient(
+		115deg,
+		rgba(255, 255, 255, 0.28) 0%,
+		transparent 42%,
+		transparent 100%
+	);
+}
+
+/** Tekst PLAY — bez counter-skew (kształt z clip-path). */
+body.menu-active #main-menu .rl-play__label,
+body.menu-active #main-menu .rl-play__mode,
+body.menu-active #main-menu .btn-massive-play .btn-sub {
+	position: relative;
+	z-index: 1;
+	width: 100%;
+	text-align: center;
+	transform: none;
+}
+
+body.menu-active #main-menu .rl-play::after,
+body.menu-active #main-menu .btn-massive-play::after {
+	display: none !important;
+	content: none !important;
+}
+
+body.menu-active #main-menu .rl-play__mode,
+body.menu-active #main-menu .btn-massive-play .btn-sub {
+	font-size: clamp(0.55rem, 0.7vw, 0.68rem);
+	letter-spacing: 0.14em;
+	opacity: 0.72;
+	font-weight: 700;
+}
+
+body.menu-active #main-menu .rl-play:hover,
+body.menu-active #main-menu .btn-massive-play:hover,
+body.menu-active #main-menu .btn-massive-play:focus-visible {
+	transform: translateY(-2px) !important;
+	filter: brightness(1.06);
+	box-shadow:
+		10px 14px 32px var(--menu-accent-glow),
+		inset 0 1px 0 rgba(255, 255, 255, 0.45) !important;
+	outline: none;
+	background: #fff !important;
+	color: #0a0c10 !important;
+}
+
+/* --- TICKER --- */
+@keyframes rl-menu-ticker {
+	from {
+		transform: translateX(0);
+	}
+	to {
+		transform: translateX(-50%);
+	}
+}
+
+body.menu-active #main-menu .rl-ticker {
+	--rl-ticker-cut: 0.95rem;
+	position: relative;
+	display: flex;
+	align-items: center;
+	width: auto;
+	min-height: 1.85rem;
+	margin: 0 clamp(10px, 1.2vw, 16px) clamp(6px, 0.9vh, 10px);
+	padding: 0.42rem calc(0.85rem + var(--rl-ticker-cut)) 0.5rem;
+	overflow: hidden;
+	background: linear-gradient(
+		180deg,
+		rgba(10, 14, 22, 0.94) 0%,
+		rgba(4, 8, 14, 0.97) 100%
+	);
+	border: 1px solid color-mix(in srgb, var(--menu-accent) 32%, rgba(255, 255, 255, 0.14));
+	border-top-color: color-mix(in srgb, var(--menu-accent) 48%, rgba(255, 255, 255, 0.16));
+	/* Skos jak GRAJ (parallelogram) — jedna całość z dockiem */
+	clip-path: polygon(
+		var(--rl-ticker-cut) 0,
+		100% 0,
+		calc(100% - var(--rl-ticker-cut)) 100%,
+		0 100%
+	);
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.08),
+		0 10px 22px rgba(0, 0, 0, 0.38);
+	mask-image: none;
+	-webkit-mask-image: none;
+}
+body.menu-active #main-menu .rl-ticker::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	width: 3px;
+	background: linear-gradient(
+		180deg,
+		rgba(255, 255, 255, 0.55),
+		var(--menu-accent),
+		color-mix(in srgb, var(--menu-accent) 40%, transparent)
+	);
+	pointer-events: none;
+	z-index: 1;
+}
+
+body.menu-active #main-menu .rl-ticker__track {
+	display: flex;
+	flex: 0 0 auto;
+	width: max-content;
+	gap: 0;
+	white-space: nowrap;
+	will-change: transform;
+	animation: rl-menu-ticker 42s linear infinite;
+}
+
+body.menu-active #main-menu .rl-ticker__seg {
+	display: inline-block;
+	padding-right: 3.5rem;
+	font-size: clamp(0.62rem, 0.78vw, 0.74rem);
+	font-weight: 800;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: #e8f0ff;
+	text-shadow:
+		0 0 12px color-mix(in srgb, var(--menu-accent) 45%, transparent),
+		0 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	body.menu-active #main-menu .rl-ticker__track {
+		animation: none;
+		transform: none;
+	}
+	body.menu-active #main-menu .rl-ticker__seg[aria-hidden="true"] {
+		display: none;
+	}
+	body.menu-active #main-menu .rl-ticker {
+		mask-image: none;
+		-webkit-mask-image: none;
+		justify-content: center;
+	}
+	body.menu-active #main-menu .rl-ticker__seg {
+		padding-right: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 100%;
+	}
+}
+
+@media (max-width: 980px) {
+	body.menu-active #main-menu .rl-topbar {
+		flex-direction: column;
+	}
+
+	body.menu-active #main-menu .rl-topnav {
+		max-width: 100%;
+		justify-content: flex-start;
+	}
+
+	body.menu-active #main-menu .rl-dock__body {
+		flex-direction: column;
+	}
+
+	body.menu-active #main-menu .rl-play {
+		width: var(--rl-play-w) !important;
+		min-width: var(--rl-play-w) !important;
+		max-width: 100% !important;
+		align-items: center;
+		margin-left: 0.35rem !important;
+	}
+
+	body.menu-active #main-menu {
+		--rl-row-h: clamp(220px, 34vh, 300px);
+		--rl-card-h: var(--rl-row-h);
+		--card-slash: clamp(16px, calc(var(--rl-card-h) * 0.08), 26px);
+		--play-slash: clamp(16px, calc(var(--rl-row-h) * 0.08), 26px);
+		--rl-play-w: min(100%, 16rem);
+	}
+}
+
+body.menu-active #main-menu .main-menu__sr-only,
+body.menu-active #main-menu .main-menu__controls--sr {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+	pointer-events: none;
+}
+
+/* Legacy nodes z poprzednich layoutów — chowaj */
+body.menu-active #main-menu .sidebar-nav,
+body.menu-active #main-menu .modes-panel-bottom,
+body.menu-active #main-menu .modes-stage,
+body.menu-active #main-menu .main-menu__cosmos-hud,
+body.menu-active #main-menu .main-menu__rl-rail,
+body.menu-active #main-menu .sidebar-left,
+body.menu-active #main-menu .sidebar-right {
+	display: none !important;
+}
+
+#mp-lobby .game-mode-card {
+	background: rgba(18, 24, 32, 0.92);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 2px;
+	box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+}
+
+
+/* ── Main menu light polish (non-drastic) ── */
+body.menu-active #main-menu .logo-ignite__img {
+	filter: drop-shadow(0 3px 16px rgba(0, 0, 0, 0.6));
+}
+
+body.menu-active #main-menu .logo-meta {
+	letter-spacing: 0.14em;
+	opacity: 0.88;
+}
+
+body.menu-active #main-menu .rl-dock__head h2 {
+	letter-spacing: 0.14em;
+}
+
+body.menu-active #main-menu .mode-card,
+body.menu-active #main-menu .mode-card.mode-card--rl-play,
+body.menu-active #main-menu .mode-card.mode-card--wypas {
+	opacity: 0.78;
+	box-shadow:
+		8px 12px 24px rgba(0, 0, 0, 0.48),
+		inset 0 1px 0 rgba(255, 255, 255, 0.07) !important;
+}
+
+body.menu-active #main-menu .mode-card:hover,
+body.menu-active #main-menu .mode-card:focus-visible,
+body.menu-active #main-menu .mode-card.is-selected,
+body.menu-active #main-menu .mode-card[aria-pressed="true"] {
+	opacity: 1;
+	border-color: color-mix(in srgb, var(--wypas-art-glow, #3de8ff) 48%, #4a6078) !important;
+	box-shadow:
+		10px 16px 30px rgba(0, 0, 0, 0.55),
+		0 0 0 1px color-mix(in srgb, var(--wypas-art-glow, #3de8ff) 28%, transparent),
+		inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Active — zaokrąglony animowany pierścień + lift (cascade winner) */
+body.menu-active #main-menu .mode-card.active,
+body.menu-active #main-menu .mode-card.selected,
+body.menu-active #main-menu .mode-card.mode-card--rl-play.active,
+body.menu-active #main-menu .mode-card.mode-card--wypas.active,
+body.menu-active #main-menu .mode-card.mode-card--wypas.selected,
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas .mode-card.mode-card--wypas.active,
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas .mode-card.mode-card--wypas.selected {
+	opacity: 1 !important;
+	filter: none !important;
+	--card-lift: -6px;
+	--card-scale: 1.02;
+	border-color: rgba(255, 255, 255, 0.35) !important;
+	border-radius: var(--mode-card-radius, 14px) !important;
+	clip-path: none !important;
+	-webkit-clip-path: none !important;
+	overflow: hidden !important;
+	box-shadow:
+		12px 20px 34px rgba(0, 0, 0, 0.58),
+		0 0 28px color-mix(in srgb, var(--wypas-art-glow, #3de8ff) 30%, transparent),
+		inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
+}
+body.menu-active #main-menu .mode-card.active::after,
+body.menu-active #main-menu .mode-card.selected::after,
+body.menu-active #main-menu .mode-card.mode-card--rl-play.active::after,
+body.menu-active #main-menu .mode-card.mode-card--wypas.active::after,
+body.menu-active #main-menu .mode-card.mode-card--wypas.selected::after,
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas
+	.mode-card.mode-card--wypas.active::after,
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas
+	.mode-card.mode-card--wypas.selected::after {
+	content: "" !important;
+	display: block !important;
+	opacity: 1 !important;
+	inset: 0 !important;
+	padding: 3.5px !important;
+	border: none !important;
+	border-radius: inherit !important;
+	background: conic-gradient(
+		from var(--mode-ring-angle, 0deg),
+		#ffffff 0deg,
+		color-mix(in srgb, var(--wypas-art-glow, #3de8ff) 75%, #ffffff) 70deg,
+		rgba(255, 255, 255, 0.35) 130deg,
+		#ffffff 180deg,
+		color-mix(in srgb, var(--wypas-art-glow, #3de8ff) 90%, #fff6e8) 250deg,
+		rgba(255, 255, 255, 0.4) 310deg,
+		#ffffff 360deg
+	) !important;
+	-webkit-mask:
+		linear-gradient(#fff 0 0) content-box,
+		linear-gradient(#fff 0 0) !important;
+	-webkit-mask-composite: xor !important;
+	mask:
+		linear-gradient(#fff 0 0) content-box,
+		linear-gradient(#fff 0 0) !important;
+	mask-composite: exclude !important;
+	animation: mode-card-ring-spin 2.8s linear infinite !important;
+	box-shadow:
+		0 0 0 1px rgba(255, 255, 255, 0.28),
+		0 0 18px rgba(255, 255, 255, 0.28),
+		0 0 28px color-mix(in srgb, var(--wypas-art-glow, #3de8ff) 38%, transparent) !important;
+}
+
+/* PLAY — pełny prostokąt, bez skosu / ucięcia prawej krawędzi */
+body.menu-active #main-menu .rl-play,
+body.menu-active #main-menu .btn-massive-play {
+	border-radius: var(--mode-card-radius, 14px) !important;
+	clip-path: none !important;
+	-webkit-clip-path: none !important;
+	margin-right: 0.5rem !important;
+}
+
+body.menu-active #main-menu .rl-playlists__nav {
+	opacity: 0.88;
+}
+
+body.menu-active #main-menu .rl-playlists__nav:hover:not(:disabled) {
+	opacity: 1;
+}
+
+body.menu-active #main-menu .rl-ticker {
+	border-color: rgba(255, 255, 255, 0.08);
+	background: rgba(6, 10, 16, 0.55);
+}
+
+body.menu-active #main-menu .rl-ticker__seg {
+	opacity: 0.82;
+	letter-spacing: 0.04em;
+}
+
+body.menu-active #main-menu .rl-topnav {
+	gap: 0.35rem;
+}
+
+body.menu-active #main-menu .rl-topnav button,
+body.menu-active #main-menu .rl-topnav .rl-topnav__btn {
+	border-radius: 6px;
+	letter-spacing: 0.08em;
+}
+
+body.menu-active #main-menu .rl-dock__head {
+	border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+body.menu-active #main-menu .mode-card__title {
+	letter-spacing: 0.06em;
+}
+
+body.menu-active #main-menu .mode-card__desc {
+	opacity: 0.78;
+}
+
+body.menu-active #main-menu .rl-tab {
+	border-radius: 8px;
+}
+
+body.menu-active #main-menu .rl-tab__sub {
+	opacity: 0.72;
+	letter-spacing: 0.02em;
+}
+
+body.menu-active #main-menu #main-menu-garage:hover,
+body.menu-active #main-menu #main-menu-garage:focus-visible {
+	border-color: color-mix(in srgb, #ff9a4a 35%, rgba(255, 255, 255, 0.14));
+}
+
+body.menu-active #main-menu .mode-card__badge {
+	border-radius: 6px;
+	letter-spacing: 0.14em;
+	opacity: 1;
+}
+
+body.menu-active #main-menu .rl-playlists__nav {
+	border-radius: 6px;
+	backdrop-filter: blur(6px);
+}
+
+body.menu-active #main-menu .rl-dock__head p,
+body.menu-active #main-menu .rl-dock__kicker {
+	opacity: 0.7;
+	letter-spacing: 0.12em;
+}
+
+body.menu-active #main-menu .mode-card__shine {
+	opacity: 0.55;
+}
+
+body.menu-active #main-menu .mode-card.active .mode-card__shine,
+body.menu-active #main-menu .mode-card:hover .mode-card__shine {
+	opacity: 0.85;
+}
+
+body.menu-active #main-menu .rl-ticker {
+	opacity: 0.92;
+}
+
+/* Garage inventory — cascade winner (after compositor) — wyraźniejszy clean look */
+body.garage-open .garage-main .garage-hero__plate {
+	padding: 0.6rem 0.8rem 0.65rem;
+	border: 1px solid rgba(255, 170, 90, 0.22);
+	border-radius: 12px;
+	background: rgba(6, 10, 16, 0.88);
+	box-shadow:
+		0 10px 28px rgba(0, 0, 0, 0.5),
+		inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+body.garage-open .garage-dock__grid .garage-tile__frame {
+	border-width: 1.5px;
+	border-color: rgba(255, 255, 255, 0.14);
+	background: rgba(8, 14, 22, 0.96);
+	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+	border-radius: 10px !important;
+}
+
+body.garage-open .garage-dock__grid .garage-tile:hover .garage-tile__frame {
+	border-color: rgba(160, 220, 255, 0.5);
+	box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5);
+	transform: translateY(-2px);
+}
+
+body.garage-open .garage-dock__grid .garage-tile--selected .garage-tile__frame {
+	border-color: rgba(255, 150, 60, 1);
+	border-width: 2px;
+	background: rgba(28, 16, 8, 0.98);
+	box-shadow:
+		0 0 0 2px rgba(255, 140, 50, 0.45),
+		0 10px 26px rgba(0, 0, 0, 0.55),
+		inset 0 0 18px rgba(255, 120, 40, 0.12);
+}
+
+body.garage-open .garage-dock__grid .garage-tile--equipped .garage-tile__frame {
+	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+}
+
+body.garage-open .garage-dock__grid .garage-tile--equipped.garage-tile--selected .garage-tile__frame {
+	box-shadow:
+		0 0 0 1px rgba(255, 140, 50, 0.35),
+		0 8px 20px rgba(0, 0, 0, 0.45);
+}
+
+body.garage-open .garage-sidebar__btn--active {
+	border-color: rgba(255, 150, 70, 1);
+	background: linear-gradient(160deg, rgba(60, 28, 10, 0.98), rgba(28, 14, 6, 0.98));
+	box-shadow:
+		0 0 0 2px rgba(255, 140, 50, 0.4),
+		0 8px 20px rgba(0, 0, 0, 0.5);
+	color: #fff4e8;
+}
+
+body.garage-open .garage-main {
+	background: linear-gradient(
+		90deg,
+		rgba(4, 8, 14, 0.78) 0%,
+		rgba(4, 8, 14, 0.45) 70%,
+		transparent 100%
+	);
+	border-radius: 0 14px 14px 0;
+	padding-right: 0.45rem;
+	border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+body.garage-open .garage-filter__chip--active {
+	border-color: rgba(255, 160, 80, 0.55);
+	background: rgba(255, 120, 40, 0.18);
+	color: #ffd8b0;
+}
+
+body.garage-open .garage-search {
+	border-radius: 10px;
+	border-color: rgba(255, 255, 255, 0.14);
+	background: rgba(4, 8, 14, 0.92);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+body.garage-open .garage-dock__grid {
+	gap: 0.65rem !important;
+}
+
+body.garage-open .garage-dock__grid .garage-tile__name {
+	font-size: 0.62rem;
+	font-weight: 700;
+	letter-spacing: 0.03em;
+	color: rgba(230, 236, 244, 0.88);
+}
+
+body.garage-open .garage-dock__grid .garage-tile--selected .garage-tile__name {
+	color: #ffe8d0;
+	text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7);
+}
+
+body.garage-open .garage-hint {
+	display: none !important;
+}
+
+body.garage-open .garage-hero__trait,
+body.garage-open .garage-hero__provenance {
+	display: none !important;
+}
+
+body.garage-open .garage-empty {
+	display: block;
+}
+
+body.garage-open .garage-dock--grid {
+	scrollbar-color: rgba(255, 160, 80, 0.35) rgba(255, 255, 255, 0.04);
+}
+
+body.garage-open .garage-dock--grid::-webkit-scrollbar-thumb {
+	background: rgba(255, 160, 80, 0.35);
+}
+
+body.garage-open .garage-dock__grid .garage-tile--new .garage-tile__frame {
+	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+}
+
+body.garage-open .garage-dock__grid .garage-tile--new.garage-tile--selected .garage-tile__frame {
+	box-shadow:
+		0 0 0 1px rgba(255, 140, 50, 0.35),
+		0 8px 20px rgba(0, 0, 0, 0.45);
+}
+
+body.garage-open .garage-tile__new {
+	border-radius: 3px;
+	font-size: 0.5rem;
+	padding: 0.08rem 0.28rem;
+	background: rgba(255, 140, 50, 0.92);
+}
+
+body.garage-open .garage-dock__grid .garage-tile:focus-visible .garage-tile__frame {
+	outline: 2px solid rgba(255, 170, 90, 0.75);
+	outline-offset: 2px;
+}
+
+body.garage-open .garage-sidebar__btn:focus-visible {
+	outline: 2px solid rgba(255, 170, 90, 0.7);
+	outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	body.garage-open .garage-dock__grid .garage-tile:hover .garage-tile__frame {
+		transform: none;
+	}
+	body.menu-active #main-menu .mode-card.mode-card--spin {
+		animation: none !important;
+	}
+}
+
+body.garage-open .garage-tile__kind {
+	position: absolute;
+	top: 0.22rem;
+	left: 0.22rem;
+	z-index: 2;
+	max-width: calc(100% - 2.2rem);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	padding: 0.06rem 0.25rem;
+	border-radius: 3px;
+	font-size: 0.46rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: rgba(220, 230, 240, 0.85);
+	background: rgba(0, 0, 0, 0.55);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.garage-open .garage-tile__paint--none {
+	opacity: 0;
+	height: 0;
+}
+
+body.garage-open .garage-top__kicker {
+	letter-spacing: 0.18em;
+	opacity: 0.7;
+}
+
+body.garage-open .garage-top h2 {
+	letter-spacing: 0.08em;
+}
+
+body.menu-active #main-menu .mode-card__art-shade {
+	opacity: 0.92;
+}
+
+body.garage-open .garage-tile__equipped {
+	max-width: calc(100% - 0.4rem);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-size: 0.48rem;
+	letter-spacing: 0.03em;
+	padding: 0.06rem 0.22rem;
+	background: rgba(40, 180, 160, 0.88);
+	color: #061018;
+	border-radius: 3px;
+}
+
+body.garage-open .garage-hero__action--primary {
+	border-color: rgba(255, 150, 70, 0.55);
+	background: rgba(255, 120, 40, 0.18);
+	color: #ffe0c0;
+	border-radius: 7px;
+}
+
+body.garage-open .garage-sidebar__btn {
+	position: relative;
+}
+
+body.garage-open .garage-sidebar__btn--has-new::after {
+	content: "";
+	position: absolute;
+	top: 0.35rem;
+	right: 0.35rem;
+	width: 0.42rem;
+	height: 0.42rem;
+	border-radius: 50%;
+	background: #ff9a4a;
+	box-shadow: 0 0 0 2px rgba(8, 12, 18, 0.85);
+}
+
+body.garage-open .garage-main {
+	background: linear-gradient(
+		90deg,
+		rgba(4, 8, 14, 0.55) 0%,
+		rgba(4, 8, 14, 0.28) 72%,
+		transparent 100%
+	);
+	border-radius: 0 12px 12px 0;
+	padding-right: 0.35rem;
+}
+
+body.garage-open .garage-search__input {
+	color: rgba(235, 242, 250, 0.92);
+}
+
+body.garage-open .garage-search__input::placeholder {
+	color: rgba(170, 190, 210, 0.45);
+}
+
+body.garage-open .garage-hero__rarity--legendary {
+	color: #ffc060;
+}
+
+body.garage-open .garage-hero__rarity--epic {
+	color: #c9a0ff;
+}
+
+body.garage-open .garage-hero__rarity--rare {
+	color: #7ec8ff;
+}
+
+body.garage-open .garage-hero__meta {
+	gap: 0.3rem;
+}
+
+body.menu-active #main-menu .rl-dock {
+	border-color: rgba(255, 255, 255, 0.06);
+}
+
+body.menu-active #main-menu .logo-ignite {
+	filter: drop-shadow(0 4px 18px rgba(0, 0, 0, 0.45));
+}
+
+body.garage-open .garage-hero__label--flash {
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+body.garage-open .garage-filter__chip:not(.garage-filter__chip--active) {
+	opacity: 0.72;
+}
+
+body.menu-active #main-menu .rl-tab__title {
+	letter-spacing: 0.1em;
+}
+
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas .mode-card__shimmer {
+	opacity: 0.45;
+}
+
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas.active .mode-card__shimmer {
+	opacity: 0.7;
+}
+
+body.menu-active #main-menu.main-menu--apex.main-menu--wypas .mode-card--wypas:not(.active):not(:hover):not(:focus-visible) {
+	opacity: 0.78;
+	filter: saturate(0.78) brightness(0.82);
+}
+
+body.garage-open .ui-ignite-back__icon {
+	color: rgba(255, 180, 120, 0.9);
+}
+
+body.garage-open .ui-ignite-back__label {
+	text-shadow:
+		0 1px 0 rgba(0, 0, 0, 0.35),
+		0 0 14px rgba(255, 140, 60, 0.18);
+}
+
+body.garage-open .garage-hero__paint-label {
+	font-size: 0.68rem;
+	opacity: 0.85;
+}
+
+body.garage-open .garage-hero__paint {
+	width: 0.7rem;
+	height: 0.7rem;
+	border-radius: 3px;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+body.garage-open .garage-dock__grid .garage-tile__thumb,
+body.garage-open .garage-dock__grid .garage-tile__map,
+body.garage-open .garage-dock__grid .garage-tile__icon {
+	transition: transform 0.15s ease;
+}
+
+body.garage-open .garage-dock__grid .garage-tile:hover .garage-tile__thumb,
+body.garage-open .garage-dock__grid .garage-tile:hover .garage-tile__map,
+body.garage-open .garage-dock__grid .garage-tile:hover .garage-tile__icon {
+	transform: scale(1.04);
+}
+
+body.garage-open .garage-dock__grid .garage-tile--selected:hover .garage-tile__thumb,
+body.garage-open .garage-dock__grid .garage-tile--selected:hover .garage-tile__map,
+body.garage-open .garage-dock__grid .garage-tile--selected:hover .garage-tile__icon {
+	transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	body.garage-open .garage-dock__grid .garage-tile:hover .garage-tile__thumb,
+	body.garage-open .garage-dock__grid .garage-tile:hover .garage-tile__map,
+	body.garage-open .garage-dock__grid .garage-tile:hover .garage-tile__icon {
+		transform: none;
+	}
+}
+
+body.menu-active #main-menu .rl-bottom {
+	gap: 0.55rem;
+}
+
+body.menu-active #main-menu .rl-dock__head h2 {
+	font-size: clamp(0.95rem, 1.4vw, 1.15rem);
+}
+
+body.garage-open .garage-top {
+	padding-top: 0.85rem;
+	padding-bottom: 0.55rem;
+}
+
+body.garage-open .garage-sidebar {
+	padding-top: 0.15rem;
+}
+
+body.menu-active #main-menu .rl-playlists__grid {
+	gap: var(--rl-card-gap, 0.65rem);
+}
+
+body.menu-active #main-menu .mode-card__bar {
+	height: 3px;
+	opacity: 0.85;
+}
+
+body.garage-open .garage-dock-wrap::after {
+	height: 1.35rem;
+	background: linear-gradient(
+		to top,
+		rgba(4, 8, 16, 0.75) 8%,
+		transparent
+	);
+}
+
+body.garage-open .garage-top__new {
+	animation: none;
+	border-radius: 5px;
+	box-shadow: none;
+}
+
+body.menu-active #main-menu .mode-card__inner {
+	border-radius: inherit;
+}
+
+body.garage-open .garage-sidebar__btn:not(.garage-sidebar__btn--active) {
+	opacity: 0.88;
+}
+
+body.garage-open .garage-sidebar__btn:not(.garage-sidebar__btn--active):hover {
+	opacity: 1;
+}
+
+body.garage-open .garage-hero__badge {
+	border-radius: 4px;
+	font-size: 0.58rem;
+	letter-spacing: 0.08em;
+	padding: 0.1rem 0.35rem;
+	background: rgba(61, 255, 232, 0.12);
+	border: 1px solid rgba(61, 255, 232, 0.28);
+	color: #b8f5ee;
+}
+
+body.garage-open .garage-hero__badge--new {
+	background: rgba(255, 180, 60, 0.14);
+	border-color: rgba(255, 180, 60, 0.4);
+	color: #ffd080;
+}
+
+body.garage-open .garage-hero__badge--locked {
+	background: rgba(255, 80, 80, 0.1);
+	border-color: rgba(255, 100, 100, 0.3);
+	color: rgba(255, 200, 190, 0.9);
+}
+
+body.menu-active #main-menu .rl-topnav {
+	opacity: 0.94;
+}
+
+body.garage-open .garage-filters {
+	margin-bottom: 0.4rem;
+}
+
+body.menu-active #main-menu .main-menu__vignette--soft {
+	opacity: 0.14;
+}
+
+body.garage-open .garage-tile__equipped {
+	bottom: 0.2rem;
+	left: 0.2rem;
+}
+
+body.menu-active #main-menu .rl-playlists__nav:disabled {
+	opacity: 0.28;
+}
+
+body.garage-open .garage-hero__name {
+	line-height: 1.15;
+}
+
+body.garage-open .garage-top__brand {
+	gap: 0.15rem;
+}
+
+body.menu-active #main-menu .rl-tab.active {
+	border-color: color-mix(in srgb, #7ec8ff 40%, rgba(255, 255, 255, 0.35));
+}
+
+body.garage-open .garage-dock__grid .garage-tile--selected .garage-tile__frame {
+	background: rgba(18, 14, 10, 0.95);
+}
+
+body.menu-active #main-menu .mode-card__mutator {
+	opacity: 0.7;
+	font-size: 0.68rem;
+}
+
+body.garage-open .garage-search:focus-within {
+	border-color: rgba(255, 160, 80, 0.45);
+	box-shadow: 0 0 0 1px rgba(255, 150, 70, 0.12);
+}
+
+
+/* ── Garage readable+flash (loaded last — wins over earlier garage CSS) ── */
+
+.garage-hero__actions[hidden],
+.garage-pit[hidden],
+.garage-overlay [hidden] {
+	display: none !important;
+}
+
+body.garage-open .garage-main {
+	padding: 0.55rem 0.65rem 0.7rem;
+	border-radius: 14px;
+	border: 1px solid rgba(120, 200, 255, 0.18);
+	background: linear-gradient(
+		165deg,
+		rgba(10, 18, 32, 0.94) 0%,
+		rgba(4, 8, 16, 0.96) 100%
+	);
+	box-shadow:
+		0 0 0 1px rgba(0, 0, 0, 0.45),
+		0 16px 40px rgba(0, 0, 0, 0.55),
+		inset 0 1px 0 rgba(255, 255, 255, 0.06),
+		0 0 28px rgba(61, 180, 255, 0.1);
+}
+
+body.garage-open .garage-dock__grid {
+	gap: 0.65rem !important;
+}
+
+body.garage-open .garage-dock__grid .garage-tile {
+	flex: 0 1 calc((100% - 0.65rem) / 2) !important;
+	width: calc((100% - 0.65rem) / 2) !important;
+	max-width: calc((100% - 0.65rem) / 2) !important;
+}
+
+body.garage-open .garage-dock__grid .garage-tile__name {
+	font-size: 0.72rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	color: rgba(230, 236, 244, 0.9);
+	max-height: none;
+}
+
+body.garage-open .garage-dock__grid .garage-tile--selected .garage-tile__name {
+	color: #fff6ec;
+}
+
+body.garage-open .garage-hero__name {
+	font-size: clamp(1.2rem, 2.1vw, 1.55rem);
+}
+
+body.garage-open .garage-filter__chip {
+	padding: 0.32rem 0.7rem;
+	font-size: 0.68rem;
+}
+
+/* Zawsze 2 kolumny w panelu inventory — czytelniejsze miniatury.
+   (3 kolumny były za ciasne przy ~40rem szerokości panelu) */
+
+/* Sidebar: scroll gdy dużo kategorii */
+body.garage-open .garage-sidebar {
+	overflow-y: auto;
+	overflow-x: hidden;
+	max-height: 100%;
+	scrollbar-width: thin;
+	scrollbar-color: rgba(255, 160, 80, 0.35) transparent;
+	padding-right: 0.15rem;
+}
+
+body.garage-open .garage-sidebar::-webkit-scrollbar {
+	width: 4px;
+}
+body.garage-open .garage-sidebar::-webkit-scrollbar-thumb {
+	background: rgba(255, 160, 80, 0.35);
+	border-radius: 999px;
+}
+
+/* Paint swatch w hero — czytelniejszy */
+body.garage-open .garage-hero__paint {
+	width: 0.95rem;
+	height: 0.95rem;
+	border-radius: 50%;
+	border: 2px solid rgba(255, 255, 255, 0.45);
+	box-shadow:
+		0 0 0 1px rgba(0, 0, 0, 0.45),
+		0 0 10px rgba(255, 255, 255, 0.12);
+}
+
+body.garage-open .garage-hero__paint-label {
+	font-size: 0.68rem;
+	letter-spacing: 0.06em;
+	color: rgba(220, 230, 240, 0.78);
+}
+
+body.garage-open .garage-hero__badge {
+	font-size: 0.62rem;
+	padding: 0.14rem 0.45rem;
+	border-radius: 5px;
+	font-weight: 800;
+	letter-spacing: 0.08em;
+}
+
+/* Lekki accent pod tytułem garażu */
+body.garage-open .garage-top__brand h2 {
+	position: relative;
+	display: inline-block;
+	padding-bottom: 0.2rem;
+}
+
+body.garage-open .garage-top__brand h2::after {
+	content: "";
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	width: 42%;
+	height: 2px;
+	border-radius: 2px;
+	background: linear-gradient(
+		90deg,
+		rgba(255, 150, 70, 0.9),
+		rgba(61, 200, 255, 0.35),
+		transparent
+	);
+	box-shadow: 0 0 10px rgba(255, 140, 50, 0.45);
+}
+
+/* Search w panelu inventory (nie w headerze) */
+body.garage-open .garage-top--sidebar {
+	grid-template-columns: 1fr;
+	width: min(50vw, 41rem);
+	max-width: min(50vw, 41rem);
+}
+
+body.garage-open .garage-search--in-panel {
+	display: flex;
+	align-items: center;
+	gap: 0.45rem;
+	width: 100%;
+	margin: 0.35rem 0 0.45rem;
+	padding: 0.45rem 0.75rem;
+	border-radius: 9px;
+	border: 1px solid rgba(100, 190, 255, 0.28);
+	background: rgba(4, 10, 18, 0.88);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+	flex-shrink: 0;
+}
+
+body.garage-open .garage-search--in-panel:focus-within {
+	border-color: rgba(255, 160, 80, 0.55);
+	box-shadow:
+		0 0 0 1px rgba(255, 150, 70, 0.18),
+		0 0 16px rgba(255, 140, 60, 0.12);
+}
+
+body.garage-open .garage-search--in-panel .garage-search__input {
+	font-size: 0.82rem;
+}
+
+body.garage-open .garage-search--in-panel .garage-search__icon {
+	opacity: 0.65;
+	color: rgba(160, 210, 255, 0.85);
+}
+
+body.garage-open .garage-empty {
+	margin: 1.5rem 0 0.75rem;
+	padding: 1.1rem 0.9rem;
+	border-radius: 10px;
+	border: 1px dashed rgba(120, 200, 255, 0.22);
+	background: rgba(6, 12, 22, 0.55);
+	box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.25);
+}
+
+body.garage-open .garage-empty__msg {
+	font-size: 0.78rem;
+	color: rgba(200, 220, 240, 0.7);
+}
+
+body.garage-open .garage-empty__clear:hover {
+	box-shadow: 0 0 14px rgba(255, 140, 50, 0.25);
+}
+
+body.garage-open .garage-dock__grid .garage-tile:focus-visible .garage-tile__frame {
+	outline: 2px solid rgba(100, 220, 255, 0.75);
+	outline-offset: 2px;
+}
+
+body.garage-open .garage-top__new:not([hidden]) {
+	animation: garage-new-pulse 1.8s ease-in-out infinite;
+	border-radius: 999px;
+	box-shadow: 0 0 12px rgba(255, 140, 50, 0.35);
+}
+
+/* Glyph thumbs (wheels/trails/…) — większe, czytelniejsze (bez banner — pełna grafika) */
+body.garage-open .garage-tile__thumb--trail,
+body.garage-open .garage-tile__thumb--decal,
+body.garage-open .garage-tile__thumb--wheel,
+body.garage-open .garage-tile__thumb--topper,
+body.garage-open .garage-tile__thumb--goalExplosion {
+	display: grid;
+	place-items: center;
+	background:
+		radial-gradient(ellipse 70% 60% at 50% 45%, rgba(80, 160, 220, 0.12), transparent 70%),
+		linear-gradient(160deg, rgba(14, 22, 34, 0.98), rgba(6, 10, 18, 0.96));
+}
+
+body.garage-open .garage-tile__glyph {
+	width: 42%;
+	height: 42%;
+	opacity: 0.92;
+	filter: drop-shadow(0 0 8px rgba(120, 200, 255, 0.25));
+}
+
+body.garage-open .garage-tile--selected .garage-tile__glyph {
+	filter: drop-shadow(0 0 10px rgba(255, 160, 70, 0.45));
+	opacity: 1;
+}
+
+body.garage-open .garage-hero__actions[data-garage-body-actions]:not([hidden]) {
+	display: flex !important;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+	padding-top: 0.35rem;
+	border-top: 1px solid rgba(255, 255, 255, 0.08);
+	margin-top: 0.4rem;
+	width: 100%;
+}
+
+/* Banery: pełna grafika w kafelku, bez glyphu */
+body.garage-open .garage-tile__thumb--banner {
+	background-color: rgba(6, 10, 18, 0.9);
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+body.garage-open .garage-tile__thumb--banner .garage-tile__glyph {
+	display: none;
+}
+
+/* Hero plate z bannerem — czytelny tekst na grafice */
+body.garage-open .garage-hero__plate.player-banner-plate {
+	min-height: 5.5rem;
+	padding: 0.65rem 0.85rem !important;
+	border-radius: 10px;
+	background-color: rgba(4, 8, 16, 0.35) !important;
+	background-image:
+		linear-gradient(90deg, rgba(4, 8, 16, 0.82) 0%, rgba(4, 8, 16, 0.35) 55%, rgba(4, 8, 16, 0.15) 100%),
+		var(--player-banner) !important;
+	background-size: cover !important;
+	background-position: center !important;
+	box-shadow:
+		inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+		0 8px 24px rgba(0, 0, 0, 0.45) !important;
+}
+
+body.garage-open .garage-hero__plate.player-banner-plate .garage-hero__name,
+body.garage-open .garage-hero__plate.player-banner-plate .garage-hero__label {
+	text-shadow:
+		0 1px 2px rgba(0, 0, 0, 0.95),
+		0 0 12px rgba(0, 0, 0, 0.7);
+}
+
+/* Body-actions: zwarta belka, żeby grid miał więcej miejsca */
+body.garage-open .garage-hero__actions[data-garage-body-actions]:not([hidden]) {
+	gap: 0.28rem;
+	padding-top: 0.28rem;
+	margin-top: 0.28rem;
+}
+
+body.garage-open .garage-hero__actions[data-garage-body-actions] .garage-hero__action {
+	flex: 1 1 auto;
+	min-width: 0;
+	justify-content: center;
+	padding: 0.3rem 0.45rem;
+	font-size: 0.6rem;
+	letter-spacing: 0.04em;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* NEW badge — pomarańcz jak reszta accentów (nie „alarm red”) */
+body.garage-open .garage-top__new:not([hidden]) {
+	background: rgba(255, 130, 40, 0.28);
+	color: #ffd0a0;
+	border: 1px solid rgba(255, 160, 70, 0.55);
+	box-shadow: 0 0 14px rgba(255, 140, 50, 0.4);
+}
+
+/* Arena minimap w kafelku */
+body.garage-open .garage-tile__thumb--arena,
+body.garage-open .garage-tile__frame .arena-minimap {
+	opacity: 0.95;
+}
+body.garage-open .garage-tile__frame .arena-minimap {
+	width: 78%;
+	height: 78%;
+	stroke: rgba(140, 210, 255, 0.85);
+	stroke-width: 1.6;
+	fill: none;
+	filter: drop-shadow(0 0 6px rgba(80, 180, 255, 0.35));
+}
+
+/* Locked tiles — czytelniejszy padlock, mniej „martwy” kafelek */
+body.garage-open .garage-tile--locked .garage-tile__frame {
+	filter: saturate(0.55) brightness(0.72);
+}
+body.garage-open .garage-tile--locked .garage-tile__lock {
+	opacity: 0.95;
+	filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.75));
+}
+body.garage-open .garage-tile--locked:hover .garage-tile__frame {
+	filter: saturate(0.7) brightness(0.82);
+}
+
+/* Filtr chip[hidden] */
+body.garage-open .garage-filter__chip[hidden] {
+	display: none !important;
+}
+
+/* Filtry: mniej zawijania przy PL / wąskim panelu */
+body.garage-open .garage-filters {
+	flex-wrap: wrap;
+	row-gap: 0.28rem;
+}
+body.garage-open .garage-filter__chip {
+	letter-spacing: 0.05em;
+	padding: 0.28rem 0.55rem;
+}
+
+/* Hover lift — lekki flash bez chaosu */
+body.garage-open .garage-dock__grid .garage-tile:hover .garage-tile__frame {
+	transform: translateY(-2px);
+	transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
+}
+body.garage-open .garage-dock__grid .garage-tile--selected:hover .garage-tile__frame {
+	transform: translateY(-1px);
+}
+
+/* Sidebar tooltip-feel: jaśniejszy hover */
+body.garage-open .garage-sidebar__btn:hover:not(.garage-sidebar__btn--active) {
+	border-color: rgba(140, 200, 255, 0.35);
+	background: rgba(20, 36, 56, 0.92);
+	box-shadow: 0 0 14px rgba(60, 160, 255, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	body.garage-open .garage-dock__grid .garage-tile:hover .garage-tile__frame,
+	body.garage-open .garage-dock__grid .garage-tile--selected:hover .garage-tile__frame {
+		transform: none;
+	}
+	body.garage-open .garage-top__new:not([hidden]) {
+		animation: none;
+	}
+}
+
+body.garage-open .garage-hero__paint-label--muted {
+	opacity: 0.55;
+	font-size: 0.64rem;
+	letter-spacing: 0.04em;
+}
+
+/* Collection: kind chip czytelniejszy */
+body.garage-open .garage-tile__kind {
+	backdrop-filter: blur(4px);
+	background: rgba(0, 0, 0, 0.62);
+	border-color: rgba(140, 200, 255, 0.22);
+	font-size: 0.5rem;
+}
+
+/* Panel glass — lekko jaśniejszy brzeg przy aucie */
+body.garage-open .garage-main {
+	background: linear-gradient(
+		165deg,
+		rgba(10, 18, 32, 0.9) 0%,
+		rgba(4, 8, 16, 0.92) 100%
+	);
+	border-color: rgba(120, 200, 255, 0.22);
+}
+
+/* Scroll fade delikatniejszy */
+body.garage-open .garage-dock-wrap::after {
+	height: 1.1rem;
+	background: linear-gradient(
+		to top,
+		rgba(4, 8, 16, 0.55) 5%,
+		transparent
+	);
+}
+
+body.garage-open .garage-tile__thumb--pending {
+	animation: none;
+	background:
+		linear-gradient(145deg, rgba(255, 255, 255, 0.035), rgba(8, 16, 28, 0.94)),
+		radial-gradient(ellipse 70% 55% at 50% 60%, rgba(100, 160, 200, 0.08), transparent 72%);
+}
+
+/* Decal/trail thumbs — glyph jaśniejszy na kolorowym tle */
+body.garage-open .garage-tile__thumb--decal .garage-tile__glyph,
+body.garage-open .garage-tile__thumb--trail .garage-tile__glyph {
+	width: 48%;
+	height: 48%;
+	opacity: 0.95;
+	filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.65));
+}
+
+/* Goal explosion — delikatny „burst” bg */
+body.garage-open .garage-tile__thumb--goalExplosion {
+	background:
+		radial-gradient(circle at 50% 55%, rgba(255, 160, 60, 0.28), transparent 55%),
+		radial-gradient(circle at 30% 30%, rgba(80, 180, 255, 0.18), transparent 50%),
+		linear-gradient(160deg, rgba(14, 22, 34, 0.98), rgba(6, 10, 18, 0.96));
+}
+
+body.garage-open .garage-tile__map {
+	display: grid;
+	place-items: center;
+	width: 100%;
+	height: 100%;
+	background:
+		radial-gradient(ellipse 70% 60% at 50% 50%, rgba(40, 100, 160, 0.2), transparent 70%),
+		linear-gradient(160deg, rgba(10, 18, 30, 0.96), rgba(4, 8, 16, 0.98));
+}
+body.garage-open .garage-tile__map .arena-minimap {
+	width: 72%;
+	height: 72%;
+	stroke: rgba(160, 220, 255, 0.9);
+	stroke-width: 2;
+	fill: rgba(40, 120, 180, 0.08);
+	filter: drop-shadow(0 0 8px rgba(80, 180, 255, 0.4));
+}
+body.garage-open .garage-tile--selected .garage-tile__map .arena-minimap {
+	stroke: rgba(255, 190, 120, 0.95);
+	filter: drop-shadow(0 0 10px rgba(255, 150, 60, 0.45));
+}
+
+body.garage-open .garage-dock__grid .garage-tile {
+	scroll-margin-block: 0.5rem;
+}
+
+/* Hero meta wrap — chips nie wychodzą poza plate */
+body.garage-open .garage-hero__meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.35rem 0.45rem;
+	max-width: 100%;
+}
+
+body.garage-open .garage-tile__paint:not(.garage-tile__paint--none) {
+	position: absolute;
+	right: 0.28rem;
+	bottom: 0.28rem;
+	width: 0.55rem;
+	height: 0.55rem;
+	border-radius: 50%;
+	border: 1.5px solid rgba(255, 255, 255, 0.55);
+	box-shadow:
+		0 0 0 1px rgba(0, 0, 0, 0.5),
+		0 0 8px rgba(255, 255, 255, 0.15);
+	z-index: 3;
+}
+
+body.garage-open .garage-filter__chip:focus-visible {
+	outline: 2px solid rgba(255, 170, 90, 0.75);
+	outline-offset: 2px;
+}
+body.garage-open .garage-search__input:focus-visible {
+	outline: none;
+}
+
+body.garage-open .garage-hero__label {
+	display: block;
+	margin: 0 0 0.12rem;
+	font-size: 0.62rem;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: rgba(180, 200, 220, 0.72);
+}
+body.garage-open .garage-hero__name {
+	display: block;
+	margin: 0;
+	line-height: 1.15;
+}
+
+/* Paint bar → kropka (nadpisz height:4px z clean pass) */
+body.garage-open .garage-tile__paint:not(.garage-tile__paint--none) {
+	width: 0.55rem !important;
+	height: 0.55rem !important;
+	min-height: 0.55rem !important;
+}
+
+body.garage-open .garage-tile__icon {
+	display: grid;
+	place-items: center;
+	width: 100%;
+	height: 100%;
+	background:
+		radial-gradient(ellipse 70% 60% at 50% 45%, rgba(80, 160, 220, 0.12), transparent 70%),
+		linear-gradient(160deg, rgba(14, 22, 34, 0.98), rgba(6, 10, 18, 0.96));
+}
+body.garage-open .garage-tile__icon .garage-tile__glyph {
+	width: 42%;
+	height: 42%;
+}
+
+body.garage-open .garage-hero__actions[data-garage-body-actions] .garage-hero__action:disabled {
+	opacity: 0.35;
+	cursor: not-allowed;
+	box-shadow: none;
+	filter: grayscale(0.35);
+}
+
+/* Topper / antenna thumbs — nie „puste” czekanie */
+body.garage-open .garage-tile__thumb--rendered {
+	background: transparent;
+}
+
+body.garage-open .garage-tile__new {
+	top: 0.22rem;
+	right: 0.22rem;
+	left: auto;
+	z-index: 4;
+}
+body.garage-open .garage-tile__equipped {
+	left: 0.22rem;
+	right: auto;
+	bottom: 0.22rem;
+	z-index: 4;
+}
+/* Paint kropka nie nachodzi na EQUIPPED */
+body.garage-open .garage-tile__paint:not(.garage-tile__paint--none) {
+	right: 0.28rem;
+	bottom: 0.28rem;
+	left: auto;
+}
+
+/* Panel wjeżdża gdy garage-open (po fazie canvas-only) */
+body.garage-open:not(.garage-entering) .garage-main,
+body.garage-open:not(.garage-entering) .garage-sidebar {
+	animation: garage-panel-in 0.34s cubic-bezier(0.22, 0.9, 0.28, 1) both;
+}
+@keyframes garage-panel-in {
+	from {
+		opacity: 0.4;
+		transform: translateX(-10px);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	body.garage-open:not(.garage-entering) .garage-main,
+	body.garage-open:not(.garage-entering) .garage-sidebar {
+		animation: none;
+	}
+}
+
+/* Dock scroll — wygodniejszy padding pod spodem */
+body.garage-open .garage-dock--grid {
+	padding-bottom: 0.75rem;
+	scroll-padding-bottom: 0.75rem;
+}
+
+/* Sidebar active — jaśniejszy glyph */
+body.garage-open .garage-sidebar__btn--active .garage-sidebar__svg {
+	filter: drop-shadow(0 0 8px rgba(255, 160, 70, 0.55));
+	opacity: 1;
+}
+body.garage-open .garage-sidebar__btn:not(.garage-sidebar__btn--active) .garage-sidebar__svg {
+	opacity: 0.78;
+}
+
+/* Empty state — centrum panelu */
+body.garage-open .garage-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.65rem;
+	min-height: 8rem;
+	padding: 1.25rem 1rem;
+	text-align: center;
+}
+body.garage-open .garage-empty__msg {
+	font-size: 0.85rem;
+	letter-spacing: 0.06em;
+	color: rgba(200, 210, 220, 0.7);
+}
+
+body.garage-open .garage-dock__grid .garage-tile__frame {
+	aspect-ratio: 16 / 11 !important;
+}
+
+body.garage-open .garage-count {
+	margin: -0.15rem 0 0.35rem;
+	font-size: 0.62rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: rgba(160, 190, 220, 0.55);
+	flex-shrink: 0;
+}
+body.garage-open .garage-count[hidden] {
+	display: none !important;
+}
+
+/* Back dock — nie koliduje z sidebar hover */
+body.garage-open .garage-back-dock {
+	z-index: 30;
+}
+body.garage-open .ui-ignite-back {
+	backdrop-filter: blur(8px);
+	box-shadow:
+		0 0 0 1px rgba(255, 150, 70, 0.35),
+		0 10px 28px rgba(0, 0, 0, 0.45);
+}
+
+/* Hero plate — trochę więcej „powietrza” */
+body.garage-open .garage-main .garage-hero__plate {
+	padding: 0.55rem 0.75rem 0.6rem;
+	border-radius: 11px;
+}
+
+
+/* Filtr ALL jako „reset” — lekko wyróżniony gdy coś innego aktywne */
+body.garage-open .garage-filters:has(.garage-filter__chip--active:not([data-garage-filter="all"]))
+	.garage-filter__chip[data-garage-filter="all"] {
+	border-color: rgba(140, 200, 255, 0.35);
+	color: rgba(200, 220, 240, 0.85);
+}
+
+body.garage-open .garage-tile__lock {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	z-index: 3;
+	pointer-events: none;
+	color: rgba(230, 240, 255, 0.88);
+}
+body.garage-open .garage-tile__lock svg {
+	width: 1.35rem;
+	height: 1.35rem;
+}
+
+body.garage-open .garage-search--in-panel .garage-search__icon {
+	color: rgba(140, 200, 255, 0.75);
+}
+body.garage-open .garage-search--in-panel:focus-within .garage-search__icon {
+	color: rgba(255, 170, 90, 0.9);
+}
+
+body.garage-open .garage-dock__grid .garage-tile--selected.garage-tile--equipped .garage-tile__equipped {
+	box-shadow: 0 0 10px rgba(40, 200, 170, 0.4);
+}
+
+/* Count line when filtering — subtle flash */
+body.garage-open .garage-count:not([hidden]) {
+	animation: garage-count-in 0.25s ease both;
+}
+@keyframes garage-count-in {
+	from { opacity: 0; transform: translateY(-2px); }
+	to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+	body.garage-open .garage-count:not([hidden]) { animation: none; }
+}
+
+body.garage-open .garage-layout {
+	grid-template-columns: 4.5rem minmax(0, 1fr);
+}
+body.garage-open .garage-sidebar__btn {
+	width: 4.15rem;
+	height: 4.15rem;
+}
+
+/* Krawędź panelu przy aucie — trochę mniej „ściana” */
+body.garage-open .garage-main {
+	border-right-color: rgba(120, 200, 255, 0.12);
+	box-shadow:
+		0 0 0 1px rgba(0, 0, 0, 0.4),
+		0 16px 40px rgba(0, 0, 0, 0.5),
+		inset 0 1px 0 rgba(255, 255, 255, 0.05),
+		0 0 24px rgba(61, 180, 255, 0.08);
+}
+
+body.garage-open .garage-dock__grid .garage-tile__name {
+	line-height: 1.25;
+	padding: 0.2rem 0.15rem 0.15rem;
+}
+
+body.garage-open .garage-top__new:not([hidden]) {
+	background: rgba(255, 130, 40, 0.32) !important;
+	color: #ffe0b8 !important;
+	border: 1px solid rgba(255, 170, 80, 0.65) !important;
+}
+
+/* Ultrawide: panel nie ucieka w nieskończoność — cap już 41rem */
+body.garage-open .garage-top,
+body.garage-open .garage-layout {
+	left: max(0px, env(safe-area-inset-left, 0px));
+}
+
+body.garage-open .garage-dock--grid {
+	scrollbar-gutter: stable;
+}
+
+body.garage-open .garage-filter__chip--active {
+	box-shadow: inset 0 -2px 0 rgba(255, 150, 70, 0.85);
+}
+
+body.garage-open .garage-search__input::placeholder {
+	color: rgba(160, 180, 200, 0.45);
+}
+
+body.garage-open .garage-hero__rarity--common,
+body.garage-open .garage-hero__rarity--standard {
+	color: rgba(200, 210, 220, 0.85);
+	border-color: rgba(160, 180, 200, 0.25);
+}
+
+body.garage-open .garage-hero__rarity--uncommon {
+	color: #9dffb0;
+	border-color: rgba(100, 220, 140, 0.35);
+	background: rgba(40, 140, 80, 0.14);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Garage SLAM — Orbitron jak reszta gry + zero „subtelności”
+   ═══════════════════════════════════════════════════════════ */
+
+body.garage-open .garage-top,
+body.garage-open .garage-layout,
+body.garage-open .garage-main,
+body.garage-open .garage-sidebar,
+body.garage-open .garage-back-dock,
+body.garage-open .garage-hero,
+body.garage-open .garage-filters,
+body.garage-open .garage-dock,
+body.garage-open .garage-search,
+body.garage-open .garage-tile,
+body.garage-open .garage-empty {
+	font-family: var(--font-display, "Orbitron", sans-serif) !important;
+	font-synthesis: none;
+}
+
+body.garage-open .garage-top h2,
+body.garage-open .garage-hero__name,
+body.garage-open .garage-hero__label,
+body.garage-open .garage-tile__name,
+body.garage-open .garage-filter__chip,
+body.garage-open .garage-hero__action,
+body.garage-open .garage-hero__rarity,
+body.garage-open .garage-hero__badge,
+body.garage-open .garage-tile__equipped,
+body.garage-open .garage-tile__new,
+body.garage-open .garage-tile__kind,
+body.garage-open .garage-top__kicker,
+body.garage-open .garage-top__new,
+body.garage-open .garage-count,
+body.garage-open .garage-search__input,
+body.garage-open .ui-ignite-back {
+	font-family: var(--font-display, "Orbitron", sans-serif) !important;
+	font-synthesis: none;
+}
+
+/* GARAGE title — jak CTA / ignite-hero-type */
+body.garage-open .garage-top h2 {
+	font-size: clamp(1.55rem, 2.8vw, 2.15rem) !important;
+	font-weight: 900 !important;
+	letter-spacing: 0.22em !important;
+	text-transform: uppercase !important;
+	color: #fff !important;
+	-webkit-text-fill-color: #fff;
+	-webkit-text-stroke: 0.4px rgba(0, 0, 0, 0.55);
+	paint-order: stroke fill;
+	text-shadow:
+		0 2px 0 rgba(0, 0, 0, 1),
+		0 0 22px rgba(255, 140, 50, 0.55),
+		0 0 48px rgba(61, 200, 255, 0.28),
+		0 8px 28px rgba(0, 0, 0, 0.9) !important;
+}
+
+body.garage-open .garage-top__brand h2::after {
+	width: 70% !important;
+	height: 3px !important;
+	background: linear-gradient(
+		90deg,
+		rgba(255, 150, 70, 1),
+		rgba(61, 255, 232, 0.75),
+		transparent
+	) !important;
+	box-shadow: 0 0 16px rgba(255, 140, 50, 0.7) !important;
+}
+
+body.garage-open .garage-top__kicker {
+	font-size: 0.72rem !important;
+	font-weight: 800 !important;
+	letter-spacing: 0.28em !important;
+	color: rgba(120, 240, 255, 0.92) !important;
+	text-shadow: 0 0 12px rgba(61, 255, 232, 0.45);
+}
+
+body.garage-open .garage-top__new:not([hidden]) {
+	font-weight: 900 !important;
+	font-size: 0.72rem !important;
+	letter-spacing: 0.12em !important;
+	padding: 0.22rem 0.65rem !important;
+	background: linear-gradient(135deg, #ff8a2a, #ff4d1a) !important;
+	color: #1a0800 !important;
+	border: 0 !important;
+	box-shadow:
+		0 0 0 1px rgba(255, 200, 120, 0.5),
+		0 0 22px rgba(255, 120, 40, 0.75) !important;
+	animation: garage-new-pulse 1.2s ease-in-out infinite !important;
+}
+
+/* Panel — neon wall, nie „szare szkło” */
+body.garage-open .garage-main {
+	border: 2px solid rgba(255, 150, 70, 0.45) !important;
+	border-radius: 16px !important;
+	background:
+		linear-gradient(
+			155deg,
+			rgba(18, 32, 52, 0.97) 0%,
+			rgba(6, 10, 20, 0.98) 45%,
+			rgba(10, 18, 36, 0.97) 100%
+		) !important;
+	box-shadow:
+		0 0 0 1px rgba(61, 255, 232, 0.18),
+		0 0 40px rgba(255, 120, 40, 0.22),
+		0 0 80px rgba(40, 140, 255, 0.12),
+		0 24px 56px rgba(0, 0, 0, 0.65),
+		inset 0 1px 0 rgba(255, 255, 255, 0.1),
+		inset 0 0 40px rgba(61, 180, 255, 0.06) !important;
+}
+
+body.garage-open .garage-main::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	pointer-events: none;
+	background: linear-gradient(
+		105deg,
+		transparent 40%,
+		rgba(255, 160, 80, 0.07) 50%,
+		transparent 60%
+	);
+	animation: garage-panel-sheen 4.5s ease-in-out infinite;
+	z-index: 0;
+}
+
+@keyframes garage-panel-sheen {
+	0%,
+	100% {
+		opacity: 0.35;
+		transform: translateX(-8%);
+	}
+	50% {
+		opacity: 0.85;
+		transform: translateX(8%);
+	}
+}
+
+body.garage-open .garage-main > * {
+	position: relative;
+	z-index: 1;
+}
+
+/* Hero name — bombastycznie */
+body.garage-open .garage-hero__name {
+	font-size: clamp(1.55rem, 2.6vw, 2.05rem) !important;
+	font-weight: 900 !important;
+	letter-spacing: 0.14em !important;
+	text-transform: uppercase !important;
+	color: #fff8f0 !important;
+	text-shadow:
+		0 2px 0 rgba(0, 0, 0, 1),
+		0 0 20px rgba(255, 150, 70, 0.55),
+		0 0 40px rgba(255, 100, 40, 0.28),
+		0 8px 24px rgba(0, 0, 0, 0.85) !important;
+}
+
+body.garage-open .garage-hero__label {
+	font-size: 0.72rem !important;
+	font-weight: 800 !important;
+	letter-spacing: 0.22em !important;
+	color: rgba(120, 230, 255, 0.9) !important;
+	text-shadow: 0 0 10px rgba(61, 255, 232, 0.4);
+}
+
+body.garage-open .garage-main .garage-hero__plate {
+	padding: 0.75rem 0.9rem 0.85rem !important;
+	border: 2px solid rgba(255, 150, 70, 0.4) !important;
+	border-radius: 12px !important;
+	background:
+		linear-gradient(
+			160deg,
+			rgba(24, 36, 56, 0.98) 0%,
+			rgba(8, 12, 22, 0.96) 100%
+		) !important;
+	box-shadow:
+		0 0 0 1px rgba(61, 255, 232, 0.15),
+		0 0 28px rgba(255, 120, 40, 0.2),
+		inset 0 0 24px rgba(255, 140, 50, 0.06) !important;
+}
+
+body.garage-open .garage-hero__rarity {
+	font-weight: 800 !important;
+	letter-spacing: 0.14em !important;
+	padding: 0.2rem 0.55rem !important;
+	border-width: 1.5px !important;
+}
+
+body.garage-open .garage-hero__badge {
+	font-weight: 900 !important;
+	letter-spacing: 0.1em !important;
+	padding: 0.18rem 0.5rem !important;
+	box-shadow: 0 0 14px rgba(61, 255, 232, 0.35);
+}
+
+body.garage-open .garage-hero__action {
+	font-family: var(--font-display) !important;
+	font-weight: 900 !important;
+	letter-spacing: 0.1em !important;
+	text-transform: uppercase !important;
+	border-width: 1.5px !important;
+	border-color: rgba(120, 200, 255, 0.35) !important;
+	background: rgba(12, 22, 38, 0.95) !important;
+	box-shadow: 0 0 16px rgba(40, 140, 255, 0.12);
+}
+
+body.garage-open .garage-hero__action:hover:not(:disabled) {
+	border-color: rgba(255, 160, 80, 0.85) !important;
+	box-shadow: 0 0 22px rgba(255, 140, 50, 0.35) !important;
+	transform: translateY(-2px);
+}
+
+/* Sidebar — duże, jaskrawe */
+body.garage-open .garage-sidebar__btn {
+	width: 4.5rem !important;
+	height: 4.5rem !important;
+	border-radius: 14px !important;
+	border: 2px solid rgba(140, 200, 255, 0.28) !important;
+	background: linear-gradient(
+		160deg,
+		rgba(16, 28, 44, 0.98),
+		rgba(6, 10, 18, 0.98)
+	) !important;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+}
+
+body.garage-open .garage-sidebar__btn--active {
+	border-color: rgba(255, 150, 70, 1) !important;
+	background: linear-gradient(
+		160deg,
+		rgba(80, 36, 12, 0.98),
+		rgba(28, 12, 6, 0.98)
+	) !important;
+	box-shadow:
+		0 0 0 2px rgba(255, 140, 50, 0.45),
+		0 0 28px rgba(255, 120, 40, 0.55),
+		inset 0 0 20px rgba(255, 120, 40, 0.18) !important;
+	transform: scale(1.04);
+}
+
+body.garage-open .garage-sidebar__svg {
+	width: 2.4rem !important;
+	height: 2.4rem !important;
+	filter: drop-shadow(0 0 6px rgba(120, 200, 255, 0.35));
+}
+
+body.garage-open .garage-sidebar__btn--active .garage-sidebar__svg {
+	filter: drop-shadow(0 0 12px rgba(255, 160, 70, 0.75)) !important;
+}
+
+/* Search + filters — punch */
+body.garage-open .garage-search--in-panel {
+	padding: 0.55rem 0.85rem !important;
+	border: 2px solid rgba(100, 200, 255, 0.4) !important;
+	border-radius: 10px !important;
+	background: rgba(4, 10, 20, 0.95) !important;
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.06),
+		0 0 18px rgba(40, 160, 255, 0.12) !important;
+}
+
+body.garage-open .garage-search--in-panel:focus-within {
+	border-color: rgba(255, 160, 80, 0.85) !important;
+	box-shadow:
+		0 0 0 2px rgba(255, 140, 50, 0.25),
+		0 0 28px rgba(255, 120, 40, 0.3) !important;
+}
+
+body.garage-open .garage-search__input {
+	font-size: 0.88rem !important;
+	font-weight: 700 !important;
+	letter-spacing: 0.06em !important;
+}
+
+body.garage-open .garage-filter__chip {
+	font-weight: 800 !important;
+	letter-spacing: 0.12em !important;
+	padding: 0.38rem 0.75rem !important;
+	border: 1.5px solid rgba(255, 255, 255, 0.14) !important;
+	text-transform: uppercase !important;
+}
+
+body.garage-open .garage-filter__chip--active {
+	border-color: rgba(255, 150, 70, 0.9) !important;
+	background: rgba(255, 120, 40, 0.28) !important;
+	color: #ffe8d0 !important;
+	box-shadow:
+		inset 0 -2px 0 rgba(255, 160, 80, 1),
+		0 0 16px rgba(255, 140, 50, 0.35) !important;
+}
+
+/* Tiles — gruby neon select */
+body.garage-open .garage-dock__grid .garage-tile__frame {
+	border-width: 2px !important;
+	border-radius: 12px !important;
+}
+
+body.garage-open .garage-dock__grid .garage-tile:hover .garage-tile__frame {
+	transform: translateY(-3px) scale(1.02) !important;
+	border-color: rgba(120, 220, 255, 0.7) !important;
+	box-shadow:
+		0 12px 28px rgba(0, 0, 0, 0.5),
+		0 0 22px rgba(80, 180, 255, 0.25) !important;
+}
+
+body.garage-open .garage-dock__grid .garage-tile--selected .garage-tile__frame {
+	border-color: rgba(255, 160, 70, 1) !important;
+	box-shadow:
+		0 0 0 2px rgba(255, 140, 50, 0.55),
+		0 0 32px rgba(255, 120, 40, 0.55),
+		0 12px 28px rgba(0, 0, 0, 0.55),
+		inset 0 0 24px rgba(255, 140, 50, 0.12) !important;
+	transform: translateY(-2px) scale(1.03) !important;
+}
+
+body.garage-open .garage-dock__grid .garage-tile__name {
+	font-size: 0.78rem !important;
+	font-weight: 800 !important;
+	letter-spacing: 0.08em !important;
+	text-transform: uppercase !important;
+	color: rgba(235, 242, 255, 0.92) !important;
+}
+
+body.garage-open .garage-dock__grid .garage-tile--selected .garage-tile__name {
+	color: #fff4e8 !important;
+	text-shadow:
+		0 0 12px rgba(255, 150, 70, 0.55),
+		0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+body.garage-open .garage-tile__equipped {
+	font-weight: 900 !important;
+	font-size: 0.55rem !important;
+	letter-spacing: 0.08em !important;
+	background: linear-gradient(135deg, #3dffc8, #2ad4e8) !important;
+	color: #041018 !important;
+	box-shadow: 0 0 14px rgba(61, 255, 200, 0.55) !important;
+}
+
+body.garage-open .garage-tile__new {
+	font-weight: 900 !important;
+	background: linear-gradient(135deg, #ff9a3a, #ff5020) !important;
+	color: #1a0800 !important;
+	box-shadow: 0 0 14px rgba(255, 120, 40, 0.65) !important;
+}
+
+/* Select sheen — mocniejszy, szybszy */
+body.garage-open .garage-dock__grid .garage-tile--selected .garage-tile__frame::after {
+	background: linear-gradient(
+		105deg,
+		transparent 30%,
+		rgba(255, 230, 180, 0.55) 48%,
+		rgba(255, 255, 255, 0.35) 52%,
+		transparent 70%
+	) !important;
+	animation: garage-select-sheen 0.7s cubic-bezier(0.22, 0.9, 0.28, 1) 1 !important;
+}
+
+body.garage-open .ui-ignite-back {
+	border-color: rgba(255, 150, 70, 0.65) !important;
+	box-shadow:
+		0 0 0 1px rgba(255, 160, 80, 0.35),
+		0 0 28px rgba(255, 120, 40, 0.35),
+		0 12px 32px rgba(0, 0, 0, 0.55) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	body.garage-open .garage-main::before {
+		animation: none;
+	}
+	body.garage-open .garage-dock__grid .garage-tile:hover .garage-tile__frame,
+	body.garage-open .garage-dock__grid .garage-tile--selected .garage-tile__frame {
+		transform: none !important;
+	}
+}
+
+body.garage-open .garage-main {
+	position: relative !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Garage panel — skosy + glass blur + większa typografia
+   ═══════════════════════════════════════════════════════════ */
+
+body.garage-open .garage-layout .garage-main {
+	--garage-cut: 1.35rem;
+	position: relative !important;
+	isolation: isolate;
+	border: 0 !important;
+	border-radius: 0 !important;
+	/* Skosy jak HUD / GRAJ — ostre cięcia narożników */
+	clip-path: polygon(
+		var(--garage-cut) 0,
+		100% 0,
+		100% calc(100% - var(--garage-cut)),
+		calc(100% - var(--garage-cut)) 100%,
+		0 100%,
+		0 var(--garage-cut)
+	);
+	/* Przezroczystość — stadion widać przez panel */
+	background:
+		linear-gradient(
+			155deg,
+			rgba(12, 22, 40, 0.55) 0%,
+			rgba(4, 8, 18, 0.48) 55%,
+			rgba(8, 14, 28, 0.58) 100%
+		) !important;
+	backdrop-filter: blur(22px) saturate(1.45) !important;
+	-webkit-backdrop-filter: blur(22px) saturate(1.45) !important;
+	box-shadow:
+		0 0 0 1.5px rgba(255, 150, 70, 0.55),
+		0 0 0 3px rgba(61, 255, 232, 0.12),
+		0 0 48px rgba(255, 120, 40, 0.28),
+		0 0 80px rgba(40, 160, 255, 0.14),
+		0 28px 64px rgba(0, 0, 0, 0.55),
+		inset 0 1px 0 rgba(255, 255, 255, 0.14),
+		inset 0 0 48px rgba(61, 180, 255, 0.08) !important;
+}
+
+/* Neonowa krawędź wzdłuż skosów */
+body.garage-open .garage-layout .garage-main::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	z-index: 2;
+	clip-path: polygon(
+		var(--garage-cut) 0,
+		100% 0,
+		100% calc(100% - var(--garage-cut)),
+		calc(100% - var(--garage-cut)) 100%,
+		0 100%,
+		0 var(--garage-cut)
+	);
+	background:
+		linear-gradient(
+			135deg,
+			rgba(255, 170, 80, 0.55) 0%,
+			transparent 18%,
+			transparent 82%,
+			rgba(61, 255, 232, 0.45) 100%
+		);
+	opacity: 0.55;
+	mix-blend-mode: screen;
+}
+
+/* Kątowe „narożniki” — małe markery skosu */
+body.garage-open .garage-layout .garage-main::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	z-index: 3;
+	background:
+		linear-gradient(90deg, rgba(255, 160, 70, 0.95), transparent 40%) top left / 2.2rem 2px
+			no-repeat,
+		linear-gradient(180deg, rgba(255, 160, 70, 0.95), transparent 40%) top left / 2px 2.2rem
+			no-repeat,
+		linear-gradient(270deg, rgba(61, 255, 232, 0.9), transparent 40%) bottom right / 2.2rem 2px
+			no-repeat,
+		linear-gradient(0deg, rgba(61, 255, 232, 0.9), transparent 40%) bottom right / 2px 2.2rem
+			no-repeat;
+	animation: none;
+	opacity: 1;
+	border-radius: 0;
+}
+
+/* Sidebar — te same skosy, mniejszy cut */
+body.garage-open .garage-sidebar {
+	gap: 0.45rem !important;
+	padding: 0.35rem 0.2rem;
+}
+
+body.garage-open .garage-sidebar__btn {
+	clip-path: polygon(18% 0, 100% 0, 100% 82%, 82% 100%, 0 100%, 0 18%);
+	border-radius: 0 !important;
+}
+
+/* Typografia — wyraźnie większa */
+body.garage-open .garage-top h2 {
+	font-size: clamp(1.75rem, 3.2vw, 2.45rem) !important;
+	letter-spacing: 0.2em !important;
+}
+
+body.garage-open .garage-top__kicker {
+	font-size: 0.82rem !important;
+	letter-spacing: 0.3em !important;
+}
+
+body.garage-open .garage-hero__name {
+	font-size: clamp(1.75rem, 3vw, 2.35rem) !important;
+	letter-spacing: 0.12em !important;
+	line-height: 1.05 !important;
+}
+
+body.garage-open .garage-hero__label {
+	font-size: 0.82rem !important;
+	letter-spacing: 0.24em !important;
+}
+
+body.garage-open .garage-hero__rarity,
+body.garage-open .garage-hero__badge {
+	font-size: 0.78rem !important;
+	padding: 0.28rem 0.65rem !important;
+}
+
+body.garage-open .garage-hero__paint-label {
+	font-size: 0.78rem !important;
+}
+
+body.garage-open .garage-hero__action {
+	font-size: 0.78rem !important;
+	padding: 0.45rem 0.75rem !important;
+}
+
+body.garage-open .garage-search__input {
+	font-size: 0.98rem !important;
+	letter-spacing: 0.05em !important;
+}
+
+body.garage-open .garage-search--in-panel {
+	padding: 0.65rem 0.95rem !important;
+	background: rgba(4, 10, 20, 0.45) !important;
+	backdrop-filter: blur(10px) !important;
+	-webkit-backdrop-filter: blur(10px) !important;
+}
+
+body.garage-open .garage-filter__chip {
+	font-size: 0.78rem !important;
+	padding: 0.42rem 0.85rem !important;
+	letter-spacing: 0.14em !important;
+	background: rgba(6, 12, 22, 0.4) !important;
+}
+
+body.garage-open .garage-dock__grid .garage-tile__name {
+	font-size: 0.88rem !important;
+	letter-spacing: 0.1em !important;
+	padding: 0.3rem 0.2rem 0.2rem !important;
+}
+
+body.garage-open .garage-tile__equipped,
+body.garage-open .garage-tile__new,
+body.garage-open .garage-tile__kind {
+	font-size: 0.62rem !important;
+	padding: 0.12rem 0.38rem !important;
+}
+
+body.garage-open .garage-count {
+	font-size: 0.72rem !important;
+}
+
+body.garage-open .garage-main .garage-hero__plate {
+	background: rgba(8, 14, 26, 0.42) !important;
+	backdrop-filter: blur(12px) !important;
+	-webkit-backdrop-filter: blur(12px) !important;
+	border: 1.5px solid rgba(255, 150, 70, 0.45) !important;
+	clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+	border-radius: 0 !important;
+}
+
+body.garage-open .ui-ignite-back__label {
+	font-size: clamp(1.05rem, 2.1vw, 1.35rem) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	body.garage-open .garage-layout .garage-main {
+		backdrop-filter: blur(14px) !important;
+		-webkit-backdrop-filter: blur(14px) !important;
+	}
+}
+
+/* ═══════════════════════════════════════════════════════════
+   GARAGE SPECTACLE — banner pod autem (nie pod inventory),
+   ostre skosy, glass ekwipunek, widowiskowy nameplate
+   ═══════════════════════════════════════════════════════════ */
+
+body.garage-open .garage-layout {
+	top: clamp(5.75rem, 11.5vh, 7rem) !important;
+	/* Tylko BACK na dole z lewej — banner jest pod autem, poza panelem */
+	bottom: clamp(5rem, 12vh, 6.5rem) !important;
+	grid-template-columns: 5.25rem minmax(0, 1fr) !important;
+	column-gap: 1rem !important;
+	gap: 1rem !important;
+	align-items: stretch !important;
+}
+
+body.garage-open .garage-sidebar {
+	z-index: 3 !important;
+	width: 5.25rem !important;
+	max-width: 5.25rem !important;
+	overflow: visible !important;
+	pointer-events: auto !important;
+	gap: 0.5rem !important;
+}
+
+body.garage-open .garage-sidebar__btn {
+	width: 5rem !important;
+	height: 5rem !important;
+	max-width: 100% !important;
+	box-sizing: border-box !important;
+	border-radius: 0 !important;
+	border: 2px solid rgba(140, 200, 255, 0.32) !important;
+	background: linear-gradient(
+		160deg,
+		rgba(18, 32, 52, 0.88) 0%,
+		rgba(6, 12, 22, 0.82) 100%
+	) !important;
+	backdrop-filter: blur(12px) saturate(1.3) !important;
+	-webkit-backdrop-filter: blur(12px) saturate(1.3) !important;
+	clip-path: polygon(0 0, 80% 0, 100% 24%, 100% 100%, 20% 100%, 0 76%) !important;
+	-webkit-clip-path: polygon(0 0, 80% 0, 100% 24%, 100% 100%, 20% 100%, 0 76%) !important;
+	box-shadow:
+		0 8px 22px rgba(0, 0, 0, 0.45),
+		inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+	transition:
+		transform 0.16s ease,
+		border-color 0.16s ease,
+		box-shadow 0.16s ease !important;
+}
+
+body.garage-open .garage-sidebar__btn:hover:not(.garage-sidebar__btn--active) {
+	transform: translateX(3px) scale(1.03) !important;
+	border-color: rgba(120, 220, 255, 0.65) !important;
+	box-shadow:
+		0 0 22px rgba(60, 180, 255, 0.28),
+		0 10px 24px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.garage-open .garage-sidebar__btn--active {
+	border-color: rgba(255, 150, 70, 1) !important;
+	background: linear-gradient(
+		160deg,
+		rgba(90, 40, 12, 0.95) 0%,
+		rgba(28, 12, 6, 0.92) 100%
+	) !important;
+	box-shadow:
+		0 0 0 2px rgba(255, 140, 50, 0.5),
+		0 0 32px rgba(255, 120, 40, 0.55),
+		inset 0 0 22px rgba(255, 120, 40, 0.2) !important;
+	transform: scale(1.06) !important;
+}
+
+body.garage-open .garage-sidebar__svg {
+	width: 2.55rem !important;
+	height: 2.55rem !important;
+	filter: drop-shadow(0 0 8px rgba(120, 200, 255, 0.4)) !important;
+}
+
+body.garage-open .garage-sidebar__btn--active .garage-sidebar__svg {
+	filter: drop-shadow(0 0 14px rgba(255, 160, 70, 0.85)) !important;
+}
+
+/* Panel inventory — skosy 4 narożniki + glass */
+body.garage-open .garage-main,
+body.garage-open .garage-layout .garage-main {
+	z-index: 1 !important;
+	margin: 0 !important;
+	position: relative !important;
+	isolation: isolate !important;
+	animation: none !important;
+	transform: none !important;
+	border-radius: 0 !important;
+	border: 2px solid rgba(255, 160, 80, 0.62) !important;
+	clip-path: polygon(
+		32px 0,
+		calc(100% - 32px) 0,
+		100% 32px,
+		100% calc(100% - 32px),
+		calc(100% - 32px) 100%,
+		32px 100%,
+		0 calc(100% - 32px),
+		0 32px
+	) !important;
+	-webkit-clip-path: polygon(
+		32px 0,
+		calc(100% - 32px) 0,
+		100% 32px,
+		100% calc(100% - 32px),
+		calc(100% - 32px) 100%,
+		32px 100%,
+		0 calc(100% - 32px),
+		0 32px
+	) !important;
+	background: linear-gradient(
+		155deg,
+		rgba(14, 26, 46, 0.72) 0%,
+		rgba(5, 10, 20, 0.64) 48%,
+		rgba(10, 18, 34, 0.74) 100%
+	) !important;
+	backdrop-filter: blur(26px) saturate(1.55) !important;
+	-webkit-backdrop-filter: blur(26px) saturate(1.55) !important;
+	box-shadow:
+		0 0 0 1px rgba(61, 255, 232, 0.22),
+		0 0 48px rgba(255, 120, 40, 0.28),
+		0 0 90px rgba(40, 140, 255, 0.12),
+		0 28px 64px rgba(0, 0, 0, 0.58),
+		inset 0 1px 0 rgba(255, 255, 255, 0.14),
+		inset 0 0 48px rgba(61, 180, 255, 0.07) !important;
+	filter: none !important;
+	overflow: hidden !important;
+	padding: 0.7rem 0.8rem 0.85rem !important;
+}
+
+body.garage-open .garage-layout .garage-main::before {
+	content: "" !important;
+	display: block !important;
+	position: absolute !important;
+	inset: 0 !important;
+	z-index: 0 !important;
+	pointer-events: none !important;
+	border-radius: 0 !important;
+	animation: garage-panel-sheen 5s ease-in-out infinite !important;
+	opacity: 0.7 !important;
+	background: linear-gradient(
+		110deg,
+		transparent 38%,
+		rgba(255, 170, 90, 0.1) 50%,
+		transparent 62%
+	) !important;
+	backdrop-filter: none !important;
+	-webkit-backdrop-filter: none !important;
+	box-shadow: none !important;
+	mix-blend-mode: screen !important;
+}
+
+body.garage-open .garage-layout .garage-main::after {
+	content: "" !important;
+	display: block !important;
+	position: absolute !important;
+	inset: 0 !important;
+	z-index: 2 !important;
+	pointer-events: none !important;
+	opacity: 1 !important;
+	mix-blend-mode: normal !important;
+	background:
+		linear-gradient(90deg, rgba(255, 160, 70, 0.95), transparent 55%) top left / 2.4rem 2.5px
+			no-repeat,
+		linear-gradient(180deg, rgba(255, 160, 70, 0.95), transparent 55%) top left / 2.5px 2.4rem
+			no-repeat,
+		linear-gradient(270deg, rgba(61, 255, 232, 0.9), transparent 55%) bottom right / 2.4rem 2.5px
+			no-repeat,
+		linear-gradient(0deg, rgba(61, 255, 232, 0.9), transparent 55%) bottom right / 2.5px 2.4rem
+			no-repeat !important;
+	box-shadow: none !important;
+	clip-path: none !important;
+	animation: none !important;
+}
+
+body.garage-open .garage-main > * {
+	position: relative !important;
+	z-index: 1 !important;
+}
+
+/* Hero plate */
+body.garage-open .garage-main .garage-hero__plate {
+	width: 100% !important;
+	align-items: flex-start !important;
+	text-align: left !important;
+	border-radius: 0 !important;
+	border: 1.5px solid rgba(255, 160, 80, 0.5) !important;
+	clip-path: polygon(
+		16px 0,
+		calc(100% - 16px) 0,
+		100% 16px,
+		100% calc(100% - 16px),
+		calc(100% - 16px) 100%,
+		16px 100%,
+		0 calc(100% - 16px),
+		0 16px
+	) !important;
+	-webkit-clip-path: polygon(
+		16px 0,
+		calc(100% - 16px) 0,
+		100% 16px,
+		100% calc(100% - 16px),
+		calc(100% - 16px) 100%,
+		16px 100%,
+		0 calc(100% - 16px),
+		0 16px
+	) !important;
+	background: linear-gradient(
+		150deg,
+		rgba(20, 34, 56, 0.55) 0%,
+		rgba(6, 12, 22, 0.4) 100%
+	) !important;
+	backdrop-filter: blur(14px) saturate(1.35) !important;
+	-webkit-backdrop-filter: blur(14px) saturate(1.35) !important;
+	box-shadow:
+		0 0 28px rgba(255, 120, 40, 0.18),
+		inset 0 0 28px rgba(61, 180, 255, 0.06) !important;
+	padding: 0.8rem 0.95rem 0.9rem !important;
+}
+
+body.garage-open .garage-hero__name {
+	font-size: clamp(1.7rem, 2.9vw, 2.35rem) !important;
+	letter-spacing: 0.12em !important;
+}
+
+body.garage-open .garage-hero__label {
+	font-size: 0.78rem !important;
+	letter-spacing: 0.24em !important;
+	color: rgba(120, 235, 255, 0.95) !important;
+}
+
+/* Search + filters */
+body.garage-open .garage-search--in-panel {
+	border-radius: 0 !important;
+	border: 2px solid rgba(100, 200, 255, 0.42) !important;
+	clip-path: polygon(
+		12px 0,
+		calc(100% - 12px) 0,
+		100% 12px,
+		100% calc(100% - 12px),
+		calc(100% - 12px) 100%,
+		12px 100%,
+		0 calc(100% - 12px),
+		0 12px
+	) !important;
+	background: rgba(4, 10, 20, 0.5) !important;
+	backdrop-filter: blur(12px) !important;
+	-webkit-backdrop-filter: blur(12px) !important;
+	padding: 0.62rem 0.95rem !important;
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.06),
+		0 0 20px rgba(40, 160, 255, 0.12) !important;
+}
+
+body.garage-open .garage-search--in-panel:focus-within {
+	border-color: rgba(255, 160, 80, 0.9) !important;
+	box-shadow:
+		0 0 0 2px rgba(255, 140, 50, 0.28),
+		0 0 28px rgba(255, 120, 40, 0.32) !important;
+}
+
+body.garage-open .garage-search__input {
+	font-size: 0.95rem !important;
+	font-weight: 700 !important;
+	letter-spacing: 0.05em !important;
+}
+
+body.garage-open .garage-filter__chip {
+	border-radius: 0 !important;
+	clip-path: polygon(
+		7px 0,
+		calc(100% - 7px) 0,
+		100% 7px,
+		100% calc(100% - 7px),
+		calc(100% - 7px) 100%,
+		7px 100%,
+		0 calc(100% - 7px),
+		0 7px
+	) !important;
+	font-size: 0.76rem !important;
+	font-weight: 800 !important;
+	letter-spacing: 0.12em !important;
+	padding: 0.4rem 0.8rem !important;
+	background: rgba(6, 12, 22, 0.48) !important;
+	backdrop-filter: blur(8px) !important;
+	-webkit-backdrop-filter: blur(8px) !important;
+	border: 1.5px solid rgba(255, 255, 255, 0.16) !important;
+}
+
+body.garage-open .garage-filter__chip--active {
+	border-color: rgba(255, 150, 70, 0.95) !important;
+	background: rgba(255, 120, 40, 0.28) !important;
+	color: #ffe8d0 !important;
+	box-shadow:
+		inset 0 -2px 0 rgba(255, 160, 80, 1),
+		0 0 18px rgba(255, 140, 50, 0.4) !important;
+}
+
+/* ── Ekwipunek / tiles — glass + nazwa w ramce ── */
+body.garage-open .garage-dock__grid {
+	gap: 0.75rem !important;
+}
+
+body.garage-open .garage-dock__grid .garage-tile {
+	position: relative !important;
+	display: block !important;
+	flex: 0 1 calc((100% - 0.75rem) / 2) !important;
+	width: calc((100% - 0.75rem) / 2) !important;
+	max-width: calc((100% - 0.75rem) / 2) !important;
+}
+
+body.garage-open .garage-dock__grid .garage-tile__frame {
+	position: relative !important;
+	display: block !important;
+	width: 100% !important;
+	aspect-ratio: 16 / 11 !important;
+	border-radius: 0 !important;
+	overflow: hidden !important;
+	clip-path: polygon(
+		14px 0,
+		calc(100% - 14px) 0,
+		100% 14px,
+		100% calc(100% - 14px),
+		calc(100% - 14px) 100%,
+		14px 100%,
+		0 calc(100% - 14px),
+		0 14px
+	) !important;
+	-webkit-clip-path: polygon(
+		14px 0,
+		calc(100% - 14px) 0,
+		100% 14px,
+		100% calc(100% - 14px),
+		calc(100% - 14px) 100%,
+		14px 100%,
+		0 calc(100% - 14px),
+		0 14px
+	) !important;
+	background: rgba(8, 14, 26, 0.48) !important;
+	backdrop-filter: blur(16px) saturate(1.45) !important;
+	-webkit-backdrop-filter: blur(16px) saturate(1.45) !important;
+	border: 2px solid rgba(150, 210, 255, 0.32) !important;
+	box-shadow:
+		0 10px 24px rgba(0, 0, 0, 0.45),
+		inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+	transition:
+		transform 0.16s ease,
+		border-color 0.16s ease,
+		box-shadow 0.16s ease !important;
+}
+
+body.garage-open .garage-dock__grid .garage-tile__thumb,
+body.garage-open .garage-dock__grid .garage-tile__thumb--pending,
+body.garage-open .garage-dock__grid .garage-tile__thumb--rendered,
+body.garage-open .garage-dock__grid .garage-tile__map,
+body.garage-open .garage-dock__grid .garage-tile__icon {
+	position: absolute !important;
+	inset: 0 !important;
+	width: 100% !important;
+	height: 100% !important;
+	background-color: transparent !important;
+}
+
+body.garage-open .garage-dock__grid .garage-tile__name {
+	position: absolute !important;
+	left: 0 !important;
+	right: 0 !important;
+	bottom: 0 !important;
+	z-index: 5 !important;
+	margin: 0 !important;
+	padding: 1.35rem 0.45rem 0.4rem !important;
+	width: 100% !important;
+	box-sizing: border-box !important;
+	font-size: 0.78rem !important;
+	font-weight: 800 !important;
+	letter-spacing: 0.08em !important;
+	text-transform: uppercase !important;
+	text-align: center !important;
+	line-height: 1.2 !important;
+	color: #f2f7ff !important;
+	background: linear-gradient(
+		180deg,
+		transparent 0%,
+		rgba(2, 6, 14, 0.55) 35%,
+		rgba(2, 6, 14, 0.92) 100%
+	) !important;
+	text-shadow:
+		0 1px 0 rgba(0, 0, 0, 1),
+		0 0 12px rgba(0, 0, 0, 0.8) !important;
+	word-break: break-word !important;
+}
+
+body.garage-open .garage-dock__grid .garage-tile:hover .garage-tile__frame {
+	transform: translateY(-4px) scale(1.03) !important;
+	border-color: rgba(120, 230, 255, 0.75) !important;
+	box-shadow:
+		0 16px 34px rgba(0, 0, 0, 0.55),
+		0 0 28px rgba(80, 180, 255, 0.32) !important;
+}
+
+body.garage-open .garage-dock__grid .garage-tile--selected .garage-tile__frame {
+	border-color: rgba(255, 160, 70, 1) !important;
+	background: rgba(36, 20, 8, 0.52) !important;
+	box-shadow:
+		0 0 0 2px rgba(255, 140, 50, 0.55),
+		0 0 36px rgba(255, 120, 40, 0.55),
+		0 14px 32px rgba(0, 0, 0, 0.55),
+		inset 0 0 28px rgba(255, 140, 50, 0.14) !important;
+	transform: translateY(-3px) scale(1.04) !important;
+}
+
+body.garage-open .garage-dock__grid .garage-tile--selected .garage-tile__name {
+	color: #fff4e8 !important;
+	text-shadow:
+		0 0 14px rgba(255, 150, 70, 0.6),
+		0 1px 4px rgba(0, 0, 0, 0.95) !important;
+}
+
+body.garage-open .garage-tile__equipped {
+	z-index: 6 !important;
+	font-weight: 900 !important;
+	font-size: 0.58rem !important;
+	letter-spacing: 0.1em !important;
+	background: linear-gradient(135deg, #3dffc8, #2ad4e8) !important;
+	color: #041018 !important;
+	box-shadow: 0 0 16px rgba(61, 255, 200, 0.6) !important;
+	border-radius: 0 !important;
+	clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 0 100%) !important;
+}
+
+body.garage-open .garage-tile__new {
+	z-index: 6 !important;
+	font-weight: 900 !important;
+	background: linear-gradient(135deg, #ff9a3a, #ff5020) !important;
+	color: #1a0800 !important;
+	box-shadow: 0 0 16px rgba(255, 120, 40, 0.7) !important;
+	border-radius: 0 !important;
+	clip-path: polygon(0 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%) !important;
+}
+
+body.garage-open .garage-dock__grid .garage-tile--selected .garage-tile__frame::after {
+	background: linear-gradient(
+		105deg,
+		transparent 28%,
+		rgba(255, 230, 180, 0.55) 48%,
+		rgba(255, 255, 255, 0.4) 52%,
+		transparent 72%
+	) !important;
+	animation: garage-select-sheen 0.75s cubic-bezier(0.22, 0.9, 0.28, 1) 1 !important;
+}
+
+/* BACK — tylko lewy dolny róg */
+body.garage-open .garage-back-dock {
+	display: block !important;
+	left: clamp(0.75rem, 2vw, 1.25rem) !important;
+	bottom: clamp(0.75rem, 2vh, 1.25rem) !important;
+	z-index: 32 !important;
+	pointer-events: auto !important;
+}
+
+body.garage-open .ui-ignite-back {
+	border-color: rgba(255, 150, 70, 0.7) !important;
+	box-shadow:
+		0 0 0 1px rgba(255, 160, 80, 0.4),
+		0 0 32px rgba(255, 120, 40, 0.38),
+		0 14px 36px rgba(0, 0, 0, 0.55) !important;
+}
+
+/*
+ * Banner gracza — skosy scorebuga + gradient + hatch (garaż = orange tint).
+ */
+body.garage-open .garage-player-banner-dock {
+	--pb-slash: clamp(36px, 5vw, 52px);
+	--pb-h: clamp(4rem, 8.5vh, 5.1rem);
+	--pb-hi: #ffc078;
+	--pb-mid: #ff8a2a;
+	--pb-lo: #b84810;
+	--pb-glow: rgba(255, 150, 60, 0.5);
+	--pb-line-a: rgba(255, 210, 140, 0.95);
+	--pb-line-b: rgba(255, 120, 40, 0.55);
+	position: fixed !important;
+	left: 50% !important;
+	right: auto !important;
+	bottom: clamp(1.1rem, 3.2vh, 1.85rem) !important;
+	transform: translateX(-50%) !important;
+	z-index: 22 !important;
+	display: flex !important;
+	justify-content: center !important;
+	align-items: flex-end !important;
+	width: min(42rem, 78vw) !important;
+	pointer-events: none !important;
+	filter:
+		drop-shadow(0 16px 28px rgba(0, 0, 0, 0.68))
+		drop-shadow(0 0 22px rgba(255, 120, 40, 0.2)) !important;
+}
+
+body.garage-open .garage-player-banner {
+	position: relative !important;
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	width: 100% !important;
+	height: var(--pb-h) !important;
+	min-height: var(--pb-h) !important;
+	padding: 0 calc(var(--pb-slash) + 1.2rem) !important;
+	box-sizing: border-box !important;
+	border: none !important;
+	border-radius: 0 !important;
+	overflow: hidden !important;
+	isolation: isolate !important;
+	clip-path: polygon(
+		var(--pb-slash) 0,
+		100% 0,
+		calc(100% - var(--pb-slash)) 100%,
+		0 100%
+	) !important;
+	-webkit-clip-path: polygon(
+		var(--pb-slash) 0,
+		100% 0,
+		calc(100% - var(--pb-slash)) 100%,
+		0 100%
+	) !important;
+	background-color: #140a04 !important;
+	background-image:
+		radial-gradient(
+			140% 160% at 50% 45%,
+			transparent 35%,
+			rgba(12, 4, 2, 0.28) 78%,
+			rgba(12, 4, 2, 0.45) 100%
+		),
+		linear-gradient(
+			195deg,
+			color-mix(in srgb, var(--pb-hi) 72%, transparent) 0%,
+			color-mix(in srgb, var(--pb-mid) 55%, transparent) 46%,
+			color-mix(in srgb, var(--pb-lo) 78%, transparent) 100%
+		),
+		repeating-linear-gradient(
+			-18deg,
+			transparent 0 9px,
+			rgba(255, 255, 255, 0.05) 9px 10px,
+			transparent 10px 22px,
+			rgba(0, 0, 0, 0.07) 22px 23px
+		),
+		repeating-linear-gradient(
+			0deg,
+			transparent 0 3px,
+			rgba(255, 255, 255, 0.03) 3px 4px
+		),
+		radial-gradient(
+			circle at 1px 1px,
+			rgba(255, 255, 255, 0.07) 0.7px,
+			transparent 1.1px
+		),
+		var(--player-banner) !important;
+	background-size:
+		auto,
+		auto,
+		auto,
+		auto,
+		6px 6px,
+		cover !important;
+	background-position: center !important;
+	box-shadow: none !important;
+}
+
+body.garage-open .garage-player-banner::before {
+	content: "" !important;
+	position: absolute !important;
+	inset: 0 !important;
+	pointer-events: none !important;
+	z-index: 1 !important;
+	background:
+		linear-gradient(
+			180deg,
+			rgba(255, 255, 255, 0.42) 0%,
+			rgba(255, 255, 255, 0.1) 26%,
+			transparent 58%
+		),
+		linear-gradient(
+			108deg,
+			transparent 0%,
+			rgba(255, 255, 255, 0.18) 40%,
+			rgba(255, 210, 160, 0.12) 48%,
+			transparent 62%
+		) !important;
+}
+
+body.garage-open .garage-player-banner::after {
+	content: "" !important;
+	position: absolute !important;
+	inset: 0 !important;
+	pointer-events: none !important;
+	z-index: 2 !important;
+	background:
+		linear-gradient(
+			90deg,
+			transparent 8%,
+			var(--pb-line-a) 35%,
+			var(--pb-line-b) 70%,
+			transparent 96%
+		)
+		bottom / 100% 3px no-repeat,
+		linear-gradient(
+			90deg,
+			transparent 10%,
+			rgba(255, 255, 255, 0.35) 50%,
+			transparent 90%
+		)
+		top / 100% 1px no-repeat !important;
+	box-shadow: inset 0 -3px 14px var(--pb-glow) !important;
+}
+
+body.garage-open .garage-player-banner__name {
+	position: relative !important;
+	z-index: 3 !important;
+	font-family: "Orbitron", var(--font-display, sans-serif) !important;
+	font-size: clamp(1.35rem, 2.8vw, 2.2rem) !important;
+	font-weight: 900 !important;
+	font-synthesis: none !important;
+	line-height: 1 !important;
+	letter-spacing: 0.06em !important;
+	text-transform: uppercase !important;
+	color: #fff8f0 !important;
+	-webkit-text-fill-color: #fff8f0 !important;
+	text-shadow:
+		0 1px 0 rgba(0, 0, 0, 0.65),
+		0 2px 10px rgba(0, 0, 0, 0.6),
+		0 0 18px color-mix(in srgb, var(--pb-hi) 55%, transparent),
+		0 0 2px rgba(255, 210, 160, 0.5) !important;
+	white-space: nowrap !important;
+	overflow: hidden !important;
+	text-overflow: ellipsis !important;
+	max-width: 100% !important;
+}
+
+@media (max-width: 1100px) {
+	body.garage-open .garage-player-banner-dock {
+		--pb-slash: 28px;
+		--pb-h: clamp(3.2rem, 8vh, 3.9rem);
+		left: 50% !important;
+		right: auto !important;
+		bottom: clamp(4.6rem, 11vh, 5.8rem) !important;
+		justify-content: center !important;
+		width: min(34rem, 92vw) !important;
+		transform: translateX(-50%) !important;
+	}
+	body.garage-open .garage-layout {
+		bottom: clamp(9.5rem, 22vh, 11.5rem) !important;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	body.garage-open .garage-layout .garage-main::before {
+		animation: none !important;
+	}
+	body.garage-open .garage-dock__grid .garage-tile:hover .garage-tile__frame,
+	body.garage-open .garage-dock__grid .garage-tile--selected .garage-tile__frame {
+		transform: none !important;
+	}
+}

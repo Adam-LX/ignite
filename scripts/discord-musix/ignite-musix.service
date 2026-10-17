@@ -1,0 +1,15 @@
+[Unit]
+Description=Ignite Discord Musix queue bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/Dokumenty/Projekty/Ignite
+ExecStart=%h/Dokumenty/Projekty/Ignite/scripts/discord-musix-run.sh
+Restart=on-failure
+RestartSec=8
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=default.target

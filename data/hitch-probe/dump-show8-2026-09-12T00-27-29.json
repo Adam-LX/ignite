@@ -1,0 +1,104 @@
+{
+  "capturedAt": "2026-09-12T00:27:29.927Z",
+  "url": "http://127.0.0.1:5173/?autostart=1v1&skipIntro=1&hitchProbe=1&graphics=low&t=1789172801157&showSec=8",
+  "swiftshader": false,
+  "hitchLogs": [
+    "[hitchProbe] ON — thresholds hitch≥50 severe≥100 freeze≥250. Dump: window.__ignitePrematchHitch",
+    "[hitchProbe] SPAN PreMatchStadiumShow.construct 61.4ms phase=show_construct",
+    "[hitchProbe] phase show_construct → show_run (spent 62ms)",
+    "[hitchProbe] FREEZE 5549.8ms phase=show_run showU=-0.008",
+    "[hitchProbe] phase show_run → show_cue_build (spent 6470ms)",
+    "[hitchProbe] hitch 50.1ms phase=show_cue_build showU=0.144",
+    "[hitchProbe] phase show_cue_build → show_cue_liquid (spent 1600ms)",
+    "[hitchProbe] phase show_cue_liquid → show_cue_drop (spent 1433ms)",
+    "[hitchProbe] hitch 50.1ms phase=show_cue_drop showU=0.525",
+    "[hitchProbe] phase show_cue_drop → show_cue_rain (spent 1617ms)",
+    "[hitchProbe] FREEZE 516.6ms phase=show_cue_rain showU=0.81",
+    "[hitchProbe] phase show_cue_rain → show_teardown (spent 2870ms)",
+    "[hitchProbe] phase show_teardown → show_dispose (spent 30ms)",
+    "[hitchProbe] after_show events=5 freezes=1 severe=0 {show_construct:PreMatchStadiumShow.construct: Object, show_run: Object, show_cue_build: Object, show_cue_drop: Object, show_cue_rain: Object} [frameStats freezeCount=1 longest=516.6ms]",
+    "[hitchProbe] phase show_dispose → post_show_snap (spent 34ms)",
+    "[hitchProbe] phase post_show_snap → countdown_prime (spent 13791ms)",
+    "[hitchProbe] countdown_primed events=5 freezes=1 severe=0 {show_construct:PreMatchStadiumShow.construct: Object, show_run: Object, show_cue_build: Object, show_cue_drop: Object, show_cue_rain: Object} [frameStats freezeCount=1 longest=516.6ms]"
+  ],
+  "dump": {
+    "enabled": true,
+    "phase": "countdown",
+    "events": [
+      {
+        "ms": 61.4,
+        "phase": "show_construct",
+        "showU": 0,
+        "wallMs": 18918,
+        "note": "PreMatchStadiumShow.construct"
+      },
+      {
+        "ms": 5549.8,
+        "phase": "show_run",
+        "showU": -0.008,
+        "wallMs": 24404
+      },
+      {
+        "ms": 50.1,
+        "phase": "show_cue_build",
+        "showU": 0.144,
+        "wallMs": 25621
+      },
+      {
+        "ms": 50.1,
+        "phase": "show_cue_drop",
+        "showU": 0.525,
+        "wallMs": 28671
+      },
+      {
+        "ms": 516.6,
+        "phase": "show_cue_rain",
+        "showU": 0.81,
+        "wallMs": 31421
+      }
+    ],
+    "byPhase": {
+      "show_construct:PreMatchStadiumShow.construct": {
+        "count": 1,
+        "maxMs": 61.4,
+        "sumMs": 61.4
+      },
+      "show_run": {
+        "count": 1,
+        "maxMs": 5549.8,
+        "sumMs": 5549.8
+      },
+      "show_cue_build": {
+        "count": 1,
+        "maxMs": 50.1,
+        "sumMs": 50.1
+      },
+      "show_cue_drop": {
+        "count": 1,
+        "maxMs": 50.1,
+        "sumMs": 50.1
+      },
+      "show_cue_rain": {
+        "count": 1,
+        "maxMs": 516.6,
+        "sumMs": 516.6
+      }
+    },
+    "frameStats": {
+      "samples": 240,
+      "avgFps": 46,
+      "avgFrameMs": 21.8,
+      "maxFrameMs": 516.6,
+      "p95FrameMs": 28.1,
+      "hitchCount": 4,
+      "severeHitchCount": 2,
+      "freezeCount": 1,
+      "longestFrameMs": 516.6,
+      "matchElapsedSec": 36.8
+    },
+    "suspects": [
+      "frameStats freezeCount=1 longest=516.6ms"
+    ]
+  },
+  "kickoff": "4"
+}

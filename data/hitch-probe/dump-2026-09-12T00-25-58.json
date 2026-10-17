@@ -1,0 +1,22 @@
+{
+  "capturedAt": "2026-09-12T00:25:58.120Z",
+  "url": "http://127.0.0.1:5173/?autostart=1v1&skipIntro=1&hitchProbe=1&graphics=medium&t=1789172657133",
+  "note": "Playwright + SwiftShader — absolute ms worse than real GPU; phase ranking is the signal",
+  "hitchLogs": [
+    "[hitchProbe] ON — thresholds hitch≥50 severe≥100 freeze≥250. Dump: window.__ignitePrematchHitch",
+    "[hitchProbe] SPAN PreMatchStadiumShow.construct 99.9ms phase=show_construct",
+    "[hitchProbe] phase show_construct → show_run (spent 100ms)",
+    "[hitchProbe] FREEZE 6166.3ms phase=show_run showU=-0.003",
+    "[hitchProbe] FREEZE 4666.5ms phase=show_run showU=-0.001",
+    "[hitchProbe] FREEZE 3783.2ms phase=show_run showU=0.001",
+    "[hitchProbe] FREEZE 3966.5ms phase=show_run showU=0.003",
+    "[hitchProbe] FREEZE 3666.5ms phase=show_run showU=0.005",
+    "[hitchProbe] FREEZE 4149.9ms phase=show_run showU=0.008",
+    "[hitchProbe] FREEZE 3666.5ms phase=show_run showU=0.01",
+    "[hitchProbe] FREEZE 3999.9ms phase=show_run showU=0.012",
+    "[hitchProbe] FREEZE 3999.8ms phase=show_run showU=0.014",
+    "[hitchProbe] FREEZE 3849.8ms phase=show_run showU=0.016"
+  ],
+  "dump": null,
+  "kickoff": ""
+}

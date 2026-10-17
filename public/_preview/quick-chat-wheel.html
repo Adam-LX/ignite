@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <style>
+    @font-face {
+      font-family: "Orbitron";
+      src: url("file:///home/adam/Dokumenty/Projekty/Ignite/src/assets/fonts/Orbitron-Variable.ttf") format("truetype");
+      font-weight: 100 900;
+      font-display: swap;
+    }
+  </style>
+  <link rel="stylesheet" href="file:///home/adam/Dokumenty/Projekty/Ignite/src/style.css" />
+  <style>
+    html, body {
+      margin: 0;
+      width: 1280px;
+      height: 720px;
+      overflow: hidden;
+      background: #050a12 url("file:///home/adam/Dokumenty/Projekty/Ignite/public/_preview/quick-chat-bg.jpg") center / cover no-repeat;
+    }
+    .shot-hud {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      font-family: Orbitron, system-ui, sans-serif;
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 0.14em;
+      color: rgba(255,255,255,0.85);
+      padding: 0.45rem 1.4rem 0.7rem;
+      background: linear-gradient(180deg, rgba(2,6,16,0.88), rgba(6,12,26,0.72));
+      border: 1px solid rgba(255,255,255,0.18);
+      border-top: none;
+      clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 70%, 50% 100%, 0 70%);
+    }
+    .shot-cam {
+      position: fixed;
+      top: 18px;
+      left: 22px;
+      z-index: 5;
+      font-family: Orbitron, system-ui, sans-serif;
+      font-weight: 800;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: #3dffe8;
+      padding: 0.35rem 0.7rem;
+      background: rgba(6,10,22,0.72);
+      border: 1px solid rgba(61,255,232,0.35);
+      clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+    }
+  </style>
+</head>
+<body>
+  <div class="shot-cam">BALL CAM</div>
+  <div class="shot-hud">BLUE 0 &nbsp;|&nbsp; 3:54 &nbsp;|&nbsp; ORANGE 0</div>
+  <script type="module">
+    const CHAT = [
+      ["great_pass", "PASS", "Great pass!"],
+      ["nice_shot", "SHOT", "Nice shot!"],
+      ["defending", "DEF", "Defending!"],
+      ["oops", "OOPS", "Oops…"],
+      ["close", "CLOSE", "So close!"],
+      ["calculated", "CALC", "Calculated."],
+      ["wow", "WOW", "WOW!"],
+      ["gg", "GG", "GG"],
+    ];
+    const N = CHAT.length;
+    const LABEL_R = 96;
+
+    function wedgePath(i, innerR, outerR, gapDeg = 2.8) {
+      const slice = 360 / N;
+      const start = -90 + i * slice + gapDeg * 0.5;
+      const end = -90 + (i + 1) * slice - gapDeg * 0.5;
+      const toRad = (d) => (d * Math.PI) / 180;
+      const x0 = Math.cos(toRad(start));
+      const y0 = Math.sin(toRad(start));
+      const x1 = Math.cos(toRad(end));
+      const y1 = Math.sin(toRad(end));
+      const large = end - start > 180 ? 1 : 0;
+      return [
+        `M ${x0 * innerR} ${y0 * innerR}`,
+        `L ${x0 * outerR} ${y0 * outerR}`,
+        `A ${outerR} ${outerR} 0 ${large} 1 ${x1 * outerR} ${y1 * outerR}`,
+        `L ${x1 * innerR} ${y1 * innerR}`,
+        `A ${innerR} ${innerR} 0 ${large} 0 ${x0 * innerR} ${y0 * innerR}`,
+        "Z",
+      ].join(" ");
+    }
+
+    const root = document.createElement("div");
+    root.id = "quick-chat-root";
+    root.className = "quick-chat-root--open";
+
+    const wheel = document.createElement("div");
+    wheel.id = "quick-chat-wheel";
+    wheel.className = "has-hover";
+
+    const ring = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    ring.classList.add("quick-chat-wheel__ring");
+    ring.setAttribute("viewBox", "-120 -120 240 240");
+    const glow = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    glow.setAttribute("class", "quick-chat-wheel__glow");
+    glow.setAttribute("r", "110");
+    ring.appendChild(glow);
+    const track = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    track.setAttribute("class", "quick-chat-wheel__track");
+    track.setAttribute("r", "84");
+    ring.appendChild(track);
+
+    for (let i = 0; i < N; i++) {
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("class", "quick-chat-wheel__wedge" + (i === 1 ? " is-hot" : ""));
+      path.setAttribute("d", wedgePath(i, 40, 102));
+      ring.appendChild(path);
+    }
+    wheel.appendChild(ring);
+
+    for (let i = 0; i < N; i++) {
+      const [id, shortTxt, fullTxt] = CHAT[i];
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "quick-chat-wheel__item" + (i === 1 ? " hover" : "");
+      const short = document.createElement("span");
+      short.className = "quick-chat-wheel__short";
+      short.textContent = shortTxt;
+      const full = document.createElement("span");
+      full.className = "quick-chat-wheel__full";
+      full.textContent = fullTxt;
+      btn.append(short, full);
+      const angle = (i / N) * Math.PI * 2 - Math.PI / 2;
+      btn.style.setProperty("--qx", `${Math.cos(angle) * LABEL_R}px`);
+      btn.style.setProperty("--qy", `${Math.sin(angle) * LABEL_R}px`);
+      wheel.appendChild(btn);
+    }
+
+    const hub = document.createElement("div");
+    hub.className = "quick-chat-wheel__hub";
+    hub.innerHTML = `
+      <span class="quick-chat-wheel__hub-key">T</span>
+      <span class="quick-chat-wheel__hub-preview">Nice shot!</span>
+      <span class="quick-chat-wheel__hub-hint">RELEASE</span>
+    `;
+    wheel.appendChild(hub);
+    root.appendChild(wheel);
+    document.body.appendChild(root);
+    document.documentElement.dataset.ready = "1";
+  </script>
+</body>
+</html>

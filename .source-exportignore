@@ -1,0 +1,77 @@
+# Build / zależności (odbudowalne: npm install, npm run build)
+node_modules/
+dist/
+release/
+releases/
+.build/
+public/donation.json
+.venv-music/
+
+# AI / IDE / notatki wewnętrzne
+.cursor/
+.cursorrules
+**/.cursor/
+AGENTS.md
+CLAUDE.md
+.aider*
+IMPLEMENTATION.md
+**/*transcript*
+**/*Transcript*
+**/*.jsonl
+**/WORKFLOW.md
+
+# Dev-only — ścieżki lokalne, tokeny HF, workflow muzyki
+docker/
+scripts/music/
+scripts/generate_*
+scripts/blender_*
+scripts/runDiagnostic*
+scripts/run-wall-ride-test*
+scripts/capture_*
+scripts/browser*
+scripts/diag_*
+scripts/testCar*
+godot/
+
+# Kod diagnostyczny (nie potrzebny do gry)
+src/debug/
+src/diagnostic/
+src/util/debugWallRideSimulation.ts
+
+# Metadane generacji / zrzuty ekranu
+**/*.provenance.json
+public/assets/audio/music/.work/
+public/assets/audio/LICENSE.md
+public/assets/audio/MUSIC.md
+screenshots/
+
+# Dev / cache / launchery osobiste
+.flyball-dev.log
+.flyball-dev.pid
+run-chrome.sh
+*.local
+.husky/
+
+# IDE
+.vscode/
+.idea/
+
+# Klucze / credentials
+*.pem
+*.key
+id_rsa*
+*.p12
+credentials*.json
+
+# Sekrety (nigdy .env — nawet puste mogą mieć ścieżki /home/...)
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Lokalna historia gita
+.git/
+
+# Runtime / logi dev
+data/*.log
+data/mp-server.log

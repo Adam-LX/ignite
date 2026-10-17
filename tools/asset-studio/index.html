@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blender dla debili — Ignite</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bebas+Neue&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <img
+            class="logo"
+            src="/assets/ignite_logo.png"
+            width="56"
+            height="56"
+            alt="Ignite"
+          />
+          <h1>Blender dla debili</h1>
+        </div>
+        <div class="top-actions">
+          <button type="button" id="btn-home" class="btn" title="Kamera jak na start">
+            Wycentruj widok
+          </button>
+          <button type="button" id="btn-save" class="btn big primary" disabled>
+            ZAPISZ
+          </button>
+        </div>
+      </header>
+
+      <div class="workspace">
+        <!-- Outliner -->
+        <aside class="panel outliner">
+          <div class="panel-h">1. ARENA</div>
+          <ul id="arena-list" class="tree"></ul>
+          <div class="panel-h">2. CO ZMIENIASZ</div>
+          <ul id="slot-list" class="tree slots-tree"></ul>
+          <p class="folder" id="folder-path"></p>
+        </aside>
+
+        <!-- Viewport -->
+        <section class="viewport-wrap">
+          <div class="viewport-chrome">
+            <span id="viewport-label">Widok 3D</span>
+            <span class="nav-hint">LPM obrót · PPM / środek przesuw · kółko zoom</span>
+          </div>
+          <canvas id="view" tabindex="0"></canvas>
+          <div id="viewport-empty" class="viewport-empty">
+            Wybierz arenę po lewej,<br />potem slot (np. Murawa).
+          </div>
+        </section>
+
+        <!-- Properties -->
+        <aside class="panel props">
+          <div class="panel-h">3. WRZUĆ PLIK</div>
+          <h2 id="prop-title">—</h2>
+          <p id="prop-desc" class="prop-desc">Wybierz pozycję z listy „Co zmieniasz”.</p>
+          <p id="prop-path" class="prop-path"></p>
+
+          <div id="drop" class="drop" tabindex="0">
+            <div class="drop-big">UPUŚĆ TU</div>
+            <div class="drop-sub">PNG · JPG · WEBP · albo GLB</div>
+            <button type="button" id="btn-pick" class="btn big">
+              Albo kliknij i wybierz plik
+            </button>
+            <input id="file" type="file" hidden />
+          </div>
+
+          <div class="howto">
+            <div class="panel-h">JAK TO DZIAŁA</div>
+            <ol>
+              <li>Wybierz <b>arenę</b></li>
+              <li>Wybierz <b>co</b> (murawa, ściana…)</li>
+              <li><b>Upuść</b> plik na wielki prostokąt</li>
+              <li>Gotowe — widać w środku</li>
+              <li>W grze: hard-reload (5173)</li>
+            </ol>
+          </div>
+        </aside>
+      </div>
+
+      <footer class="statusbar">
+        <span id="status">Startuję edytor…</span>
+        <span id="status-right">Ignite · lokalnie</span>
+      </footer>
+    </div>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>

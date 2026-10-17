@@ -1,0 +1,69 @@
+# Zmiana na main → build (Win zip + Linux deb + źródła) → publikacja w tym samym repo.
+#
+# Jednorazowa konfiguracja: ./scripts/setup-codeberg-ci.sh
+# (włącza Actions + secret CODEBERG_DEPLOY_KEY)
+#
+# Runner codeberg-tiny ma limity czasu/dysku — przy OOM użyj własnego runnera.
+
+name: Release desktop builds
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "releases/**"
+      - "DOWNLOADS.md"
+      - ".gitattributes"
+      - "audio/**"
+  workflow_dispatch:
+
+jobs:
+  build-and-publish:
+    runs-on: codeberg-tiny
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: SSH do Codeberg (deploy key)
+        env:
+          CODEBERG_DEPLOY_KEY: ${{ secrets.CODEBERG_DEPLOY_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CODEBERG_DEPLOY_KEY:-}" ]; then
+            echo "Brak secret CODEBERG_DEPLOY_KEY — publikacja pominięta." >&2
+            echo "Uruchom: CODEBERG_TOKEN=... ./scripts/setup-codeberg-ci.sh" >&2
+            exit 1
+          fi
+          mkdir -p ~/.ssh
+          printf '%s\n' "${CODEBERG_DEPLOY_KEY}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -t ed25519 codeberg.org >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Zależności systemowe (Electron / deb)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq git git-lfs zstd wine64 wine32 p7zip-full \
+            rpm fakeroot dpkg libarchive-tools
+
+      - name: Git LFS
+        run: git lfs install
+
+      - name: Build + publikacja Codeberg
+        env:
+          CODEBERG_USER: Adam-LX
+          CODEBERG_REPO: ignite
+          CODEBERG_DEPLOY_KEY: ${{ secrets.CODEBERG_DEPLOY_KEY }}
+          CODEBERG_IN_REPO: "1"
+          SKIP_TEA: "1"
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+          USE_SYSTEM_7ZA: "true"
+        run: bash ./scripts/publish-codeberg.sh all

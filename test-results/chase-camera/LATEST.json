@@ -1,0 +1,8 @@
+{
+  "generatedAt": "2026-09-02T20:26:34.343Z",
+  "pass": false,
+  "fails": [
+    "setup-error"
+  ],
+  "error": "page.screenshot: Timeout 180000ms exceeded.\nCall log:\n  - taking page screenshot\n  - waiting for fonts to load...\n  - fonts loaded\n\n    at /home/adam/Dokumenty/Projekty/Ignite/scripts/audit-chase-camera.mjs:433:13"
+}

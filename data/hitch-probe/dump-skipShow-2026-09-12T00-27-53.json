@@ -1,0 +1,30 @@
+{
+  "capturedAt": "2026-09-12T00:27:53.001Z",
+  "url": "http://127.0.0.1:5173/?autostart=1v1&skipIntro=1&hitchProbe=1&graphics=low&t=1789172861007&skipShow=1",
+  "swiftshader": false,
+  "hitchLogs": [
+    "[hitchProbe] phase unknown → post_show_snap (spent 8971ms)",
+    "[hitchProbe] phase post_show_snap → countdown_prime (spent 422ms)",
+    "[hitchProbe] countdown_primed events=0 freezes=0 severe=0 {} []"
+  ],
+  "dump": {
+    "enabled": true,
+    "phase": "countdown",
+    "events": [],
+    "byPhase": {},
+    "frameStats": {
+      "samples": 0,
+      "avgFps": null,
+      "avgFrameMs": null,
+      "maxFrameMs": null,
+      "p95FrameMs": null,
+      "hitchCount": 0,
+      "severeHitchCount": 0,
+      "freezeCount": 0,
+      "longestFrameMs": 0,
+      "matchElapsedSec": 1.4
+    },
+    "suspects": []
+  },
+  "kickoff": "3"
+}
